@@ -1352,7 +1352,7 @@ body {
         </div>
         <div class="nav-link" data-section="busqueda">
           <i class="fas fa-search"></i>
-          <span>Búsqueda Multiservicio</span>
+          <span>Búsqueda Inteligente</span>
         </div>
         <div class="nav-link" data-section="estadisticas">
           <i class="fas fa-chart-bar"></i>
@@ -1387,7 +1387,7 @@ body {
 			<i class="fas fa-bars"></i>
 		  </button>
 		  <div class="topbar-title" style="display: flex; justify-content: center; align-items: center; text-align: center; flex: 1; padding: 0 40px; max-width: 100%;">
-			  <span>SISTEMA DE GESTIÓN DE SERVICIOS PÚBLICO</span>
+			  <span>SISTEMA DE GESTIÓN DE SERVICIOS PÚBLICO GUBIR MEBUC</span>
 			</div>
 		  <button class="theme-toggle" id="themeToggle" aria-label="Cambiar tema">
 			<i class="fas fa-moon"></i>
@@ -1397,7 +1397,7 @@ body {
 		<!-- INICIO -->
 		<section id="inicio" class="page-section active">
 		  <h1 style="text-align:center;color:white;font-size:2.3rem;margin-bottom:30px;text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
-			<i class="fas fa-home"></i> Centro de Carga de Archivos
+			<i class="fas fa-home"></i> Centro de Carga
 		  </h1>
 		  
 		  <!-- Botones de Carga Profesionales -->
@@ -1499,7 +1499,7 @@ body {
         <!-- NOVEDADES -->
         <section id="novedades" class="page-section">
           <h1 style="text-align:center;color:white;font-size:2.3rem;margin-bottom:30px;">
-            <i class="fas fa-exclamation-triangle"></i> Novedades e Indicadores
+            <i class="fas fa-exclamation-triangle"></i> Novedades
           </h1>
           <div class="service-buttons" id="novedadesButtons">
             <button class="service-btn" data-service="energia">ENERGÍA</button>
@@ -1511,7 +1511,7 @@ body {
         <!-- BÚSQUEDA -->
         <section id="busqueda" class="page-section">
           <h1 style="text-align:center;color:white;font-size:2.3rem;margin-bottom:30px;">
-            <i class="fas fa-search"></i> Búsqueda Multiservicio
+            <i class="fas fa-search"></i> Búsqueda Inteligente
           </h1>
           <div class="service-buttons" id="searchButtons">
             <button class="service-btn" data-search="energia">ENERGÍA</button>
@@ -1523,7 +1523,7 @@ body {
         <!-- ESTADÍSTICAS -->
         <section id="estadisticas" class="page-section">
           <h1 style="text-align:center;color:white;font-size:2.3rem;margin-bottom:30px;">
-            <i class="fas fa-chart-bar"></i> Estadísticas Detalladas
+            <i class="fas fa-chart-bar"></i> Estadísticas
           </h1>
           <div class="service-buttons" id="estadisticasButtons">
             <button class="service-btn" data-stats="energia">ENERGÍA</button>
@@ -1559,7 +1559,7 @@ body {
 		<!-- SALDOS PRESUPUESTALES - DASHBOARD COMPACTO -->
 		<section id="saldos" class="page-section">
 		  <h1 style="text-align:center;color:white;font-size:2.0rem;margin-bottom:20px;width:100%;">
-			<i class="fas fa-balance-scale"></i> Saldos Presupuestales - Dashboard Ejecutivo
+			<i class="fas fa-balance-scale"></i> Saldos Presupuestales
 		  </h1>
 
 		  <!-- Resumen Ejecutivo con Animaciones -->
@@ -1590,6 +1590,16 @@ body {
 				<div class="amount" id="saldoDisponible" style="font-size:1.5rem;color:#fbbf24;font-weight:bold;">$0</div>
 				<div style="font-size:0.7rem;margin-top:5px;opacity:0.7;">Restante vigencia</div>
 			  </div>
+			  <div class="kpi-card" style="text-align:center;padding:15px;background:rgba(255,255,255,0.1);border-radius:8px;transition:all 0.3s ease;cursor:pointer;border:2px solid transparent;">
+				  <div style="font-weight:700;margin-bottom:8px;font-size:0.85rem;opacity:0.9;">Proy. Mes Próximo</div>
+				  <div class="amount" id="proyeccionMensual" style="font-size:1.5rem;color:#fbbf24;font-weight:bold;">$0</div>
+				  <div style="font-size:0.7rem;margin-top:5px;opacity:0.7;">Estimación dinámica</div>
+				</div>
+				<div class="kpi-card" style="text-align:center;padding:15px;background:rgba(255,255,255,0.1);border-radius:8px;transition:all 0.3s ease;cursor:pointer;border:2px solid transparent;">
+				  <div style="font-weight:700;margin-bottom:8px;font-size:0.85rem;opacity:0.9;">Presupuesto 2026</div>
+				  <div class="amount" id="proyeccionAnual" style="font-size:1.5rem;color:#fbbf24;font-weight:bold;">$0</div>
+				  <div style="font-size:0.7rem;margin-top:5px;opacity:0.7;">IPC +15%</div>
+				</div>
 			</div>
 		  </div>
 
@@ -1610,6 +1620,7 @@ body {
 				  <option value="desan">DESAN</option>
 				  <option value="demam">DEMAM</option>
 				  <option value="setra">SETRA</option>
+				  <option value="asturias">ASTURIAS</option>
 				</select>
 			  </div>
 			  <div style="flex:1;min-width:150px;">
@@ -1647,13 +1658,14 @@ body {
 			  <div style="display:flex;gap:15px;flex-wrap:wrap;flex:1;">
 				<div style="flex:1;min-width:150px;">
 				  <label style="display:block;margin-bottom:6px;font-weight:600;font-size:0.9rem;color:#374151;"><i class="fas fa-building"></i> Filtrar por Unidad</label>
-				  <select id="filtroUnidadSaldos" class="filter-select" style="padding:8px 12px;font-size:0.9rem;width:100%;border:2px solid #e5e7eb;border-radius:6px;">
-					<option value="todas">Todas las unidades</option>
-					<option value="mebuc">MEBUC</option>
-					<option value="desan">DESAN</option>
-					<option value="demam">DEMAM</option>
-					<option value="setra">SETRA</option>
-				  </select>
+					<select id="filtroUnidadSaldos" class="filter-select" ...>
+					  <option value="todas">Todas las unidades</option>
+					  <option value="mebuc">MEBUC</option>
+					  <option value="desan">DESAN</option>
+					  <option value="demam">DEMAM</option>
+					  <option value="setra">SETRA</option>
+					  <option value="asturias">ASTURIAS</option>
+					</select>
 				</div>
 				<div style="flex:1;min-width:150px;">
 				  <label style="display:block;margin-bottom:6px;font-weight:600;font-size:0.9rem;color:#374151;"><i class="fas fa-list"></i> Filtrar por Servicio</label>
@@ -1774,7 +1786,7 @@ body {
         <!-- BOLETÍN -->
 		<section id="boletin" class="page-section">
 		  <h1 style="text-align:center;color:white;font-size:2.3rem;margin-bottom:30px;">
-			<i class="fas fa-newspaper"></i> Boletín Informativo con IA
+			<i class="fas fa-newspaper"></i> Boletín Informativo
 		  </h1>
 		  
 		  <div class="section-card">
@@ -1895,10 +1907,17 @@ body {
   testQuery();
 </script>
   <script>
-  // Variables globales
+	// Variables globales
 	let registroEditando = null;
 	let autoGuardadoInterval = null;
 	let chartInstances = {};
+
+	// === VARIABLES CONFIGURABLES DE PROYECCIÓN ===
+	const CONFIG_PROYECCION = {
+	  IPC_ANUAL: 0.08,      // IPC base (8%)
+	  MARGEN_ADICIONAL: 0.15, // Margen de gestión (+15%)
+	  FACTOR_ANUAL_TOTAL: 0.23 // IPC_ANUAL + MARGEN_ADICIONAL (23%)
+	};
   // Función para actualizar nombres de columnas según el año
 	function actualizarNombresColumnas() {
 	  const añoActual = new Date().getFullYear();
@@ -2092,6 +2111,88 @@ body {
 	  return resultado;
 	}
 	
+	// Función para calcular proyección presupuestal del próximo mes (dinámica por tendencia)
+	function calcularProyeccionMensual() {
+	  const datos = calcularValoresPorMesYUnidad();
+	  const hoy = new Date();
+	  const mesActualIdx = hoy.getMonth(); // 0 = Enero
+	  const añoActual = hoy.getFullYear();
+
+	  let totalProyectado = 0;
+
+	  // Unidades y servicios relevantes
+	  const unidades = ['mebuc', 'desan', 'demam', 'setra', 'asturias'];
+	  const servicios = ['Energía', 'Alumbrado Público', 'Acueducto', 'Alcantarillado', 'Gas'];
+
+	  unidades.forEach(unidad => {
+		if (!appData.saldos[unidad]) return;
+		servicios.forEach(servicio => {
+		  const config = appData.saldos[unidad][servicio];
+		  if (!config) return;
+
+		  // Obtener los últimos 12 meses de datos reales
+		  const mesesReales = [];
+		  let totalMeses = 0;
+		  for (let i = 0; i <= mesActualIdx; i++) {
+			const mesKey = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'][i];
+			const valor = datos[unidad]?.[servicio]?.[mesKey] || 0;
+			mesesReales.push(valor);
+			if (valor > 0) totalMeses++;
+		  }
+
+		  if (totalMeses === 0) return;
+
+		  let proyeccionMesSiguiente = 0;
+
+		  if (totalMeses >= 3) {
+			// Regresión lineal simple en los últimos 3 meses con datos
+			const ultimosValores = mesesReales.slice(-3).filter(v => v > 0);
+			if (ultimosValores.length >= 2) {
+			  const n = ultimosValores.length;
+			  const sumX = n * (n - 1) / 2;
+			  const sumY = ultimosValores.reduce((a, b) => a + b, 0);
+			  const sumXY = ultimosValores.map((v, i) => v * i).reduce((a, b) => a + b, 0);
+			  const sumX2 = (n - 1) * n * (2 * n - 1) / 6;
+
+			  const pendiente = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+			  const intercepto = (sumY - pendiente * sumX) / n;
+			  proyeccionMesSiguiente = Math.max(0, intercepto + pendiente * n);
+			} else {
+			  proyeccionMesSiguiente = ultimosValores[ultimosValores.length - 1];
+			}
+		  } else {
+			// Promedio simple si <3 meses
+			proyeccionMesSiguiente = mesesReales.reduce((a, b) => a + b, 0) / totalMeses;
+		  }
+
+		  totalProyectado += proyeccionMesSiguiente;
+		});
+	  });
+
+	  return Math.round(totalProyectado);
+	}
+	
+	// Función para calcular proyección presupuestal anual con IPC + margen
+	function calcularProyeccionAnual() {
+	  const factor = 1 + CONFIG_PROYECCION.FACTOR_ANUAL_TOTAL; // 1.23
+	  let totalEjecutado = 0;
+
+	  const unidades = ['mebuc', 'desan', 'demam', 'setra', 'asturias'];
+	  const servicios = ['Energía', 'Alumbrado Público', 'Acueducto', 'Alcantarillado', 'Gas'];
+
+	  unidades.forEach(unidad => {
+		if (!appData.saldos[unidad]) return;
+		servicios.forEach(servicio => {
+		  const config = appData.saldos[unidad]?.[servicio];
+		  if (!config) return;
+		  totalEjecutado += (config.asignacion || 0);
+		});
+	  });
+
+	  // Proyección = asignación total × (1 + IPC + margen)
+	  return Math.round(totalEjecutado * factor);
+	}
+	
 	// Función para filtrar filas según búsqueda
 	function renderTablaSaldos() {
 	  const tbody = document.getElementById('tbodySaldos');
@@ -2103,6 +2204,8 @@ body {
 	  const saldoDisponibleEl = document.getElementById('saldoDisponible');
 	  const estadoEjecucionEl = document.getElementById('estadoEjecucion');
 	  const contadorFilasEl = document.getElementById('contadorFilas');
+	  const proyeccionMensualEl = document.getElementById('proyeccionMensual');
+      const proyeccionAnualEl = document.getElementById('proyeccionAnual');
 	  tbody.innerHTML = '';
 	  tfoot.innerHTML = '';
 
@@ -2306,6 +2409,14 @@ body {
 
 	  // Generar gráficos
 	  generarGraficosSaldos(filas, datosCalculados);
+	  
+	  // Actualizar proyecciones
+		if (proyeccionMensualEl) {
+		  proyeccionMensualEl.textContent = `$${calcularProyeccionMensual().toLocaleString('es-CO')}`;
+		}
+		if (proyeccionAnualEl) {
+		  proyeccionAnualEl.textContent = `$${calcularProyeccionAnual().toLocaleString('es-CO')}`;
+		}
 	}
 
 	// Función para generar gráficos mejorados
@@ -4370,7 +4481,7 @@ async function cargarSaldosDesdeSupabase() {
       });
     }
 
-    async function processFile(filename, workbook) {
+	async function processFile(filename, workbook) {
 	  const name = filename.toUpperCase();
 	  let service, unit;
 	  if (name.includes('ENERGIA') || name.includes('ENERGÍA')) {
@@ -4388,12 +4499,12 @@ async function cargarSaldosDesdeSupabase() {
 		await processGasFile(workbook);
 		return;
 	  }
-
 	  if (!service || !unit) {
 		console.warn(`⚠️ No se pudo determinar el servicio o unidad para: ${filename}`);
 		return;
 	  }
 
+	  // === INCLUSIÓN DE LA COLUMNA "FACTURA" EN COLUMN_MAPPING ===
 	  const COLUMN_MAPPING = service === 'energia' ? {
 		cuenta: ['cuenta', 'numero cuenta', 'no cuenta', 'cta', 'n° cuenta', 'no. cuenta'],
 		estacion: ['estacion', 'estación', 'predio', 'nombre', 'dependencia'],
@@ -4402,7 +4513,8 @@ async function cargarSaldosDesdeSupabase() {
 		aPublico: ['a. publico', 'a.publico', 'alumbrado publico', 'alumbrado público', 'a publico', 'publico'],
 		aseo: ['aseo', 'servicio aseo'],
 		tramitar: ['total a tramitar', 'tramitar', 'a tramitar', 'total tramitar'],
-		intereses: ['intereses', 'int', 'saldos', 'mora', 'intereses y/o saldos']
+		intereses: ['intereses', 'int', 'saldos', 'mora', 'intereses y/o saldos'],
+		factura: ['factura', 'n° factura', 'numero factura', 'no factura']
 	  } : {
 		cuenta: ['cuenta', 'numero cuenta', 'no cuenta', 'cta', 'n° cuenta', 'no. cuenta'],
 		estacion: ['estacion', 'estación', 'predio', 'nombre', 'dependencia'],
@@ -4411,7 +4523,8 @@ async function cargarSaldosDesdeSupabase() {
 		alcantarillado: ['alcantarillado', 'alcant'],
 		aseo: ['aseo', 'servicio aseo'],
 		tramitar: ['total a tramitar', 'tramitar', 'a tramitar', 'total tramitar'],
-		intereses: ['intereses', 'int', 'saldos', 'mora', 'intereses y/o saldos']
+		intereses: ['intereses', 'int', 'saldos', 'mora', 'intereses y/o saldos'],
+		factura: ['factura', 'n° factura', 'numero factura', 'no factura']
 	  };
 
 	  const sheetPromises = workbook.SheetNames.map(async (sheetName) => {
@@ -4420,14 +4533,12 @@ async function cargarSaldosDesdeSupabase() {
 			sheetUpper.includes('GRÁFICO') || sheetUpper.includes('GRAFICO')) {
 		  return null;
 		}
-
 		try {
 		  const worksheet = workbook.Sheets[sheetName];
 		  const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
 		  const maxRows = Math.min(range.e.r + 1, 1000);
 		  const headers = [];
 		  let headerRow = -1;
-
 		  for (let r = 0; r < Math.min(10, maxRows); r++) {
 			const row = [];
 			for (let c = range.s.c; c <= range.e.c; c++) {
@@ -4436,7 +4547,7 @@ async function cargarSaldosDesdeSupabase() {
 			}
 			const hasKey = row.some(cell => {
 			  const lower = cell.toLowerCase();
-			  return lower.includes('cuenta') || lower.includes('estacion') || lower.includes('estación');
+			  return lower.includes('cuenta') || lower.includes('estacion') || lower.includes('estación') || lower.includes('factura');
 			});
 			if (hasKey) {
 			  headers.push(...row);
@@ -4444,7 +4555,6 @@ async function cargarSaldosDesdeSupabase() {
 			  break;
 			}
 		  }
-
 		  if (headerRow === -1) return null;
 
 		  const colMap = {};
@@ -4458,11 +4568,10 @@ async function cargarSaldosDesdeSupabase() {
 			  }
 			}
 		  }
-
 		  if (colMap.cuenta === -1 && colMap.estacion === -1) return null;
 
 		  const normalizedData = [];
-		  const setaData = []; // Para capturar filas de SETRA
+		  const setaData = [];
 		  let consecutiveEmptyCuenta = 0;
 		  const MAX_EMPTY_CUENTA = 3;
 
@@ -4473,7 +4582,6 @@ async function cargarSaldosDesdeSupabase() {
 			  const val = cell ? String(cell.v || '').trim() : '';
 			  row.push(val);
 			}
-
 			const estacion = colMap.estacion >= 0 ? row[colMap.estacion] : '';
 			const cuenta = colMap.cuenta >= 0 ? row[colMap.cuenta] : '';
 
@@ -4492,24 +4600,27 @@ async function cargarSaldosDesdeSupabase() {
 
 			  let record;
 			  if (service === 'energia') {
-				  const kwh = cleanAndParseFloat(row[colMap.kwh]);
-				  const consumo = cleanAndParseFloat(row[colMap.consumo]); // Este es el valor de la columna "ENERGIA"
-				  const aPublico = cleanAndParseFloat(row[colMap.aPublico]);
-				  const aseo = cleanAndParseFloat(row[colMap.aseo]);
-				  const tramitar = cleanAndParseFloat(row[colMap.tramitar]);
-				  const intereses = cleanAndParseFloat(row[colMap.intereses]);
-				  record = {
-					ESTACION: estacion,
-					CUENTA: cuenta,
-					CONSUMO: kwh,           // kWh físico
-					CONSUMO_VALOR: consumo, // Valor en pesos (redundante, pero mantenido por compatibilidad)
-					ENERGIA: consumo,       // ✅ ¡ESTE ES EL CAMPO QUE NECESITA EL MÓDULO DE SALDOS!
-					A_PUBLICO: aPublico,
-					ASEO: aseo,
-					TOTAL_TRAMITAR: tramitar,
-					INTERESES: intereses,
-					TOTAL_FACTURA: tramitar + intereses
-				  };
+				const kwh = cleanAndParseFloat(row[colMap.kwh]);
+				const consumo = cleanAndParseFloat(row[colMap.consumo]);
+				const aPublico = cleanAndParseFloat(row[colMap.aPublico]);
+				const aseo = cleanAndParseFloat(row[colMap.aseo]);
+				const tramitar = cleanAndParseFloat(row[colMap.tramitar]);
+				const intereses = cleanAndParseFloat(row[colMap.intereses]);
+				const factura = colMap.factura >= 0 ? String(row[colMap.factura]).trim() : '';
+
+				record = {
+				  ESTACION: estacion,
+				  CUENTA: cuenta,
+				  FACTURA: factura,
+				  CONSUMO: kwh,
+				  CONSUMO_VALOR: consumo,
+				  ENERGIA: consumo,
+				  A_PUBLICO: aPublico,
+				  ASEO: aseo,
+				  TOTAL_TRAMITAR: tramitar,
+				  INTERESES: intereses,
+				  TOTAL_FACTURA: tramitar + intereses
+				};
 			  } else {
 				const m3 = cleanAndParseFloat(row[colMap.m3]);
 				const acueducto = cleanAndParseFloat(row[colMap.acueducto]);
@@ -4517,9 +4628,12 @@ async function cargarSaldosDesdeSupabase() {
 				const aseo = cleanAndParseFloat(row[colMap.aseo]);
 				const tramitar = cleanAndParseFloat(row[colMap.tramitar]);
 				const intereses = cleanAndParseFloat(row[colMap.intereses]);
+				const factura = colMap.factura >= 0 ? String(row[colMap.factura]).trim() : '';
+
 				record = {
 				  ESTACION: estacion,
 				  CUENTA: cuenta,
+				  FACTURA: factura,
 				  CONSUMO: m3,
 				  ACUEDUCTO: acueducto,
 				  ALCANTARILLADO: alcantarillado,
@@ -4553,7 +4667,6 @@ async function cargarSaldosDesdeSupabase() {
 			  { sheetName, data: setaData, unit: 'setra' }
 			];
 		  }
-
 		  return result;
 		} catch (err) {
 		  console.error(`❌ Error en hoja ${sheetName}:`, err);
@@ -4742,6 +4855,59 @@ async function cargarSaldosDesdeSupabase() {
       }
       return tables;
     }
+	
+	// Función para obtener el último mes disponible en los datos cargados
+	function obtenerUltimoMesCargado() {
+	  const mesesOrden = {
+		'ENERO': 1, 'FEBRERO': 2, 'MARZO': 3, 'ABRIL': 4, 'MAYO': 5,
+		'JUNIO': 6, 'JULIO': 7, 'AGOSTO': 8, 'SEPTIEMBRE': 9,
+		'OCTUBRE': 10, 'NOVIEMBRE': 11, 'DICIEMBRE': 12
+	  };
+
+	  const todosMeses = new Set();
+
+	  // Recorrer energía y acueducto (hojas nombradas con mes)
+	  ['energia', 'acueducto'].forEach(servicio => {
+		Object.keys(appData[servicio] || {}).forEach(unidad => {
+		  const mesesUnidad = Object.keys(appData[servicio][unidad] || {});
+		  mesesUnidad.forEach(m => {
+			if (m && typeof m === 'string') {
+			  todosMeses.add(m.trim().toUpperCase());
+			}
+		  });
+		});
+	  });
+
+	  // Recorrer gas (cada tabla tiene un campo "mes")
+	  ['mebuc', 'desan', 'demam', 'asturias'].forEach(unidad => {
+		if (Array.isArray(appData.gas[unidad])) {
+		  appData.gas[unidad].forEach(tabla => {
+			if (tabla && typeof tabla.mes === 'string') {
+			  todosMeses.add(tabla.mes.trim().toUpperCase());
+			}
+		  });
+		}
+	  });
+
+	  // Convertir a array y ordenar
+	  const mesesArray = Array.from(todosMeses);
+	  if (mesesArray.length === 0) return 'Mes Actual';
+
+	  // Determinar el "último mes" considerando orden natural
+	  let ultimoMes = mesesArray[0];
+	  let maxOrden = 0;
+
+	  mesesArray.forEach(mes => {
+		const orden = mesesOrden[mes] || 0;
+		if (orden > maxOrden) {
+		  maxOrden = orden;
+		  ultimoMes = mes;
+		}
+	  });
+
+	  // Formatear: Primera letra mayúscula, resto minúscula
+	  return ultimoMes.charAt(0).toUpperCase() + ultimoMes.slice(1).toLowerCase();
+	}
 
     // ========== RESUMEN ==========
 	function updateSummary() {
@@ -4762,6 +4928,9 @@ async function cargarSaldosDesdeSupabase() {
 		margin-bottom: 30px;
 	  `;
 
+	  // === OBTENER EL ÚLTIMO MES DISPONIBLE ===
+	  const ultimoMes = obtenerUltimoMesCargado();
+
 	  // TÍTULO: ESTADO DE TRAMITACIÓN
 	  const tituloTramitacion = document.createElement('h2');
 	  tituloTramitacion.style.cssText = `
@@ -4772,15 +4941,15 @@ async function cargarSaldosDesdeSupabase() {
 		font-weight: 700;
 		text-shadow: 0 2px 10px rgba(0,0,0,0.3);
 	  `;
-	  tituloTramitacion.innerHTML = '<i class="fas fa-clipboard-check"></i> Estado de Tramitación en Tiempo Real';
+	  tituloTramitacion.innerHTML = `<i class="fas fa-clipboard-check"></i> Estado de Tramitación – ${ultimoMes}`;
 	  mainContainer.appendChild(tituloTramitacion);
 
 	  // GRID DE TRAMITACIÓN
 	  const tramitacionGrid = document.createElement('div');
 	  tramitacionGrid.id = 'tramitacionGrid';
 	  mainContainer.appendChild(tramitacionGrid);
-
 	  container.appendChild(mainContainer);
+
 	  updateTramitacionGrid();
 	}
 	
@@ -4826,7 +4995,7 @@ async function cargarSaldosDesdeSupabase() {
 				right: 12px;
 				width: 24px;
 				height: 24px;
-				border-radius: 50%;
+				border-radius: 80%;
 				background: rgba(57, 255, 20, 0.15);
 				display: flex;
 				align-items: center;
@@ -4837,7 +5006,7 @@ async function cargarSaldosDesdeSupabase() {
 			  " 
 			  title="Ver predios pendientes"
 			  onclick="mostrarPrediosPendientesModal('${service}', '${unit}')">
-				<i class="fas fa-info-circle" style="font-size:0.85rem;color:#fbbf24;"></i>
+				<i class="fas fa-eye" style="font-size:1.2rem; color:#0a0505;"></i>
 			  </div>
 
 			  <div style="position:absolute;top:0;right:0;font-size:4rem;opacity:0.05;padding:10px;color:#1e293b;">
@@ -4860,7 +5029,7 @@ async function cargarSaldosDesdeSupabase() {
 				  </div>
 				  <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
 					<span style="color:#ef4444;font-weight:600;">
-					  <i class="fas fa-exclamation-circle"></i> Pendientes
+					  <i class="fas fa-times-circle"></i> Pendientes
 					</span>
 					<span style="font-weight:700;color:#ef4444;">${stats.pendientes}</span>
 				  </div>
@@ -5270,7 +5439,7 @@ async function cargarSaldosDesdeSupabase() {
 	  // ========== SECCIÓN: INTERESES POR UNIDAD ==========
 	  const interesesSection = document.createElement('div');
 	  interesesSection.className = 'section-card';
-	  interesesSection.innerHTML = '<h3 style="text-align:center;margin-bottom:20px;">💰 Intereses por Unidad (Mes Actual vs Anterior)</h3>';
+	  interesesSection.innerHTML = '<h3 style="text-align:center;margin-bottom:20px;color:white;text-shadow:0 1px 4px rgba(0,0,0,0.3);">💰 Intereses por Unidad (Mes Actual vs Anterior)</h3>';
 	  
 	  const interesesGrid = document.createElement('div');
 	  interesesGrid.style.display = 'grid';
@@ -5286,11 +5455,11 @@ async function cargarSaldosDesdeSupabase() {
 		card.innerHTML = `
 		  <h4 style="text-align:center;margin:0 0 12px;font-weight:700;color:#06402b;">${unit.toUpperCase()}</h4>
 		  <div style="display:flex;flex-direction:column;gap:10px;">
-			<div style="background:#f8f9fa;padding:12px;border-radius:8px;text-align:center;">
+			<div style="background:rgba(248,249,250,0.8);padding:12px;border-radius:8px;text-align:center;">
 			  <p style="margin:0;font-size:0.85rem;color:#64748b;">Mes Anterior</p>
 			  <p style="margin:5px 0 0;font-size:1.3rem;font-weight:700;color:#4a5568;">$${comparison.prev.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
 			</div>
-			<div style="background:#fef3c7;padding:12px;border-radius:8px;text-align:center;">
+			<div style="background:rgba(254,243,199,0.8);padding:12px;border-radius:8px;text-align:center;">
 			  <p style="margin:0;font-size:0.85rem;color:#64748b;">Mes Actual</p>
 			  <p style="margin:5px 0 0;font-size:1.3rem;font-weight:700;color:#ef4444;">$${comparison.curr.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
 			</div>
@@ -5306,16 +5475,15 @@ async function cargarSaldosDesdeSupabase() {
 	  interesesSection.appendChild(interesesGrid);
 	  content.appendChild(interesesSection);
 
-	  // ========== SECCIÓN: TOP 5 POR UNIDAD ==========
+	  // ========== SECCIÓN: TOP 5 ==========
 	  const top5Section = document.createElement('div');
 	  top5Section.className = 'section-card';
 	  top5Section.innerHTML = `
-		<h3 style="text-align:center;margin-bottom:20px;">🔺 Top 5 Predios - Mayor Incremento de Consumo</h3>
-		<p style="text-align:center;color:#64748b;margin-bottom:15px;font-size:0.95rem;">
+		<h3 style="text-align:center;margin-bottom:20px;color:white;text-shadow:0 1px 4px rgba(0,0,0,0.3);">🔺 Top 5 Predios - Mayor Incremento de Consumo</h3>
+		<p style="text-align:center;color:rgba(255,255,255,0.9);margin-bottom:15px;font-size:0.95rem;">
 		  Predios con ≥5% de aumento en consumo (Mes actual vs anterior)
 		</p>
 	  `;
-
 	  const top5Grid = document.createElement('div');
 	  top5Grid.style.display = 'grid';
 	  top5Grid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(300px, 1fr))';
@@ -5325,14 +5493,13 @@ async function cargarSaldosDesdeSupabase() {
 	  unidades.forEach(unit => {
 		const top5 = getTopIncrementByUnit(service, unit, 5);
 		if (top5.length === 0) return;
-
 		const card = document.createElement('div');
 		card.className = 'card';
 		card.style.minHeight = '260px';
 		let listHtml = '<ol style="padding-left:20px;margin:0;">';
 		top5.forEach((p, i) => {
 		  listHtml += `
-			<li style="margin-bottom:10px;font-size:0.95rem;">
+			<li style="margin-bottom:10px;font-size:0.95rem;color:#2d3748;">
 			  <strong>${i + 1}. ${p.predio}</strong><br>
 			  <small style="color:#64748b;">Cta: ${p.cuenta}</small><br>
 			  <span style="color:#06402b;font-weight:600;">${formatConsumo(p.consumoActual, service === 'energia' ? 'kWh' : 'M³')}</span>
@@ -5349,16 +5516,15 @@ async function cargarSaldosDesdeSupabase() {
 	  top5Section.appendChild(top5Grid);
 	  content.appendChild(top5Section);
 
-	  // ========== SECCIÓN: TOP 10 POR UNIDAD ==========
+	  // ========== SECCIÓN: TOP 10 ==========
 	  const top10Section = document.createElement('div');
 	  top10Section.className = 'section-card';
 	  top10Section.innerHTML = `
-		<h3 style="text-align:center;margin-bottom:20px;">🚀 Top 10 Predios - Mayor Consumo Acumulado (Año)</h3>
-		<p style="text-align:center;color:#64748b;margin-bottom:15px;font-size:0.95rem;">
+		<h3 style="text-align:center;margin-bottom:20px;color:white;text-shadow:0 1px 4px rgba(0,0,0,0.3);">🚀 Top 10 Predios - Mayor Consumo Acumulado (Año)</h3>
+		<p style="text-align:center;color:rgba(255,255,255,0.9);margin-bottom:15px;font-size:0.95rem;">
 		  Suma total del consumo desde enero hasta el último mes cargado
 		</p>
 	  `;
-
 	  const top10Grid = document.createElement('div');
 	  top10Grid.style.display = 'grid';
 	  top10Grid.style.gridTemplateColumns = 'repeat(auto-fit, minmax(300px, 1fr))';
@@ -5367,7 +5533,6 @@ async function cargarSaldosDesdeSupabase() {
 	  unidades.forEach(unit => {
 		const top10 = getTopAllMonthsByUnit(service, unit, 10);
 		if (top10.length === 0) return;
-
 		const card = document.createElement('div');
 		card.className = 'card';
 		card.style.minHeight = '280px';
@@ -5375,7 +5540,7 @@ async function cargarSaldosDesdeSupabase() {
 		top10.forEach((p, i) => {
 		  const unidad = service === 'energia' ? 'kWh' : 'M³';
 		  listHtml += `
-			<li style="margin-bottom:8px;font-size:0.95rem;">
+			<li style="margin-bottom:8px;font-size:0.95rem;color:#2d3748;">
 			  <strong>${i + 1}. ${p.predio}</strong><br>
 			  <small style="color:#64748b;">Cta: ${p.cuenta || 'N/A'}</small><br>
 			  <span style="color:#06402b;font-weight:600;">${formatConsumo(p.total, unidad)}</span>
@@ -6059,291 +6224,324 @@ async function cargarSaldosDesdeSupabase() {
     });
 
 	function showDetails(cuenta, service) {
-		  const allData = [];
-		  let predioNombre = '';
-		  let unidadNombre = '';
-		  if (service === 'gas') {
-			['mebuc', 'desan', 'demam'].forEach(unit => {
-			  if (Array.isArray(appData.gas[unit])) {
-				appData.gas[unit].forEach(table => {
-				  if (Array.isArray(table.data)) {
-					const record = table.data.find(r => String(r.CUENTA).trim() === String(cuenta).trim());
-					if (record) {
-					  allData.push({ ...record, mes: table.mes, unit });
-					  if (!predioNombre) predioNombre = record.ESTACION;
-					  if (!unidadNombre) unidadNombre = unit;
-					}
-				  }
-				});
+	  const allData = [];
+	  let predioNombre = '';
+	  let unidadNombre = '';
+
+	  if (service === 'gas') {
+		['mebuc', 'desan', 'demam', 'asturias'].forEach(unit => {
+		  if (Array.isArray(appData.gas[unit])) {
+			appData.gas[unit].forEach(table => {
+			  if (Array.isArray(table.data)) {
+				const record = table.data.find(r => String(r.CUENTA).trim() === String(cuenta).trim());
+				if (record) {
+				  allData.push({ ...record, mes: table.mes, unit });
+				  if (!predioNombre) predioNombre = record.ESTACION;
+				  if (!unidadNombre) unidadNombre = unit;
+				}
 			  }
 			});
-		  } else {
-			Object.keys(appData[service]).forEach(unit => {
-			  Object.keys(appData[service][unit]).forEach(month => {
-				if (Array.isArray(appData[service][unit][month])) {
-				  const record = appData[service][unit][month].find(r => String(r.CUENTA).trim() === String(cuenta).trim());
-				  if (record) {
-					allData.push({ ...record, mes: month, unit });
-					if (!predioNombre) predioNombre = record.ESTACION;
-					if (!unidadNombre) unidadNombre = unit;
-				  }
-				}
-			  });
-			});
 		  }
-		  if (allData.length === 0) {
-			showNotification('No se encontraron datos históricos', 'error');
-			return;
-		  }
-		  let tableRows = '';
-		  let totals = {};
-		  let tableHeader = '';
-		  let tableFooter = '';
-		  let promediosHTML = '';
-		  const count = allData.length;
-		  if (service === 'energia') {
-			totals = { kwh: 0, consumo: 0, aPublico: 0, aseo: 0, tramitar: 0, intereses: 0 };
-			allData.forEach(row => {
-			  const kwh = row.CONSUMO || 0;
-			  const consumo = row.CONSUMO_VALOR || 0;
-			  const aPublico = row.A_PUBLICO || 0;
-			  const aseo = row.ASEO || 0;
-			  const tramitar = row.TOTAL_TRAMITAR || 0;
-			  const intereses = row.INTERESES || 0;
-			  totals.kwh += kwh;
-			  totals.consumo += consumo;
-			  totals.aPublico += aPublico;
-			  totals.aseo += aseo;
-			  totals.tramitar += tramitar;
-			  totals.intereses += intereses;
-			  tableRows += `
-				<tr>
-				  <td>${row.mes}</td>
-				  <td>${row.unit.toUpperCase()}</td>
-				  <td style="text-align:right;">${kwh.toFixed(2)} kWh</td>
-				  <td style="text-align:right;">$${consumo.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-				  <td style="text-align:right;">$${aPublico.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-				  <td style="text-align:right;">$${aseo.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-				  <td style="text-align:right;">$${tramitar.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-				  <td style="text-align:right;">$${intereses.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-				</tr>
-			  `;
-			});
-			tableHeader = `
-			  <tr>
-				<th>Mes</th>
-				<th>Unidad</th>
-				<th>KW/H</th>
-				<th>Consumo</th>
-				<th>A. Público</th>
-				<th>Aseo</th>
-				<th>Total Tramitado</th>
-				<th>Intereses</th>
-			  </tr>
-			`;
-			tableFooter = `
-			  <tr style="background:var(--primary-solid);color:white;font-weight:700;">
-				<td colspan="2">TOTALES</td>
-				<td style="text-align:right;">${totals.kwh.toFixed(2)} kWh</td>
-				<td style="text-align:right;">$${totals.consumo.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-				<td style="text-align:right;">$${totals.aPublico.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-				<td style="text-align:right;">$${totals.aseo.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-				<td style="text-align:right;">$${totals.tramitar.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-				<td style="text-align:right;">$${totals.intereses.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-			  </tr>
-			`;
-			promediosHTML = `
-			  <div style="background:white;padding:15px;border-radius:8px;">
-				<p style="color:#64748b;margin-bottom:5px;">Promedio kW/h</p>
-				<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">${(totals.kwh / count).toFixed(2)} kWh</p>
-			  </div>
-			  <div style="background:white;padding:15px;border-radius:8px;">
-				<p style="color:#64748b;margin-bottom:5px;">Promedio Consumo</p>
-				<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">$${(totals.consumo / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-			  </div>
-			  <div style="background:white;padding:15px;border-radius:8px;">
-				<p style="color:#64748b;margin-bottom:5px;">Promedio A. Público</p>
-				<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">$${(totals.aPublico / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-			  </div>
-			  <div style="background:white;padding:15px;border-radius:8px;">
-				<p style="color:#64748b;margin-bottom:5px;">Promedio Aseo</p>
-				<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">$${(totals.aseo / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-			  </div>
-			  <div style="background:white;padding:15px;border-radius:8px;">
-				<p style="color:#64748b;margin-bottom:5px;">Promedio Tramitado</p>
-				<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">$${(totals.tramitar / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-			  </div>
-			  <div style="background:white;padding:15px;border-radius:8px;">
-				<p style="color:#64748b;margin-bottom:5px;">Promedio Intereses</p>
-				<p style="font-size:1.3rem;font-weight:700;color:#ef4444;">$${(totals.intereses / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-			  </div>
-			`;
-		  } else if (service === 'acueducto') {
-			totals = { m3: 0, acueducto: 0, alcantarillado: 0, aseo: 0, tramitar: 0, intereses: 0 };
-			allData.forEach(row => {
-			  const m3 = row.CONSUMO || 0;
-			  const acueducto = row.ACUEDUCTO || 0;
-			  const alcantarillado = row.ALCANTARILLADO || 0;
-			  const aseo = row.ASEO || 0;
-			  const tramitar = row.TOTAL_TRAMITAR || 0;
-			  const intereses = row.INTERESES || 0;
-			  totals.m3 += m3;
-			  totals.acueducto += acueducto;
-			  totals.alcantarillado += alcantarillado;
-			  totals.aseo += aseo;
-			  totals.tramitar += tramitar;
-			  totals.intereses += intereses;
-			  tableRows += `
-				<tr>
-				  <td>${row.mes}</td>
-				  <td>${row.unit.toUpperCase()}</td>
-				  <td style="text-align:right;">${m3.toFixed(2)} M³</td>
-				  <td style="text-align:right;">$${acueducto.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-				  <td style="text-align:right;">$${alcantarillado.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-				  <td style="text-align:right;">$${aseo.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-				  <td style="text-align:right;">$${tramitar.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-				  <td style="text-align:right;">$${intereses.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-				</tr>
-			  `;
-			});
-			tableHeader = `
-			  <tr>
-				<th>Mes</th>
-				<th>Unidad</th>
-				<th>M³</th>
-				<th>Acueducto</th>
-				<th>Alcantarillado</th>
-				<th>Aseo</th>
-				<th>Total Tramitado</th>
-				<th>Intereses</th>
-			  </tr>
-			`;
-			tableFooter = `
-			  <tr style="background:var(--primary-solid);color:white;font-weight:700;">
-				<td colspan="2">TOTALES</td>
-				<td style="text-align:right;">${totals.m3.toFixed(2)} M³</td>
-				<td style="text-align:right;">$${totals.acueducto.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-				<td style="text-align:right;">$${totals.alcantarillado.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-				<td style="text-align:right;">$${totals.aseo.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-				<td style="text-align:right;">$${totals.tramitar.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-				<td style="text-align:right;">$${totals.intereses.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-			  </tr>
-			`;
-			promediosHTML = `
-			  <div style="background:white;padding:15px;border-radius:8px;">
-				<p style="color:#64748b;margin-bottom:5px;">Promedio M³</p>
-				<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">${(totals.m3 / count).toFixed(2)} M³</p>
-			  </div>
-			  <div style="background:white;padding:15px;border-radius:8px;">
-				<p style="color:#64748b;margin-bottom:5px;">Promedio Acueducto</p>
-				<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">$${(totals.acueducto / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-			  </div>
-			  <div style="background:white;padding:15px;border-radius:8px;">
-				<p style="color:#64748b;margin-bottom:5px;">Promedio Alcantarillado</p>
-				<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">$${(totals.alcantarillado / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-			  </div>
-			  <div style="background:white;padding:15px;border-radius:8px;">
-				<p style="color:#64748b;margin-bottom:5px;">Promedio Aseo</p>
-				<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">$${(totals.aseo / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-			  </div>
-			  <div style="background:white;padding:15px;border-radius:8px;">
-				<p style="color:#64748b;margin-bottom:5px;">Promedio Tramitado</p>
-				<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">$${(totals.tramitar / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-			  </div>
-			  <div style="background:white;padding:15px;border-radius:8px;">
-				<p style="color:#64748b;margin-bottom:5px;">Promedio Intereses</p>
-				<p style="font-size:1.3rem;font-weight:700;color:#ef4444;">$${(totals.intereses / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-			  </div>
-			`;
-		  } else if (service === 'gas') {
-			totals = { m3: 0, tramitar: 0, intereses: 0 };
-			allData.forEach(row => {
-			  const m3 = row.CONSUMO || 0;
-			  const tramitar = row.TOTAL_TRAMITAR || 0;
-			  const intereses = row.INTERESES || 0;
-			  totals.m3 += m3;
-			  totals.tramitar += tramitar;
-			  totals.intereses += intereses;
-			  tableRows += `
-				<tr>
-				  <td>${row.mes}</td>
-				  <td>${row.unit.toUpperCase()}</td>
-				  <td style="text-align:right;">${m3.toFixed(2)} M³</td>
-				  <td style="text-align:right;">$${tramitar.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-				  <td style="text-align:right;">$${intereses.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-				</tr>
-			  `;
-			});
-			tableHeader = `
-			  <tr>
-				<th>Mes</th>
-				<th>Unidad</th>
-				<th>M³</th>
-				<th>Total Tramitado</th>
-				<th>Intereses</th>
-			  </tr>
-			`;
-			tableFooter = `
-			  <tr style="background:var(--primary-solid);color:white;font-weight:700;">
-				<td colspan="2">TOTALES</td>
-				<td style="text-align:right;">${totals.m3.toFixed(2)} M³</td>
-				<td style="text-align:right;">$${totals.tramitar.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-				<td style="text-align:right;">$${totals.intereses.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-			  </tr>
-			`;
-			promediosHTML = `
-			  <div style="background:white;padding:15px;border-radius:8px;">
-				<p style="color:#64748b;margin-bottom:5px;">Promedio M³</p>
-				<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">${(totals.m3 / count).toFixed(2)} M³</p>
-			  </div>
-			  <div style="background:white;padding:15px;border-radius:8px;">
-				<p style="color:#64748b;margin-bottom:5px;">Promedio Tramitado</p>
-				<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">$${(totals.tramitar / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-			  </div>
-			  <div style="background:white;padding:15px;border-radius:8px;">
-				<p style="color:#64748b;margin-bottom:5px;">Promedio Intereses</p>
-				<p style="font-size:1.3rem;font-weight:700;color:#ef4444;">$${(totals.intereses / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-			  </div>
-			`;
-		  }
-		  document.getElementById('modalContent').innerHTML = `
-			<h2 style="margin-bottom:25px;color:var(--primary-solid);">📋 Historial Completo</h2>
-			<div style="background:#f8f9fa;padding:20px;border-radius:12px;margin-bottom:25px;">
-			  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;">
-				<div>
-				  <p style="color:#64748b;font-size:0.9rem;margin-bottom:4px;">Unidad</p>
-				  <p style="font-weight:700;font-size:1.1rem;color:var(--primary-solid);">${unidadNombre.toUpperCase()}</p>
-				</div>
-				<div>
-				  <p style="color:#64748b;font-size:0.9rem;margin-bottom:4px;">Predio/Estación</p>
-				  <p style="font-weight:700;font-size:1.1rem;">${predioNombre}</p>
-				</div>
-				<div>
-				  <p style="color:#64748b;font-size:0.9rem;margin-bottom:4px;">Número de Cuenta</p>
-				  <p style="font-weight:700;font-size:1.1rem;color:var(--primary-solid);">${cuenta}</p>
-				</div>
-			  </div>
-			</div>
-			<div style="overflow-x:auto;">
-			  <table>
-				<thead>
-				  ${tableHeader}
-				</thead>
-				<tbody>
-				  ${tableRows}
-				  ${tableFooter}
-				</tbody>
-			  </table>
-			</div>
-			<div style="margin-top:30px;padding:20px;background:#f8f9fa;border-radius:12px;">
-			  <h3 style="margin-bottom:20px;color:var(--primary-solid);">📊 Resumen Estadístico</h3>
-			  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;">
-				${promediosHTML}
-			  </div>
-			</div>
+		});
+	  } else {
+		Object.keys(appData[service]).forEach(unit => {
+		  Object.keys(appData[service][unit]).forEach(month => {
+			if (Array.isArray(appData[service][unit][month])) {
+			  const record = appData[service][unit][month].find(r => String(r.CUENTA).trim() === String(cuenta).trim());
+			  if (record) {
+				allData.push({ ...record, mes: month, unit });
+				if (!predioNombre) predioNombre = record.ESTACION;
+				if (!unidadNombre) unidadNombre = unit;
+			  }
+			}
+		  });
+		});
+	  }
+
+	  if (allData.length === 0) {
+		showNotification('No se encontraron datos históricos', 'error');
+		return;
+	  }
+
+	  let tableRows = '';
+	  let totals = {};
+	  let tableHeader = '';
+	  let tableFooter = '';
+	  let promediosHTML = '';
+	  const count = allData.length;
+
+	  if (service === 'energia') {
+		totals = { kwh: 0, consumo: 0, aPublico: 0, aseo: 0, tramitar: 0, intereses: 0 };
+		allData.forEach(row => {
+		  const kwh = row.CONSUMO || 0;
+		  const consumo = row.CONSUMO_VALOR || 0;
+		  const aPublico = row.A_PUBLICO || 0;
+		  const aseo = row.ASEO || 0;
+		  const tramitar = row.TOTAL_TRAMITAR || 0;
+		  const intereses = row.INTERESES || 0;
+		  const factura = row.FACTURA || '';
+
+		  totals.kwh += kwh;
+		  totals.consumo += consumo;
+		  totals.aPublico += aPublico;
+		  totals.aseo += aseo;
+		  totals.tramitar += tramitar;
+		  totals.intereses += intereses;
+
+		  tableRows += `
+			<tr>
+			  <td>${row.mes}</td>
+			  <td>${row.unit.toUpperCase()}</td>
+			  <td>${factura}</td>
+			  <td style="text-align:right;">${kwh.toFixed(2)} kWh</td>
+			  <td style="text-align:right;">$${consumo.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+			  <td style="text-align:right;">$${aPublico.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+			  <td style="text-align:right;">$${aseo.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+			  <td style="text-align:right;">$${tramitar.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+			  <td style="text-align:right;">$${intereses.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+			</tr>
 		  `;
-		  document.getElementById('modal').classList.add('active');
-		}
+		});
+
+		tableHeader = `
+		  <tr>
+			<th>Mes</th>
+			<th>Unidad</th>
+			<th>Factura</th>
+			<th>KW/H</th>
+			<th>Consumo</th>
+			<th>A. Público</th>
+			<th>Aseo</th>
+			<th>Total Tramitado</th>
+			<th>Intereses</th>
+		  </tr>
+		`;
+
+		tableFooter = `
+		  <tr style="background:var(--primary-solid);color:white;font-weight:700;">
+			<td colspan="2">TOTALES</td>
+			<td></td>
+			<td style="text-align:right;">${totals.kwh.toFixed(2)} kWh</td>
+			<td style="text-align:right;">$${totals.consumo.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+			<td style="text-align:right;">$${totals.aPublico.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+			<td style="text-align:right;">$${totals.aseo.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+			<td style="text-align:right;">$${totals.tramitar.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+			<td style="text-align:right;">$${totals.intereses.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+		  </tr>
+		`;
+
+		promediosHTML = `
+		  <div style="background:white;padding:15px;border-radius:8px;">
+			<p style="color:#64748b;margin-bottom:5px;">Promedio kW/h</p>
+			<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">${(totals.kwh / count).toFixed(2)} kWh</p>
+		  </div>
+		  <div style="background:white;padding:15px;border-radius:8px;">
+			<p style="color:#64748b;margin-bottom:5px;">Promedio Consumo</p>
+			<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">$${(totals.consumo / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+		  </div>
+		  <div style="background:white;padding:15px;border-radius:8px;">
+			<p style="color:#64748b;margin-bottom:5px;">Promedio A. Público</p>
+			<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">$${(totals.aPublico / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+		  </div>
+		  <div style="background:white;padding:15px;border-radius:8px;">
+			<p style="color:#64748b;margin-bottom:5px;">Promedio Aseo</p>
+			<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">$${(totals.aseo / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+		  </div>
+		  <div style="background:white;padding:15px;border-radius:8px;">
+			<p style="color:#64748b;margin-bottom:5px;">Promedio Tramitado</p>
+			<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">$${(totals.tramitar / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+		  </div>
+		  <div style="background:white;padding:15px;border-radius:8px;">
+			<p style="color:#64748b;margin-bottom:5px;">Promedio Intereses</p>
+			<p style="font-size:1.3rem;font-weight:700;color:#ef4444;">$${(totals.intereses / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+		  </div>
+		`;
+	  } else if (service === 'acueducto') {
+		totals = { m3: 0, acueducto: 0, alcantarillado: 0, aseo: 0, tramitar: 0, intereses: 0 };
+		allData.forEach(row => {
+		  const m3 = row.CONSUMO || 0;
+		  const acueducto = row.ACUEDUCTO || 0;
+		  const alcantarillado = row.ALCANTARILLADO || 0;
+		  const aseo = row.ASEO || 0;
+		  const tramitar = row.TOTAL_TRAMITAR || 0;
+		  const intereses = row.INTERESES || 0;
+		  const factura = row.FACTURA || '';
+
+		  totals.m3 += m3;
+		  totals.acueducto += acueducto;
+		  totals.alcantarillado += alcantarillado;
+		  totals.aseo += aseo;
+		  totals.tramitar += tramitar;
+		  totals.intereses += intereses;
+
+		  tableRows += `
+			<tr>
+			  <td>${row.mes}</td>
+			  <td>${row.unit.toUpperCase()}</td>
+			  <td>${factura}</td>
+			  <td style="text-align:right;">${m3.toFixed(2)} M³</td>
+			  <td style="text-align:right;">$${acueducto.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+			  <td style="text-align:right;">$${alcantarillado.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+			  <td style="text-align:right;">$${aseo.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+			  <td style="text-align:right;">$${tramitar.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+			  <td style="text-align:right;">$${intereses.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+			</tr>
+		  `;
+		});
+
+		tableHeader = `
+		  <tr>
+			<th>Mes</th>
+			<th>Unidad</th>
+			<th>Factura</th>
+			<th>M³</th>
+			<th>Acueducto</th>
+			<th>Alcantarillado</th>
+			<th>Aseo</th>
+			<th>Total Tramitado</th>
+			<th>Intereses</th>
+		  </tr>
+		`;
+
+		tableFooter = `
+		  <tr style="background:var(--primary-solid);color:white;font-weight:700;">
+			<td colspan="2">TOTALES</td>
+			<td></td>
+			<td style="text-align:right;">${totals.m3.toFixed(2)} M³</td>
+			<td style="text-align:right;">$${totals.acueducto.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+			<td style="text-align:right;">$${totals.alcantarillado.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+			<td style="text-align:right;">$${totals.aseo.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+			<td style="text-align:right;">$${totals.tramitar.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+			<td style="text-align:right;">$${totals.intereses.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+		  </tr>
+		`;
+
+		promediosHTML = `
+		  <div style="background:white;padding:15px;border-radius:8px;">
+			<p style="color:#64748b;margin-bottom:5px;">Promedio M³</p>
+			<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">${(totals.m3 / count).toFixed(2)} M³</p>
+		  </div>
+		  <div style="background:white;padding:15px;border-radius:8px;">
+			<p style="color:#64748b;margin-bottom:5px;">Promedio Acueducto</p>
+			<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">$${(totals.acueducto / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+		  </div>
+		  <div style="background:white;padding:15px;border-radius:8px;">
+			<p style="color:#64748b;margin-bottom:5px;">Promedio Alcantarillado</p>
+			<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">$${(totals.alcantarillado / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+		  </div>
+		  <div style="background:white;padding:15px;border-radius:8px;">
+			<p style="color:#64748b;margin-bottom:5px;">Promedio Aseo</p>
+			<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">$${(totals.aseo / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+		  </div>
+		  <div style="background:white;padding:15px;border-radius:8px;">
+			<p style="color:#64748b;margin-bottom:5px;">Promedio Tramitado</p>
+			<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">$${(totals.tramitar / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+		  </div>
+		  <div style="background:white;padding:15px;border-radius:8px;">
+			<p style="color:#64748b;margin-bottom:5px;">Promedio Intereses</p>
+			<p style="font-size:1.3rem;font-weight:700;color:#ef4444;">$${(totals.intereses / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+		  </div>
+		`;
+	  } else if (service === 'gas') {
+		totals = { m3: 0, tramitar: 0, intereses: 0 };
+		allData.forEach(row => {
+		  const m3 = row.CONSUMO || 0;
+		  const tramitar = row.TOTAL_TRAMITAR || 0;
+		  const intereses = row.INTERESES || 0;
+		  const factura = row.FACTURA || '';
+
+		  totals.m3 += m3;
+		  totals.tramitar += tramitar;
+		  totals.intereses += intereses;
+
+		  tableRows += `
+			<tr>
+			  <td>${row.mes}</td>
+			  <td>${row.unit.toUpperCase()}</td>
+			  <td>${factura}</td>
+			  <td style="text-align:right;">${m3.toFixed(2)} M³</td>
+			  <td style="text-align:right;">$${tramitar.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+			  <td style="text-align:right;">$${intereses.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+			</tr>
+		  `;
+		});
+
+		tableHeader = `
+		  <tr>
+			<th>Mes</th>
+			<th>Unidad</th>
+			<th>Factura</th>
+			<th>M³</th>
+			<th>Total Tramitado</th>
+			<th>Intereses</th>
+		  </tr>
+		`;
+
+		tableFooter = `
+		  <tr style="background:var(--primary-solid);color:white;font-weight:700;">
+			<td colspan="2">TOTALES</td>
+			<td></td>
+			<td style="text-align:right;">${totals.m3.toFixed(2)} M³</td>
+			<td style="text-align:right;">$${totals.tramitar.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+			<td style="text-align:right;">$${totals.intereses.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+		  </tr>
+		`;
+
+		promediosHTML = `
+		  <div style="background:white;padding:15px;border-radius:8px;">
+			<p style="color:#64748b;margin-bottom:5px;">Promedio M³</p>
+			<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">${(totals.m3 / count).toFixed(2)} M³</p>
+		  </div>
+		  <div style="background:white;padding:15px;border-radius:8px;">
+			<p style="color:#64748b;margin-bottom:5px;">Promedio Tramitado</p>
+			<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">$${(totals.tramitar / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+		  </div>
+		  <div style="background:white;padding:15px;border-radius:8px;">
+			<p style="color:#64748b;margin-bottom:5px;">Promedio Intereses</p>
+			<p style="font-size:1.3rem;font-weight:700;color:#ef4444;">$${(totals.intereses / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+		  </div>
+		`;
+	  }
+
+	  document.getElementById('modalContent').innerHTML = `
+		<h2 style="margin-bottom:25px;color:var(--primary-solid);">📋 Historial Completo</h2>
+		<div style="background:#f8f9fa;padding:20px;border-radius:12px;margin-bottom:25px;">
+		  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;">
+			<div>
+			  <p style="color:#64748b;font-size:0.9rem;margin-bottom:4px;">Unidad</p>
+			  <p style="font-weight:700;font-size:1.1rem;color:var(--primary-solid);">${unidadNombre.toUpperCase()}</p>
+			</div>
+			<div>
+			  <p style="color:#64748b;font-size:0.9rem;margin-bottom:4px;">Predio/Estación</p>
+			  <p style="font-weight:700;font-size:1.1rem;">${predioNombre}</p>
+			</div>
+			<div>
+			  <p style="color:#64748b;font-size:0.9rem;margin-bottom:4px;">Número de Cuenta</p>
+			  <p style="font-weight:700;font-size:1.1rem;color:var(--primary-solid);">${cuenta}</p>
+			</div>
+		  </div>
+		</div>
+		<div style="overflow-x:auto;">
+		  <table>
+			<thead>
+			  ${tableHeader}
+			</thead>
+			<tbody>
+			  ${tableRows}
+			  ${tableFooter}
+			</tbody>
+		  </table>
+		</div>
+		<div style="margin-top:30px;padding:20px;background:#f8f9fa;border-radius:12px;">
+		  <h3 style="margin-bottom:20px;color:var(--primary-solid);">📊 Resumen Estadístico</h3>
+		  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;">
+			${promediosHTML}
+		  </div>
+		</div>
+	  `;
+
+	  document.getElementById('modal').classList.add('active');
+	}
 
     // ========== ESTADÍSTICAS ==========
     document.querySelectorAll('#estadisticasButtons .service-btn').forEach(btn => {
@@ -6818,7 +7016,7 @@ async function cargarSaldosDesdeSupabase() {
                 <option value="mebuc">MEBUC</option>
                 <option value="desan">DESAN</option>
                 <option value="demam">DEMAM</option>
-				<option value="setra">SETRA</option>
+				${service === 'gas' ? '<option value="asturias">ASTURIAS</option>' : '<option value="setra">SETRA</option>'}
               </select>
             </div>
           </div>
@@ -6884,526 +7082,443 @@ async function cargarSaldosDesdeSupabase() {
       });
     }
 
-function generateAdvancedChart(service, tipo, metrica, unidad, predio) {
-  const ctx = document.getElementById('graficoCanvas');
-  if (!ctx) return;
-  const context = ctx.getContext('2d');
-  let chartData = {};
-  let chartTitle = '';
-  let chartType = 'line';
-  
-  if (tipo === 'comparativo') {
-    chartType = 'bar';
-    const unidades = unidad === 'todas' ? ['mebuc', 'desan', 'demam', 'setra'] : [unidad];
-    const datos = unidades.map(u => {
-      let total = 0;
-      if (service === 'gas') {
-        if (Array.isArray(appData.gas[u])) {
-          appData.gas[u].forEach(table => {
-            if (Array.isArray(table.data)) {
-              table.data.forEach(row => {
-                if (metrica === 'kwh' || metrica === 'm3') {
-                  total += row.CONSUMO || 0;
-                } else if (metrica === 'tramitar') {
-                  total += row.TOTAL_TRAMITAR || 0;
-                } else if (metrica === 'intereses') {
-                  total += row.INTERESES || 0;
-                }
-              });
-            }
-          });
-        }
-      } else {
-        const unitData = appData[service][u];
-        Object.keys(unitData).forEach(month => {
-          if (Array.isArray(unitData[month])) {
-            unitData[month].forEach(row => {
-              if (metrica === 'kwh' || metrica === 'm3') {
-                total += row.CONSUMO || 0;
-              } else if (metrica === 'tramitar') {
-                total += row.TOTAL_TRAMITAR || 0;
-              } else if (metrica === 'intereses') {
-                total += row.INTERESES || 0;
-              }
-            });
-          }
-        });
-      }
-      return { unidad: u.toUpperCase(), valor: total };
-    });
-    
-    const metricaLabels = {
-      kwh: 'kW/h',
-      m3: 'M³',
-      tramitar: 'Total a Tramitar ($)',
-      intereses: 'Intereses ($)'
-    };
-    
-    const allColors = [
-      { bg: 'rgba(102, 126, 234, 0.8)', border: 'rgba(102, 126, 234, 1)', shadow: 'rgba(102, 126, 234, 0.3)' },
-      { bg: 'rgba(32, 191, 107, 0.8)', border: 'rgba(32, 191, 107, 1)', shadow: 'rgba(32, 191, 107, 0.3)' },
-      { bg: 'rgba(245, 175, 25, 0.8)', border: 'rgba(245, 175, 25, 1)', shadow: 'rgba(245, 175, 25, 0.3)' },
-      { bg: 'rgba(239, 68, 68, 0.8)', border: 'rgba(239, 68, 68, 1)', shadow: 'rgba(239, 68, 68, 0.3)' }
-    ];
-    
-    chartTitle = `Comparativo por Unidades - ${metricaLabels[metrica]}`;
-    chartData = {
-      labels: datos.map(d => d.unidad),
-      datasets: [{
-        label: metricaLabels[metrica],
-        data: datos.map(d => d.valor),
-        backgroundColor: datos.map((_, i) => allColors[i].bg),
-        borderColor: datos.map((_, i) => allColors[i].border),
-        borderWidth: 3,
-        borderRadius: 8,
-        borderSkipped: false,
-        hoverBackgroundColor: datos.map((_, i) => allColors[i].border),
-        hoverBorderWidth: 4
-      }]
-    };
-  } else if (tipo === 'temporal') {
-    chartType = 'line';
-    const unidades = unidad === 'todas' ? ['mebuc', 'desan', 'demam', 'setra'] : [unidad];
-    const mesesSet = new Set();
-    
-    if (service === 'gas') {
-      unidades.forEach(u => {
-        if (Array.isArray(appData.gas[u])) {
-          appData.gas[u].forEach(t => {
-            if (t.mes) mesesSet.add(t.mes);
-          });
-        }
-      });
-    } else {
-      unidades.forEach(u => {
-        Object.keys(appData[service][u]).forEach(m => mesesSet.add(m));
-      });
-    }
-    
-    const meses = Array.from(mesesSet).sort((a, b) => {
-      const order = {
-        'ENERO':1,'FEBRERO':2,'MARZO':3,'ABRIL':4,'MAYO':5,'JUNIO':6,
-        'JULIO':7,'AGOSTO':8,'SEPTIEMBRE':9,'OCTUBRE':10,'NOVIEMBRE':11,'DICIEMBRE':12
-      };
-      return (order[a.toUpperCase()] || 0) - (order[b.toUpperCase()] || 0);
-    });
-    
-    const colores = [
-      { bg: 'rgba(102, 126, 234, 0.15)', border: 'rgba(102, 126, 234, 1)', point: '#667eea' },
-      { bg: 'rgba(32, 191, 107, 0.15)', border: 'rgba(32, 191, 107, 1)', point: '#20bf6b' },
-      { bg: 'rgba(245, 175, 25, 0.15)', border: 'rgba(245, 175, 25, 1)', point: '#f5af19' },
-      { bg: 'rgba(239, 68, 68, 0.15)', border: 'rgba(239, 68, 68, 1)', point: '#ef4444' }
-    ];
-    
-    const datasets = unidades.map((u, idx) => {
-      const valores = meses.map(mes => {
-        let total = 0;
-        if (service === 'gas') {
-          if (Array.isArray(appData.gas[u])) {
-            const table = appData.gas[u].find(t => t.mes === mes);
-            if (table && Array.isArray(table.data)) {
-              table.data.forEach(row => {
-                if (metrica === 'kwh' || metrica === 'm3') {
-                  total += row.CONSUMO || 0;
-                } else if (metrica === 'tramitar') {
-                  total += row.TOTAL_TRAMITAR || 0;
-                } else if (metrica === 'intereses') {
-                  total += row.INTERESES || 0;
-                }
-              });
-            }
-          }
-        } else {
-          if (appData[service][u][mes]) {
-            appData[service][u][mes].forEach(row => {
-              if (metrica === 'kwh' || metrica === 'm3') {
-                total += row.CONSUMO || 0;
-              } else if (metrica === 'tramitar') {
-                total += row.TOTAL_TRAMITAR || 0;
-              } else if (metrica === 'intereses') {
-                total += row.INTERESES || 0;
-              }
-            });
-          }
-        }
-        return total;
-      });
-      
-      return {
-        label: u.toUpperCase(),
-        data: valores,
-        borderColor: colores[idx].border,
-        backgroundColor: colores[idx].bg,
-        borderWidth: 3,
-        fill: true,
-        tension: 0.4,
-        pointRadius: 5,
-        pointHoverRadius: 8,
-        pointBackgroundColor: colores[idx].point,
-        pointBorderColor: '#fff',
-        pointBorderWidth: 3,
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: colores[idx].border,
-        pointHoverBorderWidth: 3
-      };
-    });
-    
-    const metricaLabels = {
-      kwh: 'kW/h',
-      m3: 'M³',
-      tramitar: 'Total a Tramitar',
-      intereses: 'Intereses'
-    };
-    
-    chartTitle = `Evolución Temporal - ${metricaLabels[metrica]}`;
-    chartData = {
-      labels: meses,
-      datasets: datasets
-    };
-  } else if (tipo === 'distribucion') {
-    chartType = 'doughnut';
-    const unidades = ['mebuc', 'desan', 'demam', 'setra'];
-    const datos = unidades.map(u => {
-      let total = 0;
-      if (service === 'gas') {
-        if (Array.isArray(appData.gas[u])) {
-          appData.gas[u].forEach(table => {
-            if (Array.isArray(table.data)) {
-              table.data.forEach(row => {
-                if (metrica === 'kwh' || metrica === 'm3') {
-                  total += row.CONSUMO || 0;
-                } else if (metrica === 'tramitar') {
-                  total += row.TOTAL_TRAMITAR || 0;
-                } else if (metrica === 'intereses') {
-                  total += row.INTERESES || 0;
-                }
-              });
-            }
-          });
-        }
-      } else {
-        const unitData = appData[service][u];
-        Object.keys(unitData).forEach(month => {
-          if (Array.isArray(unitData[month])) {
-            unitData[month].forEach(row => {
-              if (metrica === 'kwh' || metrica === 'm3') {
-                total += row.CONSUMO || 0;
-              } else if (metrica === 'tramitar') {
-                total += row.TOTAL_TRAMITAR || 0;
-              } else if (metrica === 'intereses') {
-                total += row.INTERESES || 0;
-              }
-            });
-          }
-        });
-      }
-      return total;
-    });
-    
-    const metricaLabels = {
-      kwh: 'kW/h',
-      m3: 'M³',
-      tramitar: 'Total a Tramitar',
-      intereses: 'Intereses'
-    };
-    
-    const allColors = [
-      { bg: 'rgba(102, 126, 234, 0.9)', border: 'rgba(102, 126, 234, 1)', hover: 'rgba(102, 126, 234, 1)' },
-      { bg: 'rgba(32, 191, 107, 0.9)', border: 'rgba(32, 191, 107, 1)', hover: 'rgba(32, 191, 107, 1)' },
-      { bg: 'rgba(245, 175, 25, 0.9)', border: 'rgba(245, 175, 25, 1)', hover: 'rgba(245, 175, 25, 1)' },
-      { bg: 'rgba(239, 68, 68, 0.9)', border: 'rgba(239, 68, 68, 1)', hover: 'rgba(239, 68, 68, 1)' }
-    ];
-    
-    chartTitle = `Distribución por Unidad - ${metricaLabels[metrica]}`;
-    chartData = {
-      labels: ['MEBUC', 'DESAN', 'DEMAM', 'SETRA'],
-      datasets: [{
-        data: datos,
-        backgroundColor: datos.map((_, i) => allColors[i].bg),
-        borderColor: datos.map((_, i) => allColors[i].border),
-        hoverBackgroundColor: datos.map((_, i) => allColors[i].hover),
-        borderWidth: 3,
-        hoverBorderWidth: 4,
-        hoverOffset: 15
-      }]
-    };
-  } else if (tipo === 'predio' && predio) {
-    chartType = 'line';
-    const meses = [];
-    const valores = [];
-    
-    if (service === 'gas') {
-      ['mebuc', 'desan', 'demam', 'setra'].forEach(u => {
-        if (Array.isArray(appData.gas[u])) {
-          appData.gas[u].forEach(table => {
-            if (Array.isArray(table.data)) {
-              const row = table.data.find(r => r.ESTACION === predio);
-              if (row) {
-                meses.push(table.mes);
-                if (metrica === 'm3') {
-                  valores.push(row.CONSUMO || 0);
-                } else if (metrica === 'tramitar') {
-                  valores.push(row.TOTAL_TRAMITAR || 0);
-                } else if (metrica === 'intereses') {
-                  valores.push(row.INTERESES || 0);
-                }
-              }
-            }
-          });
-        }
-      });
-    } else {
-      Object.keys(appData[service]).forEach(u => {
-        Object.keys(appData[service][u]).forEach(month => {
-          if (Array.isArray(appData[service][u][month])) {
-            const row = appData[service][u][month].find(r => r.ESTACION === predio);
-            if (row) {
-              meses.push(month);
-              if (metrica === 'kwh' || metrica === 'm3') {
-                valores.push(row.CONSUMO || 0);
-              } else if (metrica === 'tramitar') {
-                valores.push(row.TOTAL_TRAMITAR || 0);
-              } else if (metrica === 'intereses') {
-                valores.push(row.INTERESES || 0);
-              }
-            }
-          }
-        });
-      });
-    }
-    
-    const metricaLabels = {
-      kwh: 'Consumo kW/h',
-      m3: 'Consumo M³',
-      tramitar: 'Total a Tramitar ($)',
-      intereses: 'Intereses ($)'
-    };
-    
-    chartTitle = `${predio} - ${metricaLabels[metrica]}`;
-    chartData = {
-      labels: meses,
-      datasets: [{
-        label: metricaLabels[metrica],
-        data: valores,
-        borderColor: 'rgba(102, 126, 234, 1)',
-        backgroundColor: 'rgba(102, 126, 234, 0.15)',
-        borderWidth: 4,
-        fill: true,
-        tension: 0.4,
-        pointRadius: 6,
-        pointHoverRadius: 9,
-        pointBackgroundColor: 'rgba(102, 126, 234, 1)',
-        pointBorderColor: '#fff',
-        pointBorderWidth: 3,
-        pointHoverBackgroundColor: '#fff',
-        pointHoverBorderColor: 'rgba(102, 126, 234, 1)',
-        pointHoverBorderWidth: 4,
-        segment: {
-          borderColor: ctx => {
-            const curr = ctx.p1.parsed.y;
-            const prev = ctx.p0.parsed.y;
-            return curr > prev ? 'rgba(239, 68, 68, 1)' : 'rgba(32, 191, 107, 1)';
-          }
-        }
-      }]
-    };
-  }
-  
-  if (window.currentChart) {
-    window.currentChart.destroy();
-  }
-  
-  document.getElementById('graficoCanvasContainer').classList.remove('hidden');
-  document.getElementById('graficoTitle').textContent = chartTitle;
-  
-  let chartOptions = {};
-  
-  if (chartType === 'doughnut') {
-    chartOptions = {
-      responsive: true,
-      maintainAspectRatio: true,
-      plugins: {
-        legend: {
-          display: true,
-          position: 'right',
-          labels: {
-            font: {
-              size: 14,
-              weight: '600',
-              family: 'Inter, sans-serif'
-            },
-            padding: 20,
-            usePointStyle: true,
-            pointStyle: 'circle',
-            generateLabels: function(chart) {
-              const data = chart.data;
-              if (data.labels.length && data.datasets.length) {
-                const dataset = data.datasets[0];
-                const total = dataset.data.reduce((a, b) => a + b, 0);
-                return data.labels.map((label, i) => {
-                  const value = dataset.data[i];
-                  const percentage = ((value / total) * 100).toFixed(1);
-                  return {
-                    text: `${label}: ${percentage}%`,
-                    fillStyle: dataset.backgroundColor[i],
-                    hidden: false,
-                    index: i
-                  };
-                });
-              }
-              return [];
-            }
-          }
-        },
-        tooltip: {
-          backgroundColor: 'rgba(0, 0, 0, 0.85)',
-          padding: 16,
-          titleFont: {
-            size: 15,
-            weight: 'bold',
-            family: 'Inter, sans-serif'
-          },
-          bodyFont: {
-            size: 14,
-            family: 'Inter, sans-serif'
-          },
-          cornerRadius: 10,
-          displayColors: true,
-          boxPadding: 6,
-          callbacks: {
-            label: function(context) {
-              const label = context.label || '';
-              const value = context.parsed || 0;
-              const total = context.dataset.data.reduce((a, b) => a + b, 0);
-              const percentage = ((value / total) * 100).toFixed(2);
-              if (metrica === 'kwh' || metrica === 'm3') {
-                return `${label}: ${value.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})} (${percentage}%)`;
-              } else {
-                return `${label}: $${value.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})} (${percentage}%)`;
-              }
-            }
-          }
-        }
-      },
-      animation: {
-        animateRotate: true,
-        animateScale: true,
-        duration: 1000,
-        easing: 'easeInOutQuart'
-      }
-    };
-  } else {
-    chartOptions = {
-      responsive: true,
-      maintainAspectRatio: true,
-      interaction: {
-        mode: 'index',
-        intersect: false
-      },
-      plugins: {
-        legend: {
-          display: true,
-          position: 'top',
-          labels: {
-            font: {
-              size: 14,
-              weight: '600',
-              family: 'Inter, sans-serif'
-            },
-            padding: 20,
-            usePointStyle: true,
-            pointStyle: 'circle',
-            boxWidth: 12,
-            boxHeight: 12
-          }
-        },
-        tooltip: {
-          backgroundColor: 'rgba(0, 0, 0, 0.85)',
-          padding: 16,
-          titleFont: {
-            size: 15,
-            weight: 'bold',
-            family: 'Inter, sans-serif'
-          },
-          bodyFont: {
-            size: 14,
-            family: 'Inter, sans-serif'
-          },
-          cornerRadius: 10,
-          displayColors: true,
-          boxPadding: 6,
-          callbacks: {
-            label: function(context) {
-              let label = context.dataset.label || '';
-              if (label) {
-                label += ': ';
-              }
-              const value = context.parsed.y;
-              if (metrica === 'kwh' || metrica === 'm3') {
-                label += value.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-              } else {
-                label += '$' + value.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-              }
-              return label;
-            }
-          }
-        }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          grid: {
-            color: 'rgba(0, 0, 0, 0.06)',
-            drawBorder: false,
-            lineWidth: 1
-          },
-          ticks: {
-            font: {
-              size: 13,
-              family: 'Inter, sans-serif'
-            },
-            padding: 10,
-            callback: function(value) {
-              if (metrica === 'kwh' || metrica === 'm3') {
-                return value >= 1000000 ? (value / 1000000).toFixed(1) + 'M' :
-                       value >= 1000 ? (value / 1000).toFixed(1) + 'K' :
-                       value.toFixed(0);
-              } else {
-                return value >= 1000000 ? '$' + (value / 1000000).toFixed(1) + 'M' :
-                       value >= 1000 ? '$' + (value / 1000).toFixed(1) + 'K' :
-                       '$' + value.toFixed(0);
-              }
-            }
-          }
-        },
-        x: {
-          grid: {
-            display: false,
-            drawBorder: false
-          },
-          ticks: {
-            font: {
-              size: 13,
-              family: 'Inter, sans-serif',
-              weight: '500'
-            },
-            padding: 10
-          }
-        }
-      },
-      animation: {
-        duration: 1200,
-        easing: 'easeInOutQuart'
-      }
-    };
-  }
-  
-  window.currentChart = new Chart(context, {
-    type: chartType,
-    data: chartData,
-    options: chartOptions
-  });
-}
+	function generateAdvancedChart(service, tipo, metrica, unidad, predio) {
+	  const ctx = document.getElementById('graficoCanvas');
+	  if (!ctx) return;
+	  const context = ctx.getContext('2d');
+	  let chartData = {};
+	  let chartTitle = '';
+	  let chartType = 'line';
+
+	  if (tipo === 'comparativo') {
+		chartType = 'bar';
+		const unidades = unidad === 'todas' ? ['mebuc', 'desan', 'demam', 'setra'] : [unidad];
+		const datos = unidades.map(u => {
+		  let total = 0;
+		  if (service === 'gas') {
+			if (Array.isArray(appData.gas[u])) {
+			  appData.gas[u].forEach(table => {
+				if (Array.isArray(table.data)) {
+				  table.data.forEach(row => {
+					if (metrica === 'kwh' || metrica === 'm3') {
+					  total += row.CONSUMO || 0;
+					} else if (metrica === 'tramitar') {
+					  total += row.TOTAL_TRAMITAR || 0;
+					} else if (metrica === 'intereses') {
+					  total += row.INTERESES || 0;
+					}
+				  });
+				}
+			  });
+			}
+		  } else {
+			const unitData = appData[service][u];
+			Object.keys(unitData).forEach(month => {
+			  if (Array.isArray(unitData[month])) {
+				unitData[month].forEach(row => {
+				  if (metrica === 'kwh' || metrica === 'm3') {
+					total += row.CONSUMO || 0;
+				  } else if (metrica === 'tramitar') {
+					total += row.TOTAL_TRAMITAR || 0;
+				  } else if (metrica === 'intereses') {
+					total += row.INTERESES || 0;
+				  }
+				});
+			  }
+			});
+		  }
+		  return { unidad: u.toUpperCase(), valor: total };
+		});
+		const metricaLabels = {
+		  kwh: 'kW/h',
+		  m3: 'M³',
+		  tramitar: 'Total a Tramitar ($)',
+		  intereses: 'Intereses ($)'
+		};
+		const allColors = [
+		  { bg: 'rgba(102, 126, 234, 0.8)', border: 'rgba(102, 126, 234, 1)', shadow: 'rgba(102, 126, 234, 0.3)' },
+		  { bg: 'rgba(32, 191, 107, 0.8)', border: 'rgba(32, 191, 107, 1)', shadow: 'rgba(32, 191, 107, 0.3)' },
+		  { bg: 'rgba(245, 175, 25, 0.8)', border: 'rgba(245, 175, 25, 1)', shadow: 'rgba(245, 175, 25, 0.3)' },
+		  { bg: 'rgba(239, 68, 68, 0.8)', border: 'rgba(239, 68, 68, 1)', shadow: 'rgba(239, 68, 68, 0.3)' }
+		];
+		chartTitle = `Comparativo por Unidades - ${metricaLabels[metrica]}`;
+		chartData = {
+		  labels: datos.map(d => d.unidad),
+		  datasets: [{
+			label: metricaLabels[metrica],
+			data: datos.map(d => d.valor),
+			backgroundColor: datos.map((_, i) => allColors[i].bg),
+			borderColor: datos.map((_, i) => allColors[i].border),
+			borderWidth: 3,
+			borderRadius: 8,
+			borderSkipped: false,
+			hoverBackgroundColor: datos.map((_, i) => allColors[i].border),
+			hoverBorderWidth: 4
+		  }]
+		};
+	  } else if (tipo === 'temporal') {
+		chartType = 'line';
+		const unidades = unidad === 'todas' ? ['mebuc', 'desan', 'demam', 'setra'] : [unidad];
+		const mesesSet = new Set();
+		if (service === 'gas') {
+		  unidades.forEach(u => {
+			if (Array.isArray(appData.gas[u])) {
+			  appData.gas[u].forEach(t => {
+				if (t.mes) mesesSet.add(t.mes);
+			  });
+			}
+		  });
+		} else {
+		  unidades.forEach(u => {
+			Object.keys(appData[service][u]).forEach(m => mesesSet.add(m));
+		  });
+		}
+		const meses = Array.from(mesesSet).sort((a, b) => {
+		  const order = {
+			'ENERO':1,'FEBRERO':2,'MARZO':3,'ABRIL':4,'MAYO':5,'JUNIO':6,
+			'JULIO':7,'AGOSTO':8,'SEPTIEMBRE':9,'OCTUBRE':10,'NOVIEMBRE':11,'DICIEMBRE':12
+		  };
+		  return (order[a.toUpperCase()] || 0) - (order[b.toUpperCase()] || 0);
+		});
+		const colores = [
+		  { bg: 'rgba(102, 126, 234, 0.15)', border: 'rgba(102, 126, 234, 1)', point: '#667eea' },
+		  { bg: 'rgba(32, 191, 107, 0.15)', border: 'rgba(32, 191, 107, 1)', point: '#20bf6b' },
+		  { bg: 'rgba(245, 175, 25, 0.15)', border: 'rgba(245, 175, 25, 1)', point: '#f5af19' },
+		  { bg: 'rgba(239, 68, 68, 0.15)', border: 'rgba(239, 68, 68, 1)', point: '#ef4444' }
+		];
+		const datasets = unidades.map((u, idx) => {
+		  const valores = meses.map(mes => {
+			let total = 0;
+			if (service === 'gas') {
+			  if (Array.isArray(appData.gas[u])) {
+				const table = appData.gas[u].find(t => t.mes === mes);
+				if (table && Array.isArray(table.data)) {
+				  table.data.forEach(row => {
+					if (metrica === 'kwh' || metrica === 'm3') {
+					  total += row.CONSUMO || 0;
+					} else if (metrica === 'tramitar') {
+					  total += row.TOTAL_TRAMITAR || 0;
+					} else if (metrica === 'intereses') {
+					  total += row.INTERESES || 0;
+					}
+				  });
+				}
+			  }
+			} else {
+			  if (appData[service][u][mes]) {
+				appData[service][u][mes].forEach(row => {
+				  if (metrica === 'kwh' || metrica === 'm3') {
+					total += row.CONSUMO || 0;
+				  } else if (metrica === 'tramitar') {
+					total += row.TOTAL_TRAMITAR || 0;
+				  } else if (metrica === 'intereses') {
+					total += row.INTERESES || 0;
+				  }
+				});
+			  }
+			}
+			return total;
+		  });
+		  return {
+			label: u.toUpperCase(),
+			data: valores,
+			borderColor: colores[idx].border,
+			backgroundColor: colores[idx].bg,
+			borderWidth: 3,
+			fill: true,
+			tension: 0.4,
+			pointRadius: 5,
+			pointHoverRadius: 8,
+			pointBackgroundColor: colores[idx].point,
+			pointBorderColor: '#fff',
+			pointBorderWidth: 3,
+			pointHoverBackgroundColor: '#fff',
+			pointHoverBorderColor: colores[idx].border,
+			pointHoverBorderWidth: 3
+		  };
+		});
+		const metricaLabels = {
+		  kwh: 'kW/h',
+		  m3: 'M³',
+		  tramitar: 'Total a Tramitar',
+		  intereses: 'Intereses'
+		};
+		chartTitle = `Evolución Temporal - ${metricaLabels[metrica]}`;
+		chartData = {
+		  labels: meses,
+		  datasets: datasets
+		};
+	  } else if (tipo === 'distribucion') {
+		chartType = 'doughnut';
+		const unidades = ['mebuc', 'desan', 'demam', 'setra'];
+		const datos = unidades.map(u => {
+		  let total = 0;
+		  if (service === 'gas') {
+			if (Array.isArray(appData.gas[u])) {
+			  appData.gas[u].forEach(table => {
+				if (Array.isArray(table.data)) {
+				  table.data.forEach(row => {
+					if (metrica === 'kwh' || metrica === 'm3') {
+					  total += row.CONSUMO || 0;
+					} else if (metrica === 'tramitar') {
+					  total += row.TOTAL_TRAMITAR || 0;
+					} else if (metrica === 'intereses') {
+					  total += row.INTERESES || 0;
+					}
+				  });
+				}
+			  });
+			}
+		  } else {
+			const unitData = appData[service][u];
+			Object.keys(unitData).forEach(month => {
+			  if (Array.isArray(unitData[month])) {
+				unitData[month].forEach(row => {
+				  if (metrica === 'kwh' || metrica === 'm3') {
+					total += row.CONSUMO || 0;
+				  } else if (metrica === 'tramitar') {
+					total += row.TOTAL_TRAMITAR || 0;
+				  } else if (metrica === 'intereses') {
+					total += row.INTERESES || 0;
+				  }
+				});
+			  }
+			});
+		  }
+		  return total;
+		});
+		const metricaLabels = {
+		  kwh: 'kW/h',
+		  m3: 'M³',
+		  tramitar: 'Total a Tramitar',
+		  intereses: 'Intereses'
+		};
+		const allColors = [
+		  { bg: 'rgba(102, 126, 234, 0.9)', border: 'rgba(102, 126, 234, 1)', hover: 'rgba(102, 126, 234, 1)' },
+		  { bg: 'rgba(32, 191, 107, 0.9)', border: 'rgba(32, 191, 107, 1)', hover: 'rgba(32, 191, 107, 1)' },
+		  { bg: 'rgba(245, 175, 25, 0.9)', border: 'rgba(245, 175, 25, 1)', hover: 'rgba(245, 175, 25, 1)' },
+		  { bg: 'rgba(239, 68, 68, 0.9)', border: 'rgba(239, 68, 68, 1)', hover: 'rgba(239, 68, 68, 1)' }
+		];
+		chartTitle = `Distribución por Unidad - ${metricaLabels[metrica]}`;
+		chartData = {
+		  labels: ['MEBUC', 'DESAN', 'DEMAM', 'SETRA'],
+		  datasets: [{
+			data: datos,
+			backgroundColor: datos.map((_, i) => allColors[i].bg),
+			borderColor: datos.map((_, i) => allColors[i].border),
+			hoverBackgroundColor: datos.map((_, i) => allColors[i].hover),
+			borderWidth: 3,
+			hoverBorderWidth: 4,
+			hoverOffset: 15
+		  }]
+		};
+	  } else if (tipo === 'predio' && predio) {
+		chartType = 'line';
+		const meses = [];
+		const valores = [];
+		if (service === 'gas') {
+		  ['mebuc', 'desan', 'demam', 'setra'].forEach(u => {
+			if (Array.isArray(appData.gas[u])) {
+			  appData.gas[u].forEach(table => {
+				if (Array.isArray(table.data)) {
+				  const row = table.data.find(r => r.ESTACION === predio);
+				  if (row) {
+					meses.push(table.mes);
+					if (metrica === 'm3') {
+					  valores.push(row.CONSUMO || 0);
+					} else if (metrica === 'tramitar') {
+					  valores.push(row.TOTAL_TRAMITAR || 0);
+					} else if (metrica === 'intereses') {
+					  valores.push(row.INTERESES || 0);
+					}
+				  }
+				}
+			  });
+			}
+		  });
+		} else {
+		  Object.keys(appData[service]).forEach(u => {
+			Object.keys(appData[service][u]).forEach(month => {
+			  if (Array.isArray(appData[service][u][month])) {
+				const row = appData[service][u][month].find(r => r.ESTACION === predio);
+				if (row) {
+				  meses.push(month);
+				  if (metrica === 'kwh' || metrica === 'm3') {
+					valores.push(row.CONSUMO || 0);
+				  } else if (metrica === 'tramitar') {
+					valores.push(row.TOTAL_TRAMITAR || 0);
+				  } else if (metrica === 'intereses') {
+					valores.push(row.INTERESES || 0);
+				  }
+				}
+			  }
+			});
+		  });
+		}
+		const metricaLabels = {
+		  kwh: 'Consumo kW/h',
+		  m3: 'Consumo M³',
+		  tramitar: 'Total a Tramitar ($)',
+		  intereses: 'Intereses ($)'
+		};
+		chartTitle = `${predio} - ${metricaLabels[metrica]}`;
+		chartData = {
+		  labels: meses,
+		  datasets: [{
+			label: metricaLabels[metrica],
+			data: valores,
+			borderColor: 'rgba(102, 126, 234, 1)',
+			backgroundColor: 'rgba(102, 126, 234, 0.15)',
+			borderWidth: 4,
+			fill: true,
+			tension: 0.4,
+			pointRadius: 6,
+			pointHoverRadius: 9,
+			pointBackgroundColor: 'rgba(102, 126, 234, 1)',
+			pointBorderColor: '#fff',
+			pointBorderWidth: 3,
+			pointHoverBackgroundColor: '#fff',
+			pointHoverBorderColor: 'rgba(102, 126, 234, 1)',
+			pointHoverBorderWidth: 4,
+			segment: {
+			  borderColor: ctx => {
+				const curr = ctx.p1.parsed.y;
+				const prev = ctx.p0.parsed.y;
+				return curr > prev ? 'rgba(239, 68, 68, 1)' : 'rgba(32, 191, 107, 1)';
+			  }
+			}
+		  }]
+		};
+	  }
+
+	  if (window.currentChart) {
+		window.currentChart.destroy();
+	  }
+	  document.getElementById('graficoCanvasContainer').classList.remove('hidden');
+	  document.getElementById('graficoTitle').textContent = chartTitle;
+
+	  // === OPCIONES MEJORADAS PARA LEGIBILIDAD ===
+	  let chartOptions = {};
+	  if (chartType === 'doughnut') {
+		chartOptions = {
+		  responsive: true,
+		  maintainAspectRatio: true,
+		  plugins: {
+			legend: {
+			  display: true,
+			  position: 'right',
+			  labels: {
+				font: {
+				  size: 13,
+				  weight: '600',
+				  family: "'Inter', sans-serif"
+				},
+				color: '#1e293b',
+				padding: 20,
+				usePointStyle: true
+			  }
+			},
+			tooltip: {
+			  backgroundColor: 'rgba(0, 0, 0, 0.85)',
+			  titleColor: '#fff',
+			  bodyColor: '#f8fafc',
+			  titleFont: {
+				size: 14,
+				weight: 'bold',
+				family: "'Inter', sans-serif"
+			  },
+			  bodyFont: {
+				size: 13,
+				family: "'Inter', sans-serif"
+			  },
+			  cornerRadius: 10
+			}
+		  },
+		  animation: {
+			animateRotate: true,
+			animateScale: true,
+			duration: 1000,
+			easing: 'easeInOutQuart'
+		  }
+		};
+	  } else {
+		chartOptions = {
+		  responsive: true,
+		  maintainAspectRatio: true,
+		  interaction: { mode: 'index', intersect: false },
+		  plugins: {
+			legend: {
+			  display: true,
+			  position: 'top',
+			  labels: {
+				font: {
+				  size: 13,
+				  weight: '600',
+				  family: "'Inter', sans-serif"
+				},
+				color: '#1e293b',
+				padding: 20,
+				usePointStyle: true,
+				boxWidth: 12
+			  }
+			},
+			tooltip: {
+			  backgroundColor: 'rgba(0, 0, 0, 0.85)',
+			  titleColor: '#fff',
+			  bodyColor: '#f8fafc',
+			  titleFont: {
+				size: 14,
+				weight: 'bold',
+				family: "'Inter', sans-serif"
+			  },
+			  bodyFont: {
+				size: 13,
+				family: "'Inter', sans-serif"
+			  },
+			  cornerRadius: 10
+			}
+		  },
+		  scales: {
+			y: {
+			  beginAtZero: true,
+			  grid: { color: 'rgba(0,0,0,0.06)' },
+			  ticks: {
+				font: { size: 13, family: "'Inter', sans-serif" },
+				color: '#334155',
+				padding: 8,
+				callback: function(value) {
+				  if (metrica === 'kwh' || metrica === 'm3') {
+					return value >= 1000000 ? (value / 1000000).toFixed(1) + 'M' :
+						   value >= 1000 ? (value / 1000).toFixed(1) + 'K' : value.toFixed(0);
+				  } else {
+					return value >= 1000000 ? '$' + (value / 1000000).toFixed(1) + 'M' :
+						   value >= 1000 ? '$' + (value / 1000).toFixed(1) + 'K' : '$' + value.toFixed(0);
+				  }
+				}
+			  }
+			},
+			x: {
+			  grid: { display: false },
+			  ticks: {
+				font: { size: 13, family: "'Inter', sans-serif" },
+				color: '#1e293b',
+				padding: 10
+			  }
+			}
+		  },
+		  animation: {
+			duration: 1200,
+			easing: 'easeInOutQuart'
+		  }
+		};
+	  }
+
+	  window.currentChart = new Chart(context, {
+		type: chartType,
+		data: chartData,
+		options: chartOptions
+	  });
+	}
 
     function setupPredioSearchForChart(service) {
       const input = document.getElementById('graficoPredio');
