@@ -1408,6 +1408,40 @@ body {
 .badge-alerta { background: linear-gradient(135deg, #fed7aa, #fdba74); color: #92400e; }
 .badge-critico { background: linear-gradient(135deg, #fecaca, #fca5a5); color: #991b1b; }
 
+/* ===== BOTONES 3D EN TOPBAR ===== */
+.topbar-btn {
+  position: relative;
+  overflow: hidden;
+  transform-style: preserve-3d;
+}
+.topbar-btn:hover {
+  transform: translateY(-3px) translateZ(10px) scale(1.03);
+  box-shadow:
+    0 8px 20px rgba(0,0,0,0.3),
+    0 0 0 2px rgba(57, 255, 20, 0.4);
+  background: linear-gradient(135deg, #0a5c3d, #06402b);
+}
+.topbar-btn:active {
+  transform: translateY(0) translateZ(0) scale(1);
+}
+.topbar-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,0.2),
+    transparent
+  );
+  transition: left 0.6s;
+}
+.topbar-btn:hover::before {
+  left: 100%;
+}
 </style>
 </head>
 <body>
@@ -1482,117 +1516,69 @@ body {
 	</div>
     </aside>
     <main class="main-content">
-      <div class="topbar" id="topbar">
+		<div class="topbar" id="topbar" style="position: relative; padding: 12px 20px;">
 		  <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">
 			<i class="fas fa-bars"></i>
 		  </button>
-		  <div class="topbar-title" style="display: flex; justify-content: center; align-items: center; text-align: center; flex: 1; padding: 0 40px; max-width: 100%;">
-			  <span>SISTEMA DE GESTIÓN DE SERVICIOS PÚBLICO GUBIR MEBUC</span>
-			</div>
+		  <div class="topbar-title" style="flex: 1; text-align: center; padding: 0 80px;">
+			<span style="font-weight: 700; font-size: 1.2rem; color: white; white-space: nowrap;">
+			  SISTEMA DE GESTIÓN DE SERVICIOS PÚBLICO GUBIR MEBUC
+			</span>
+		  </div>
 		  <button class="theme-toggle" id="themeToggle" aria-label="Cambiar tema">
 			<i class="fas fa-moon"></i>
 		  </button>
+
+		  <!-- Botones de carga en esquina superior derecha -->
+		  <div style="
+			position: absolute;
+			top: 12px;
+			right: 20px;
+			display: flex;
+			gap: 10px;
+			z-index: 10;
+		  ">
+			<button id="btnCargarLocalTop" class="btn topbar-btn" style="
+			  background: linear-gradient(135deg, #06402b, #0a5c3d);
+			  color: white;
+			  padding: 6px 14px;
+			  font-size: 0.82rem;
+			  border: none;
+			  border-radius: 8px;
+			  display: flex;
+			  align-items: center;
+			  gap: 6px;
+			  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+			  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+			">
+			  <i class="fas fa-folder-open"></i> Local
+			</button>
+			<button id="btnCargarNubeTop" class="btn topbar-btn" style="
+			  background: linear-gradient(135deg, #06402b, #0a5c3d);
+			  color: white;
+			  padding: 6px 14px;
+			  font-size: 0.82rem;
+			  border: none;
+			  border-radius: 8px;
+			  display: flex;
+			  align-items: center;
+			  gap: 6px;
+			  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+			  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+			">
+			  <i class="fas fa-cloud-download-alt"></i> Nube
+			</button>
+		  </div>
+
+		  <!-- Input oculto para carga local -->
+		  <input type="file" id="fileInputTop" multiple accept=".xlsx,.xlsm,.xls" style="display: none;" onchange="handleFiles(this.files)">
 		</div>
       <div class="content-area">
 		<!-- INICIO -->
 		<section id="inicio" class="page-section active">
 		  <h1 style="text-align:center;color:white;font-size:2.3rem;margin-bottom:30px;text-shadow: 0 2px 10px rgba(0,0,0,0.3);">
 		  Centro de Carga
-		  </h1>
-		  
-		  <!-- Botones de Carga Profesionales -->
-		  <div style="display:grid;grid-template-columns:1fr 1fr;gap:25px;margin-bottom:30px;max-width:900px;margin-left:auto;margin-right:auto;">
-			<!-- CARGA LOCAL -->
-			<div style="
-			  background: rgba(255, 255, 255, 0.15);
-			  backdrop-filter: blur(20px) saturate(180%);
-			  -webkit-backdrop-filter: blur(20px) saturate(180%);
-			  border-radius: 20px;
-			  padding: 35px;
-			  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-			  border: 1px solid rgba(255, 255, 255, 0.3);
-			  text-align: center;
-			  transition: all 0.3s;
-			  cursor: pointer;
-			" onclick="document.getElementById('fileInput').click()" 
-			   onmouseenter="this.style.transform='translateY(-5px)';this.style.boxShadow='0 12px 40px rgba(0,0,0,0.15)'"
-			   onmouseleave="this.style.transform='translateY(0)';this.style.boxShadow='0 8px 32px rgba(0,0,0,0.1)'">
-			  <i class="fas fa-file-excel" style="font-size:3.5rem;color:#4CAF50;margin-bottom:20px;filter:drop-shadow(0 4px 8px rgba(76,175,80,0.3));"></i>
-			  <h3 style="color:#fff;margin-bottom:12px;font-size:1.4rem;font-weight:700;">Carga Local</h3>
-			  <p style="color:rgba(255,255,255,0.85);margin-bottom:20px;font-size:0.95rem;line-height:1.5;">
-				Selecciona archivos Excel desde tu computador
-			  </p>
-			  <button id="btnCargarLocal" class="btn btn-primary" style="
-				background: linear-gradient(135deg, #06402b, #0a5c3d);
-				padding: 14px 28px;
-				font-size: 1rem;
-				font-weight: 700;
-				border: none;
-				border-radius: 12px;
-				cursor: pointer;
-				box-shadow: 0 6px 18px rgba(6, 64, 43, 0.4);
-				transition: all 0.3s ease;
-				width: 100%;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				gap: 10px;
-			  ">
-				<i class="fas fa-folder-open"></i> Seleccionar Archivos
-			  </button>
-			  <p style="color:rgba(255,255,255,0.7);margin-top:12px;font-size:0.85rem;">
-				Formatos: .xlsx, .xlsm, .xls
-			  </p>
-			  <input type="file" id="fileInput" multiple accept=".xlsx,.xlsm,.xls" style="display: none;" onchange="handleFiles(this.files)">
-			</div>
-			
-			<!-- CARGA DESDE LA NUBE -->
-			<div style="
-			  background: rgba(255, 255, 255, 0.15);
-			  backdrop-filter: blur(20px) saturate(180%);
-			  -webkit-backdrop-filter: blur(20px) saturate(180%);
-			  border-radius: 20px;
-			  padding: 35px;
-			  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-			  border: 1px solid rgba(255, 255, 255, 0.3);
-			  text-align: center;
-			  transition: all 0.3s;
-			" onmouseenter="this.style.transform='translateY(-5px)';this.style.boxShadow='0 12px 40px rgba(0,0,0,0.15)'"
-			   onmouseleave="this.style.transform='translateY(0)';this.style.boxShadow='0 8px 32px rgba(0,0,0,0.1)'">
-			  <i class="fas fa-cloud-download-alt" style="font-size:3.5rem;color:#fbbf24;margin-bottom:20px;filter:drop-shadow(0 4px 8px rgba(251,191,36,0.3));"></i>
-			  <h3 style="color:#fff;margin-bottom:12px;font-size:1.4rem;font-weight:700;">Carga desde Nube</h3>
-			  <p style="color:rgba(255,255,255,0.85);margin-bottom:20px;font-size:0.95rem;line-height:1.5;">
-				Sincroniza archivos directamente desde Supabase
-			  </p>
-			  <button id="btnCargarNube" class="btn btn-primary" style="
-				background: linear-gradient(135deg, #06402b, #0a5c3d);
-				padding: 14px 28px;
-				font-size: 1rem;
-				font-weight: 700;
-				border: none;
-				border-radius: 12px;
-				cursor: pointer;
-				box-shadow: 0 6px 18px rgba(6, 64, 43, 0.4);
-				transition: all 0.3s ease;
-				width: 100%;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				gap: 10px;
-			  ">
-				<i class="fas fa-sync-alt"></i> Actualizar Archivos
-			  </button>
-			  <p style="color:rgba(255,255,255,0.7);margin-top:12px;font-size:0.85rem;">
-				Formatos: .xlsx, .xlsm, .xls
-			  </p>
-			  <div id="loadingIndicator" style="display: none; margin-top: 20px;">
-				<div class="spinner" style="margin: 0 auto 12px;"></div>
-				<p style="color: #fff; font-weight: 600; font-size: 0.95rem;">Descargando desde Supabase...</p>
-				<p style="color: rgba(255,255,255,0.8); font-size: 0.85rem;">Por favor espera</p>
-			  </div>
-			</div>
-		  </div>
-		  
+		  </h1>	  
 		  <!-- Tarjetas de Resumen -->
 		  <div class="cards-container" id="summaryCards"></div>
 		</section>
@@ -3706,79 +3692,15 @@ body {
 	  }
 	}
 
-	// Función optimizada para carga automática de Supabase
+	// ========== CARGA AUTOMÁTICA DESDE SUPABASE AL INICIAR ==========
 	async function cargarDesdeSupabaseAutomatico() {
-	  const btnCargarNube = document.getElementById('btnCargarNube');
-	  if (!btnCargarNube) return; // Si no existe el botón, salir
-
 	  try {
-		// Cambiar el texto del botón a "Cargando..."
-		btnCargarNube.disabled = true;
-		btnCargarNube.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cargando...';
-
-		console.log('🚀 Iniciando carga automática de archivos desde Supabase...');
-
-		// URL base de Supabase Storage
-		const supabaseUrl = 'https://jjbjgrnhnlmmlilbrqbx.supabase.co/storage/v1/object/public/excels/';
-
-		// Lista de archivos a descargar
-		const nombresArchivos = [
-		  '1- MEBUC ENERGIA.xlsm',
-		  '2- MEBUC ACUEDUCTO.xlsm',
-		  '3- DESAN ENERGIA.xlsm',
-		  '4- DESAN ACUEDUCTO.xlsm',
-		  '5- DEMAM ENERGIA.xlsm',
-		  '6- DEMAM ACUEDUCTO.xlsm',
-		  '7- GAS MEBUC-DESAN-DEMAM.xlsm'
-		];
-
-		// Descargar todos los archivos en paralelo
-		const promesasDescarga = nombresArchivos.map(async (nombreArchivo, index) => {
-		  const url = supabaseUrl + encodeURIComponent(nombreArchivo);
-		  console.log(`📥 Descargando: ${nombreArchivo} (${index + 1}/${nombresArchivos.length})`);
-
-		  const response = await fetch(url);
-		  if (!response.ok) {
-			throw new Error(`Error al descargar ${nombreArchivo}: ${response.status} ${response.statusText}`);
-		  }
-
-		  const blob = await response.blob();
-		  console.log(`✅ Descargado: ${nombreArchivo} (${(blob.size / 1024).toFixed(2)} KB)`);
-
-		  // Crear un objeto File virtual
-		  return new File([blob], nombreArchivo, {
-			type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-		  });
-		});
-
-		// Esperar a que todos los archivos se descarguen
-		const archivos = await Promise.all(promesasDescarga);
-		console.log(`✅ Descargados ${archivos.length} archivos exitosamente`);
-
-		// Procesar los archivos
-		await handleFiles(archivos);
-
-		// Renderizar la tabla de saldos automáticamente
-		renderTablaSaldos();
-
-		// Mostrar la sección de saldos
-		showSection('saldos');
-
-		// Restaurar el botón a su estado original
-		btnCargarNube.disabled = false;
-		btnCargarNube.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Actualizar Archivos';
-
-		console.log('🎉 Proceso de carga automática completado exitosamente');
-
+		showNotification('🔽 Iniciando carga automática desde la nube...', 'info', 2000);
+		await cargarDesdeSupabase(); // Usa la función ya corregida
+		showNotification('✅ Carga automática completada con éxito', 'success', 3000);
 	  } catch (error) {
-		console.error('❌ Error al cargar archivos desde Supabase:', error);
-
-		// Restaurar el botón a su estado original
-		btnCargarNube.disabled = false;
-		btnCargarNube.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Actualizar Archivos';
-
-		// Mostrar notificación de error
-		showNotification(`❌ Error al cargar datos: ${error.message}`, 'error', 5000);
+		console.error('❌ Error en carga automática:', error);
+		showNotification(`❌ Error al cargar datos automáticamente: ${error.message}`, 'error', 5000);
 	  }
 	}
  
@@ -3831,6 +3753,63 @@ body {
 		}
 	  }
 	};
+	
+	// ========== FUNCIÓN PARA CONFIRMAR ELIMINACIÓN DE PRESUPUESTO ==========
+	function confirmarEliminacion() {
+	  if (!registroEditando) {
+		showNotification('⚠️ No hay registro seleccionado para eliminar', 'error');
+		document.getElementById('modalEliminar').style.display = 'none';
+		return;
+	  }
+
+	  const { unidad, servicio } = registroEditando;
+
+	  try {
+		// Eliminar del objeto local
+		if (appData.saldos[unidad] && appData.saldos[unidad][servicio]) {
+		  delete appData.saldos[unidad][servicio];
+		  localStorage.setItem('appDataSaldos', JSON.stringify(appData.saldos));
+
+		  // Opcional: eliminar en Supabase
+		  supabase
+			.from('saldos_presupuestales')
+			.delete()
+			.match({ unidad, servicio })
+			.then(({ error }) => {
+			  if (error) {
+				console.warn('⚠️ No se pudo eliminar en Supabase:', error);
+			  }
+			});
+
+		  showNotification(`✅ Registro eliminado: ${servicio} (${unidad.toUpperCase()})`, 'success');
+		  renderTablaSaldos();
+		} else {
+		  showNotification('❌ Registro no encontrado', 'error');
+		}
+	  } catch (error) {
+		console.error('❌ Error al eliminar registro:', error);
+		showNotification('❌ Error al eliminar el registro', 'error');
+	  } finally {
+		// Cerrar modal y limpiar
+		document.getElementById('modalEliminar').style.display = 'none';
+		registroEditando = null;
+	  }
+	}
+	
+	// ========== FUNCIÓN PARA INICIAR LA ELIMINACIÓN DE UN REGISTRO ==========
+	function eliminarRegistro(unidad, servicio) {
+	  // Verificar que el registro exista
+	  if (!appData.saldos[unidad] || !appData.saldos[unidad][servicio]) {
+		showNotification('❌ Registro no encontrado', 'error');
+		return;
+	  }
+
+	  // Guardar el registro seleccionado globalmente
+	  registroEditando = { unidad, servicio };
+
+	  // Mostrar el modal de confirmación
+	  document.getElementById('modalEliminar').style.display = 'flex';
+	}
 
     // ========== NAVEGACIÓN ==========
     document.querySelectorAll('.nav-link').forEach(link => {
@@ -3981,17 +3960,14 @@ body {
 	
 	// ========== FUNCIÓN PARA CARGAR DESDE SUPABASE ==========
 	async function cargarDesdeSupabase() {
-	  const btnCargarNube = document.getElementById('btnCargarNube');
-	  const loadingIndicator = document.getElementById('loadingIndicator');
-
+	  // ✅ Ya no intentamos manipular btnCargarNube ni loadingIndicator (fueron eliminados)
 	  try {
-		// Cambiar el texto del botón a "Descargando..."
-		btnCargarNube.disabled = true;
-		btnCargarNube.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Descargando...';
+		// Mostrar notificación de inicio
+		showNotification('🔽 Iniciando descarga desde la nube...', 'info', 2000);
 
 		// URL base de Supabase Storage
 		const supabaseUrl = 'https://jjbjgrnhnlmmlilbrqbx.supabase.co/storage/v1/object/public/excels/';
-
+		
 		// Lista de archivos a descargar
 		const nombresArchivos = [
 		  '1- MEBUC ENERGIA.xlsm',
@@ -4007,15 +3983,12 @@ body {
 		const promesasDescarga = nombresArchivos.map(async (nombreArchivo) => {
 		  const url = supabaseUrl + encodeURIComponent(nombreArchivo);
 		  console.log(`📥 Descargando: ${nombreArchivo}`);
-
 		  const response = await fetch(url);
 		  if (!response.ok) {
 			throw new Error(`Error al descargar ${nombreArchivo}: ${response.status} ${response.statusText}`);
 		  }
-
 		  const blob = await response.blob();
 		  console.log(`✅ Descargado: ${nombreArchivo} (${(blob.size / 1024).toFixed(2)} KB)`);
-
 		  // Crear un objeto File virtual
 		  return new File([blob], nombreArchivo, {
 			type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -4029,22 +4002,12 @@ body {
 		// Procesar los archivos
 		await handleFiles(archivos);
 
-		// Restaurar el botón a su estado original
-		btnCargarNube.disabled = false;
-		btnCargarNube.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Actualizar Archivos';
-
 		// Mostrar notificación de éxito
-		showNotification('✅ Archivos actualizados exitosamente', 'success', 3000);
-
+		showNotification('✅ Archivos actualizados exitosamente desde la nube', 'success', 3000);
 	  } catch (error) {
 		console.error('❌ Error al cargar archivos desde Supabase:', error);
-
-		// Restaurar el botón a su estado original
-		btnCargarNube.disabled = false;
-		btnCargarNube.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Actualizar Archivos';
-
 		// Mostrar notificación de error
-		showNotification(`❌ Error al cargar datos: ${error.message}`, 'error', 5000);
+		showNotification(`❌ Error al cargar desde la nube: ${error.message}`, 'error', 5000);
 	  }
 	}
 
@@ -7580,6 +7543,15 @@ body {
 	  initKeyboardShortcuts();
 	  initSaldos();
 	  cargarDesdeSupabaseAutomatico();
+	  
+	 // Vincular nuevos botones del topbar
+	  document.getElementById('btnCargarLocalTop').addEventListener('click', () => {
+		document.getElementById('fileInputTop').click();
+	  });
+
+	  document.getElementById('btnCargarNubeTop').addEventListener('click', () => {
+		cargarDesdeSupabase();
+	  });
 
 	  // ✅ Inicialización del módulo CONSOLIDADO
 	  document.querySelectorAll('.nav-link').forEach(link => {
