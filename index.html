@@ -909,23 +909,62 @@ table tr:last-child td {
   border-bottom: none;
 }
 
-/* ===== THEME TOGGLE ===== */
-.theme-toggle {
+/* === BOTÓN FLOTANTE DE AYUDA MODERNO === */
+.floating-help {
   position: fixed;
-  bottom: 25px;
-  right: 25px;
-  background: white;
-  border: 1px solid rgba(57, 255, 20, 0.3);
+  bottom: 30px;
+  right: 30px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  cursor: pointer;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: white;
+  border: none;
+  box-shadow:
+    0 8px 20px rgba(124, 58, 237, 0.4),
+    0 2px 6px rgba(0, 0, 0, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  color: var(--primary-solid);
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  font-size: 1.4rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.floating-help:hover {
+  transform: scale(1.15) rotate(10deg);
+  box-shadow:
+    0 12px 30px rgba(124, 58, 237, 0.6),
+    0 4px 12px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #6d28d9, #5b21b6);
+}
+
+.floating-help:active {
+  transform: scale(1.05);
+}
+
+/* === ICONO INTERACTIVO: animación sutil === */
+.floating-help i {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  display: block;
+  margin: 0;
+}
+
+.floating-help:hover i {
+  transform: scale(1.1) rotate(45deg);
+  opacity: 0.95;
+}
+
+@keyframes pulseHelp {
+  0%, 100% { box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4); }
+  50% { box-shadow: 0 8px 20px rgba(124, 58, 237, 0.8); }
+}
+
+.floating-help.pulse {
+  animation: pulseHelp 2.5s infinite;
 }
 
 /* ===== SCROLLBAR PERSONALIZADO ===== */
@@ -1442,6 +1481,63 @@ body {
 .topbar-btn:hover::before {
   left: 100%;
 }
+
+/* === ESTILO DE PESTAÑAS EN AYUDA === */
+.help-tab {
+  background: rgba(6, 64, 43, 0.2);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px 8px 0 0;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+  white-space: nowrap;
+  font-size: 0.95rem;
+}
+.help-tab:hover {
+  background: rgba(57, 255, 20, 0.3);
+}
+.help-tab.active {
+  background: linear-gradient(135deg, #06402b, #0a5c3d);
+  color: white;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.2);
+}
+
+/* ===== ACCESIBILIDAD ===== */
+.accesibilidad-alto-contraste {
+  background: black !important;
+  color: white !important;
+}
+.accesibilidad-alto-contraste .section-card,
+.accesibilidad-alto-contraste .card,
+.accesibilidad-alto-contraste .btn,
+.accesibilidad-alto-contraste input,
+.accesibilidad-alto-contraste select {
+  background: white !important;
+  color: black !important;
+  border-color: white !important;
+}
+.accesibilidad-alto-contraste h1,
+.accesibilidad-alto-contraste h2,
+.accesibilidad-alto-contraste h3,
+.accesibilidad-alto-contraste h4,
+.accesibilidad-alto-contraste p,
+.accesibilidad-alto-contraste span,
+.accesibilidad-alto-contraste div {
+  color: white !important;
+}
+
+/* TAMAÑO TEXTO */
+.tamano-texto-s {
+  font-size: 0.85em !important;
+}
+.tamano-texto-m {
+  font-size: 1em !important;
+}
+.tamano-texto-l {
+  font-size: 1.25em !important;
+}
 </style>
 </head>
 <body>
@@ -1525,10 +1621,10 @@ body {
 			  SISTEMA DE GESTIÓN DE SERVICIOS PÚBLICO GUBIR MEBUC
 			</span>
 		  </div>
-		  <button class="theme-toggle" id="themeToggle" aria-label="Cambiar tema">
-			<i class="fas fa-moon"></i>
-		  </button>
-
+		<!-- Botón flotante de ayuda global -->
+		<button class="floating-help" id="floatingHelpBtn" aria-label="Abrir guía de ayuda">
+		  <i class="fas fa-question"></i>
+		</button>
 		  <!-- Botones de carga en esquina superior derecha -->
 		  <div style="
 			position: absolute;
@@ -1916,61 +2012,64 @@ body {
 			</div>
 		  </div>
 		</section>
-	<!-- CONFIGURACIÓN -->
+	<!-- CONFIGURACION -->
 	<section id="configuracion" class="page-section">
 	  <h1 style="text-align:center;color:white;font-size:2.3rem;margin-bottom:30px;">
-		<i class="fas fa-cog"></i> Configuración y Ayuda
+		<i class="fas fa-cog"></i> Configuración del Sistema
 	  </h1>
 	  <div class="section-card">
-		<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:25px;margin-bottom:25px;">
-		  <!-- TEMA CLARO/OSC URO -->
-		  <div style="background:rgba(6,64,43,0.2);border-radius:16px;padding:25px;text-align:center;transition:all 0.3s ease;">
-			<div style="width:60px;height:60px;background:rgba(255,255,255,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 4px 12px rgba(0,0,0,0.2);">
-			  <i class="fas fa-moon" style="font-size:1.8rem;color:white;"></i>
-			</div>
-			<h3 style="color:white;font-weight:700;margin-bottom:12px;">Tema claro y oscuro</h3>
-			<p style="color:rgba(255,255,255,0.85);font-size:0.95rem;margin-bottom:20px;line-height:1.5;">
-			  Cambia entre modo diurno y nocturno para reducir fatiga visual
-			</p>
-			<button class="btn" id="themeToggleCard" style="background:linear-gradient(135deg, #06402b, #0a5c3d);color:white;padding:10px 20px;width:100%;border:none;border-radius:12px;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,0.15);">
-			  <i class="fas fa-sync-alt"></i> Cambiar tema
+		<!-- TARJETA 1: NOTIFICACIONES -->
+		<div style="background:rgba(6,64,43,0.2);border-radius:16px;padding:25px;text-align:center;transition:all 0.3s ease;margin-bottom:25px;">
+		  <div style="width:60px;height:60px;background:rgba(255,255,255,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 4px 12px rgba(0,0,0,0.2);">
+			<i class="fas fa-bell" style="font-size:1.8rem;color:white;"></i>
+		  </div>
+		  <h3 style="color:white;font-weight:700;margin-bottom:12px;">Notificaciones del sistema</h3>
+		  <p style="color:rgba(255,255,255,0.85);font-size:0.95rem;margin-bottom:20px;line-height:1.5;">
+			Activa o desactiva alertas de carga, errores y acciones completadas
+		  </p>
+		  <button class="btn" id="notificacionesToggle" onclick="toggleNotificaciones()" style="padding:10px 20px;width:100%;border:none;border-radius:12px;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+			<!-- Contenido dinámico -->
+		  </button>
+		</div>
+		<!-- TARJETA 2: ACCESIBILIDAD -->
+		<div style="background:rgba(6,64,43,0.2);border-radius:16px;padding:25px;text-align:center;transition:all 0.3s ease;margin-bottom:25px;">
+		  <div style="width:60px;height:60px;background:rgba(255,255,255,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 4px 12px rgba(0,0,0,0.2);">
+			<i class="fas fa-universal-access" style="font-size:1.8rem;color:white;"></i>
+		  </div>
+		  <h3 style="color:white;font-weight:700;margin-bottom:12px;">Accesibilidad</h3>
+		  <p style="color:rgba(255,255,255,0.85);font-size:0.95rem;margin-bottom:20px;line-height:1.5;">
+			Ajusta el sistema a tus necesidades visuales
+		  </p>
+		  <div style="display:flex;gap:10px;margin:15px 0;justify-content:center;">
+			<button class="btn" onclick="toggleAltoContraste()" style="background:linear-gradient(135deg, #06402b, #0a5c3d);color:white;padding:8px 16px;font-size:0.85rem;">
+			  <i class="fas fa-adjust"></i> Alto contraste
 			</button>
 		  </div>
-
-		  <!-- AYUDA -->
-		  <div style="background:rgba(6,64,43,0.2);border-radius:16px;padding:25px;text-align:center;transition:all 0.3s ease;">
-			<div style="width:60px;height:60px;background:rgba(255,255,255,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 4px 12px rgba(0,0,0,0.2);">
-			  <i class="fas fa-question-circle" style="font-size:1.8rem;color:white;"></i>
+		  <div style="margin-top:10px;">
+			<p style="color:white;font-size:0.9rem;margin-bottom:10px;">Tamaño del texto</p>
+			<div style="display:flex;justify-content:center;gap:8px;">
+			  <button class="btn" onclick="cambiarTamanoTexto('s')" style="padding:6px 12px;font-size:0.8rem;background:rgba(255,255,255,0.2);color:white;">S</button>
+			  <button class="btn" onclick="cambiarTamanoTexto('m')" style="padding:6px 12px;font-size:0.8rem;background:rgba(255,255,255,0.2);color:white;">M</button>
+			  <button class="btn" onclick="cambiarTamanoTexto('l')" style="padding:6px 12px;font-size:0.8rem;background:rgba(255,255,255,0.2);color:white;">L</button>
 			</div>
-			<h3 style="color:white;font-weight:700;margin-bottom:12px;">Ayuda</h3>
-			<p style="color:rgba(255,255,255,0.85);font-size:0.95rem;margin-bottom:20px;line-height:1.5;">
-			  Guía interactiva con instrucciones y atajos del sistema
-			</p>
-			<button class="btn" onclick="showHelpModal()" style="background:linear-gradient(135deg, #06402b, #0a5c3d);color:white;padding:10px 20px;width:100%;border:none;border-radius:12px;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,0.15);">
-			  <i class="fas fa-book"></i> Ver guía
-			</button>
-		  </div>
-
-		  <!-- SOPORTE -->
-		  <div style="background:rgba(6,64,43,0.2);border-radius:16px;padding:25px;text-align:center;transition:all 0.3s ease;">
-			<div style="width:60px;height:60px;background:rgba(255,255,255,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 4px 12px rgba(0,0,0,0.2);">
-			  <i class="fas fa-headset" style="font-size:1.8rem;color:white;"></i>
-			</div>
-			<h3 style="color:white;font-weight:700;margin-bottom:12px;">Soporte</h3>
-			<p style="color:rgba(255,255,255,0.85);font-size:0.95rem;margin-bottom:20px;line-height:1.5;">
-			  Contacto directo con el desarrollador para asistencia técnica
-			</p>
-			<button class="btn" onclick="showSoporteModal()" style="background:linear-gradient(135deg, #06402b, #0a5c3d);color:white;padding:10px 20px;width:100%;border:none;border-radius:12px;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,0.15);">
-			  <i class="fas fa-envelope"></i> Contactar
-			</button>
 		  </div>
 		</div>
-
-		<!-- Información del sistema -->
-		<div style="background:rgba(0,0,0,0.2);border-radius:12px;padding:20px;margin-top:30px;text-align:center;">
-		  <p style="color:white;font-size:0.95rem;margin:8px 0;"><strong>Desarrollado por:</strong> SI. Santiago Escorcia Carlos Andrés</p>
-		  <p style="color:white;font-size:0.95rem;margin:8px 0;"><strong>Versión del sistema:</strong> 1.1</p>
-		  <p style="color:white;font-size:0.95rem;margin:8px 0;"><strong>Última actualización:</strong> Noviembre 2025</p>
+		<!-- === DESARROLLADOR DESTACADO === -->
+		<div style="background:linear-gradient(135deg, #06402b, #0a5c3d);border-radius:20px;padding:30px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,0.3);margin-top:30px;">
+		  <div style="width:80px;height:80px;border-radius:50%;background:white;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+			<i class="fas fa-code" style="font-size:2.2rem;color:#06402b;"></i>
+		  </div>
+		  <h3 style="color:white;font-weight:800;font-size:1.4rem;margin-bottom:10px;">Desarrollado por</h3>
+		  <p style="color:white;font-size:1.2rem;font-weight:700;margin:8px 0;">SI. SANTIAGO ESCORCIA CARLOS ANDRÉS</p>
+		  <p style="color:rgba(255,255,255,0.9);font-style:italic;font-size:0.95rem;margin:12px 0;">“Donde otros ven problemas, yo veo oportunidades.”</p>
+		  <div style="display:flex;justify-content:center;gap:15px;margin-top:15px;flex-wrap:wrap;">
+			<a href="mailto:carlos.santiago2987@correo.policia.gov.co" style="color:white;text-decoration:none;font-weight:600;font-size:0.9rem;">
+			  <i class="fas fa-envelope"></i> Enviar correo
+			</a>
+			<a href="tel:+573152380960" style="color:white;text-decoration:none;font-weight:600;font-size:0.9rem;">
+			  <i class="fas fa-phone"></i> Llamar ahora
+			</a>
+		  </div>
 		</div>
 	  </div>
 	</section>
@@ -1980,8 +2079,8 @@ body {
   <div id="loading" class="loading">
     <div class="loading-content">
       <div class="spinner"></div>
-      <h3 style="margin-bottom:10px;">Procesando archivos...</h3>
-      <p style="color:#64748b;">Por favor espera</p>
+      <h3 style="margin-bottom:10px;">Procesando Informacion...</h3>
+      <p style="color:#64748b;">Por favor espera un momento</p>
     </div>
   </div>
   <div id="modal" class="modal">
@@ -3695,7 +3794,7 @@ body {
 	// ========== CARGA AUTOMÁTICA DESDE SUPABASE AL INICIAR ==========
 	async function cargarDesdeSupabaseAutomatico() {
 	  try {
-		showNotification('🔽 Iniciando carga automática desde la nube...', 'info', 2000);
+		
 		await cargarDesdeSupabase(); // Usa la función ya corregida
 		showNotification('✅ Carga automática completada con éxito', 'success', 3000);
 	  } catch (error) {
@@ -3870,19 +3969,6 @@ body {
 	  document.getElementById('topbar').className = 'topbar';
 	}
 
-    // ========== TEMA OSCURO/CLARO ==========
-    const themeToggle = document.getElementById('themeToggle');
-    themeToggle.addEventListener('click', () => {
-      const currentTheme = document.body.getAttribute('data-theme');
-      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-      document.body.setAttribute('data-theme', newTheme);
-      localStorage.setItem('theme', newTheme);
-      themeToggle.innerHTML = newTheme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-    });
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    document.body.setAttribute('data-theme', savedTheme);
-    themeToggle.innerHTML = savedTheme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-
     // ========== UTILIDADES UI ==========
     function showNotification(message, type = 'success', duration = 3000) {
       const notif = document.createElement('div');
@@ -4003,7 +4089,7 @@ body {
 		await handleFiles(archivos);
 
 		// Mostrar notificación de éxito
-		showNotification('✅ Archivos actualizados exitosamente desde la nube', 'success', 3000);
+		
 	  } catch (error) {
 		console.error('❌ Error al cargar archivos desde Supabase:', error);
 		// Mostrar notificación de error
@@ -4101,7 +4187,6 @@ body {
 		  // ✅ Inicializar saldos con las unidades/servicios encontrados
 		  inicializarEstructuraSaldosDesdeDatos();
 		  renderTablaSaldos(); // ✅ Refrescar tabla inmediatamente
-		  showNotification(`✅ ${processedCount} archivo(s) procesado(s) exitosamente`);
 		}
 
 	  } catch (error) {
@@ -7208,119 +7293,376 @@ body {
       }
     }
 
-    // ========== SISTEMA DE AYUDA INTERACTIVA ==========
-    function initHelpSystem() {
-      const helpButton = document.createElement('button');
-      helpButton.innerHTML = '<i class="fas fa-question-circle"></i>';
-      helpButton.className = 'help-button';
-      helpButton.addEventListener('click', showHelpModal);
-      document.body.appendChild(helpButton);
-    }
+	// ======== GUÍA DE AYUDA INTERACTIVA MODERNA ========
+	function showHelpModal() {
+	  const helpContent = `
+		<div style="max-width: 950px; width: 100%;">
+		  <h2 style="color: white; margin-bottom: 24px; font-size: 2rem; text-align: center; text-shadow: 0 2px 6px rgba(0,0,0,0.3);">
+			<i class="fas fa-graduation-cap" style="color: #fbbf24;"></i> Guía Interactiva del Sistema
+		  </h2>
 
-    function showHelpModal() {
-      const helpContent = `
-        <div style="max-width: 900px;">
-          <h2 style="color: var(--primary-solid); margin-bottom: 30px; font-size: 2rem; text-align: center;">
-            <i class="fas fa-graduation-cap"></i> Guía Rápida del Sistema
-          </h2>
-          <div style="display: grid; gap: 20px;">
-            <div class="help-card" style="background: linear-gradient(135deg, #667eea15, #764ba215); padding: 25px; border-radius: 15px; border-left: 5px solid #667eea;">
-              <h3 style="color: #667eea; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-                <span style="background: #667eea; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">1</span>
-                Cargar Archivos Excel
-              </h3>
-              <p style="color: #4a5568; line-height: 1.8; margin-bottom: 10px;">
-                • Ve a la sección <strong>INICIO</strong><br>
-                • Arrastra tus archivos Excel o haz clic en el área de carga<br>
-				• tambien puedes darle actualizar desde la nube, donde te brindara informacion en tiempo real.<br>
-                • Los archivos deben nombrarse: <code style="background: #f3f4f6; padding: 2px 8px; border-radius: 4px;">ENERGIA_MEBUC.xlsx</code>, <code style="background: #f3f4f6; padding: 2px 8px; border-radius: 4px;">ACUEDUCTO_DESAN.xlsx</code>, etc.<br>
-                • El sistema detecta automáticamente el servicio y la unidad
-              </p>
-              <div style="background: #fef3c7; padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 3px solid #f59e0b;">
-                <strong style="color: #92400e;">💡 Tip:</strong> Puedes cargar múltiples archivos a la vez
-              </div>
-            </div>
-            <div class="help-card" style="background: linear-gradient(135deg, #20bf6b15, #0575e615); padding: 25px; border-radius: 15px; border-left: 5px solid #20bf6b;">
-              <h3 style="color: #20bf6b; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-                <span style="background: #20bf6b; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">2</span>
-                Explorar Novedades
-              </h3>
-              <p style="color: #4a5568; line-height: 1.8; margin-bottom: 10px;">
-                • Selecciona el servicio (Energía, Acueducto o Gas)<br>
-                • Visualiza intereses comparados entre meses<br>
-                • Consulta el Top 5 de predios con mayor incremento de consumo<br>
-                • Revisa el Top 10 de mayor consumo acumulado del año
-              </p>
-              <div style="background: #dbeafe; padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 3px solid #3b82f6;">
-                <strong style="color: #1e40af;">📊 Información:</strong> Las novedades se actualizan automáticamente al cargar nuevos datos
-              </div>
-            </div>
-            <div class="help-card" style="background: linear-gradient(135deg, #f5af1915, #f1271115); padding: 25px; border-radius: 15px; border-left: 5px solid #f5af19;">
-              <h3 style="color: #f5af19; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-                <span style="background: #f5af19; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">3</span>
-                Búsqueda Inteligente
-              </h3>
-              <p style="color: #4a5568; line-height: 1.8; margin-bottom: 10px;">
-                • Selecciona el servicio a consultar<br>
-                • Escribe el nombre del predio o número de cuenta<br>
-                • Presiona "Ver Detalles" para historial completo<br>
-                • Accede a promedios y totales del predio
-              </p>
-            </div>
-            <div class="help-card" style="background: linear-gradient(135deg, #f093fb15, #f5576c15); padding: 25px; border-radius: 15px; border-left: 5px solid #f093fb;">
-              <h3 style="color: #f093fb; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-                <span style="background: #f093fb; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700;">4</span>
-                Análisis Gráfico Avanzado
-              </h3>
-              <p style="color: #4a5568; line-height: 1.8; margin-bottom: 10px;">
-                <strong>Tipos de análisis disponibles:</strong><br>
-                • <strong>Comparativo por Unidades:</strong> Compara MEBUC, DESAN y DEMAM<br>
-                • <strong>Evolución Temporal:</strong> Observa tendencias mes a mes<br>
-                • <strong>Distribución por Unidad:</strong> Gráfico circular de proporción<br>
-                • <strong>Análisis de Predio Específico:</strong> Historial detallado de un predio
-              </p>
-              <div style="background: #f0fdf4; padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 3px solid #22c55e;">
-                <strong style="color: #166534;">✅ Ventaja:</strong> Exporta gráficos como imagen PNG con un clic
-              </div>
-            </div>
-            <div class="help-card" style="background: linear-gradient(135deg, #4facfe15, #00f2fe15); padding: 25px; border-radius: 15px; border-left: 5px solid #4facfe;">
-              <h3 style="color: #4facfe; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
-                <i class="fas fa-keyboard"></i>
-                Atajos de Teclado
-              </h3>
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
-                <div style="background: white; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 8px;">
-                  <kbd style="background: #2d3748; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem;">Ctrl + U</kbd>
-                  <span style="font-size: 0.9rem;">Cargar archivo</span>
-                </div>
-                <div style="background: white; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 8px;">
-                  <kbd style="background: #2d3748; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem;">Ctrl + F</kbd>
-                  <span style="font-size: 0.9rem;">Buscar predio</span>
-                </div>
-                <div style="background: white; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 8px;">
-                  <kbd style="background: #2d3748; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem;">Esc</kbd>
-                  <span style="font-size: 0.9rem;">Cerrar modal</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div style="margin-top: 30px; text-align: center; padding: 20px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 12px; color: white;">
-            <h4 style="margin-bottom: 10px; font-size: 1.3rem;">¿Necesitas más ayuda?</h4>
-            <p style="margin-bottom: 15px;">Contacta al equipo de soporte técnico</p>
-            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-              <a href="mailto:carlos.santiago2987@correo.policia.gov.co" style="background: white; color: #667eea; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
-                <i class="fas fa-envelope"></i> carlos.santiago2987@correo.policia.gov.co
-              </a>
-              <a href="tel:+57315-238-0960" style="background: white; color: #667eea; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
-                <i class="fas fa-phone"></i> +57 315-238-0960
-              </a>
-            </div>
-          </div>
-        </div>
-      `;
-      document.getElementById('modalContent').innerHTML = helpContent;
-      document.getElementById('modal').classList.add('active');
-    }
+		  <!-- Pestañas de navegación -->
+		  <div id="helpTabs" style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px; scrollbar-width: thin;">
+			<button class="help-tab active" data-tab="inicio">Inicio</button>
+			<button class="help-tab" data-tab="novedades">Novedades</button>
+			<button class="help-tab" data-tab="busqueda">Búsqueda</button>
+			<button class="help-tab" data-tab="estadisticas">Estadísticas</button>
+			<button class="help-tab" data-tab="graficos">Gráficos</button>
+			<button class="help-tab" data-tab="saldos">Saldos</button>
+			<button class="help-tab" data-tab="consolidado">Consolidado</button>
+			<button class="help-tab" data-tab="atajos">Atajos</button>
+			<button class="help-tab" data-tab="soporte">Soporte</button>
+		  </div>
+
+		  <!-- Contenido dinámico -->
+		  <div id="helpContent" style="margin-top: 20px; background: rgba(255,255,255,0.95); border-radius: 16px; padding: 24px; color: #2d3748;">
+			<!-- Contenido se inyecta aquí -->
+		  </div>
+		</div>
+	  `;
+
+	  document.getElementById('modalContent').innerHTML = helpContent;
+	  document.getElementById('modal').classList.add('active');
+
+	  // Inyectar contenido inicial
+	  showHelpTab('inicio');
+
+	  // Manejar clics en pestañas
+	  document.querySelectorAll('.help-tab').forEach(tab => {
+		tab.addEventListener('click', () => {
+		  document.querySelectorAll('.help-tab').forEach(t => t.classList.remove('active'));
+		  tab.classList.add('active');
+		  showHelpTab(tab.dataset.tab);
+		});
+	  });
+	}
+	
+	// ========== CONFIGURACIÓN: NOTIFICACIONES ==========
+	function toggleNotificaciones() {
+	  const activas = localStorage.getItem('notificaciones_activas') !== 'false';
+	  const nuevas = !activas;
+	  localStorage.setItem('notificaciones_activas', String(nuevas));
+	  const btn = document.getElementById('notificacionesToggle');
+	  const icon = btn.querySelector('i');
+	  btn.style.background = nuevas 
+		? 'linear-gradient(135deg, #22c55e, #0d9488)' 
+		: 'linear-gradient(135deg, #6b7280, #4b5563)';
+	  btn.innerHTML = nuevas 
+		? '<i class="fas fa-bell"></i> Activadas' 
+		: '<i class="fas fa-bell-slash"></i> Desactivadas';
+	  showNotification(
+		`🔔 Notificaciones ${nuevas ? 'activadas' : 'desactivadas'}`,
+		nuevas ? 'success' : 'info',
+		1500
+	  );
+	}
+
+	// ========== CONFIGURACIÓN: ACCESIBILIDAD ==========
+	function aplicarAccesibilidad() {
+	  const altoContraste = localStorage.getItem('accesibilidad_alto_contraste') === 'true';
+	  const tamano = localStorage.getItem('accesibilidad_tamano_texto') || 'm';
+
+	  // Aplicar alto contraste
+	  document.body.classList.toggle('accesibilidad-alto-contraste', altoContraste);
+
+	  // Aplicar tamaño de texto
+	  document.body.classList.remove('tamano-texto-s', 'tamano-texto-m', 'tamano-texto-l');
+	  document.body.classList.add(`tamano-texto-${tamano}`);
+	}
+
+	function toggleAltoContraste() {
+	  const activo = localStorage.getItem('accesibilidad_alto_contraste') !== 'true';
+	  localStorage.setItem('accesibilidad_alto_contraste', String(activo));
+	  aplicarAccesibilidad();
+	  showNotification(
+		`🎨 ${activo ? 'Alto contraste activado' : 'Alto contraste desactivado'}`,
+		'success',
+		1500
+	  );
+	}
+
+	function cambiarTamanoTexto(tamano) {
+	  localStorage.setItem('accesibilidad_tamano_texto', tamano);
+	  aplicarAccesibilidad();
+	  const labels = { s: 'pequeño', m: 'mediano', l: 'grande' };
+	  showNotification(`🔍 Tamaño de texto: ${labels[tamano]}`, 'success', 1500);
+	}
+
+	// Aplicar preferencias al cargar
+	document.addEventListener('DOMContentLoaded', () => {
+	  aplicarAccesibilidad();
+	  // Estado inicial del botón de notificaciones
+	  const notifActivas = localStorage.getItem('notificaciones_activas') !== 'false';
+	  const btn = document.getElementById('notificacionesToggle');
+	  if (btn) {
+		btn.style.background = notifActivas 
+		  ? 'linear-gradient(135deg, #22c55e, #0d9488)' 
+		  : 'linear-gradient(135deg, #6b7280, #4b5563)';
+		btn.innerHTML = notifActivas 
+		  ? '<i class="fas fa-bell"></i> Activadas' 
+		  : '<i class="fas fa-bell-slash"></i> Desactivadas';
+	  }
+	});
+	
+	// ========== FUNCIÓN PARA TOGGLER TEMA CLARO/OSC URO ==========
+	function toggleTheme() {
+	  const html = document.documentElement;
+	  const currentTheme = html.getAttribute('data-theme');
+	  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+	  
+	  html.setAttribute('data-theme', newTheme);
+	  localStorage.setItem('theme', newTheme);
+	  
+	  // Actualizar ícono
+	  const icon = document.getElementById('themeToggleIcon');
+	  if (icon) {
+		icon.className = newTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+	  }
+	  
+	  // Notificación
+	  showNotification(
+		`🎨 Modo ${newTheme === 'dark' ? 'oscuro' : 'claro'} activado`,
+		'success',
+		2000
+	  );
+	}
+
+	// ========== FUNCIÓN PARA MOSTRAR MODAL DE SOPORTE ==========
+	function showSoporteModal() {
+	  const content = `
+		<div style="max-width: 600px; text-align: center;">
+		  <h3 style="color: var(--primary-solid); margin-bottom: 20px;">
+			<i class="fas fa-headset"></i> Soporte Técnico
+		  </h3>
+		  <p style="font-size: 1.1rem; margin-bottom: 25px;">
+			¿Tienes dudas, errores o sugerencias? ¡Contáctame!
+		  </p>
+		  <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 25px;">
+			<a href="mailto:carlos.santiago2987@correo.policia.gov.co" style="display: inline-block; background: linear-gradient(135deg, #06402b, #0a5c3d); color: white; padding: 12px 24px; border-radius: 10px; text-decoration: none; font-weight: 600;">
+			  <i class="fas fa-envelope"></i> Enviar correo
+			</a>
+			<a href="tel:+573152380960" style="display: inline-block; background: linear-gradient(135deg, #06402b, #0a5c3d); color: white; padding: 12px 24px; border-radius: 10px; text-decoration: none; font-weight: 600;">
+			  <i class="fas fa-phone"></i> Llamar ahora
+			</a>
+		  </div>
+		  <p style="font-size: 0.95rem; color: #64748b;">
+			<strong>Desarrollado por:</strong> SI. Santiago Escorcia Carlos Andrés<br>
+			<strong>Versión:</strong> 1.1 • Noviembre 2025
+		  </p>
+		</div>
+	  `;
+	  document.getElementById('modalContent').innerHTML = content;
+	  document.getElementById('modal').classList.add('active');
+	}
+
+	function showHelpTab(tabId) {
+	  const container = document.getElementById('helpContent');
+	  let content = '';
+
+	  const styles = {
+		card: `background: linear-gradient(135deg, rgba(6,64,43,0.08), rgba(6,64,43,0.02)); padding: 20px; border-radius: 12px; margin-bottom: 18px; border-left: 4px solid #06402b;`,
+		title: `color: #06402b; font-size: 1.3rem; margin-bottom: 12px; display: flex; align-items: center; gap: 10px;`,
+		tip: `background: #fffbeb; padding: 12px; border-radius: 8px; border-left: 3px solid #f59e0b; margin-top: 12px; font-size: 0.95rem;`,
+		code: `background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-family: monospace;`,
+		warning: `background: #fee2e2; padding: 12px; border-radius: 8px; border-left: 3px solid #ef4444; margin-top: 12px;`
+	  };
+
+	  switch(tabId) {
+		case 'inicio':
+		  content = `
+			<div style="${styles.card}">
+			  <h3 style="${styles.title}"><i class="fas fa-home"></i> Centro de Carga</h3>
+			  <p>Este es tu panel principal. Aquí verás un resumen en tiempo real de:</p>
+			  <ul style="padding-left: 20px; margin: 12px 0;">
+				<li>Predios tramitados vs pendientes por unidad</li>
+				<li>Porcentaje de avance por servicio</li>
+				<li>Último mes procesado</li>
+			  </ul>
+			  <div style="${styles.tip}">
+				<strong>💡 Tip:</strong> Haz clic en el ícono de <strong>ojo 👁️</strong> en cada tarjeta para ver los predios pendientes por unidad.
+			  </div>
+			  <p>Los colores indican estado:
+				<span style="color:#10b981;">🟢 Normal</span>,
+				<span style="color:#f59e0b;">🟠 Alerta</span>,
+				<span style="color:#ef4444;">🔴 Crítico</span>
+			  </p>
+			</div>
+		  `;
+		  break;
+
+		case 'novedades':
+		  content = `
+			<div style="${styles.card}">
+			  <h3 style="${styles.title}"><i class="fas fa-exclamation-triangle"></i> Novedades</h3>
+			  <p>Este módulo te alerta sobre:</p>
+			  <ul style="padding-left: 20px; margin: 12px 0;">
+				<li><strong>Aumento de intereses</strong> mes a mes (compara actual vs anterior)</li>
+				<li><strong>Top 5 predios</strong> con mayor incremento de consumo (≥5%)</li>
+				<li><strong>Top 10 predios</strong> con mayor consumo acumulado en el año</li>
+			  </ul>
+			  <div style="${styles.tip}">
+				<strong>💡 Tip:</strong> Usa estas listas para priorizar auditorías técnicas en predios críticos.
+			  </div>
+			</div>
+		  `;
+		  break;
+
+		case 'busqueda':
+		  content = `
+			<div style="${styles.card}">
+			  <h3 style="${styles.title}"><i class="fas fa-search"></i> Búsqueda Inteligente</h3>
+			  <p>Busca cualquier predio por:</p>
+			  <ul style="padding-left: 20px; margin: 12px 0;">
+				<li>Nombre de estación</li>
+				<li>Número de cuenta</li>
+			  </ul>
+			  <p>Al encontrarlo, haz clic en <strong>"Ver Detalles"</strong> para ver:</p>
+			  <ul style="padding-left: 20px; margin: 12px 0;">
+				<li>Historial mensual completo</li>
+				<li>Promedios de consumo y tramite</li>
+				<li>Factura asociada (si está presente)</li>
+			  </ul>
+			  <div style="${styles.warning}">
+				<strong>⚠️ Importante:</strong> La búsqueda es <strong>case-insensitive</strong> y basta con 2 letras.
+			  </div>
+			</div>
+		  `;
+		  break;
+
+		case 'estadisticas':
+		  content = `
+			<div style="${styles.card}">
+			  <h3 style="${styles.title}"><i class="fas fa-chart-bar"></i> Estadísticas</h3>
+			  <p>Obtén resúmenes numéricos por:</p>
+			  <ul style="padding-left: 20px; margin: 12px 0;">
+				<li>Servicio (Energía, Acueducto, Gas)</li>
+				<li>Unidad (MEBUC, DESAN, etc.)</li>
+				<li>Mes específico o todos los meses</li>
+			  </ul>
+			  <p>Verás métricas clave como:</p>
+			  <ul style="padding-left: 20px; margin: 12px 0;">
+				<li>Consumo total (kWh o m³)</li>
+				<li>Valor a tramitar</li>
+				<li>Intereses generados</li>
+			  </ul>
+			</div>
+		  `;
+		  break;
+
+		case 'graficos':
+		  content = `
+			<div style="${styles.card}">
+			  <h3 style="${styles.title}"><i class="fas fa-chart-line"></i> Análisis Gráfico</h3>
+			  <p>Elige entre 4 tipos de análisis:</p>
+			  <ol style="padding-left: 20px; margin: 12px 0;">
+				<li><strong>Comparativo por unidades:</strong> Barra horizontal entre MEBUC, DESAN, etc.</li>
+				<li><strong>Evolución temporal:</strong> Línea que muestra tendencia mes a mes</li>
+				<li><strong>Distribución:</strong> Gráfico circular de participación</li>
+				<li><strong>Predio específico:</strong> Historial gráfico de un predio</li>
+			  </ol>
+			  <div style="${styles.tip}">
+				<strong>💡 Tip:</strong> Usa el filtro "Buscar Predio" para analizar un predio específico.
+			  </div>
+			  <p>Todos los gráficos se pueden <strong>exportar como PNG</strong> con un clic.</p>
+			</div>
+		  `;
+		  break;
+
+		case 'saldos':
+		  content = `
+			<div style="${styles.card}">
+			  <h3 style="${styles.title}"><i class="fas fa-wallet"></i> Saldos Presupuestales</h3>
+			  <p>Gestiona tu presupuesto institucional con:</p>
+			  <ul style="padding-left: 20px; margin: 12px 0;">
+				<li>Asignación anual por unidad y servicio</li>
+				<li>Ejecución real mes a mes</li>
+				<li>Proyección de gasto para el resto del año</li>
+				<li>Alertas tempranas (% ejecución >60% = alerta, >80% = crítica)</li>
+			  </ul>
+			  <p>Puedes <strong>editar o agregar</strong> partidas presupuestales directamente desde aquí.</p>
+			  <div style="${styles.tip}">
+				<strong>💡 Tip:</strong> El sistema guarda automáticamente cada 30 segundos y respalda en la nube.
+			  </div>
+			</div>
+		  `;
+		  break;
+
+		case 'consolidado':
+		  content = `
+			<div style="${styles.card}">
+			  <h3 style="${styles.title}"><i class="fas fa-balance-scale"></i> Comparación Analítica</h3>
+			  <p>Compara dos meses del mismo servicio y unidad para:</p>
+			  <ul style="padding-left: 20px; margin: 12px 0;">
+				<li>Identificar variaciones en consumo</li>
+				<li>Cuantificar ahorros o sobrecostos</li>
+				<li>Generar informes técnicos con recomendaciones</li>
+			  </ul>
+			  <p>El sistema incluye un <strong>análisis escrito automático</strong> con:</p>
+			  <ul style="padding-left: 20px; margin: 12px 0;">
+				<li>Tendencia general</li>
+				<li>Predio con mayor impacto negativo</li>
+				<li>Predio con mayor eficiencia</li>
+				<li>Recomendaciones operativas</li>
+			  </ul>
+			  <p>Exporta en <strong>PDF o Excel</strong> con un solo clic.</p>
+			</div>
+		  `;
+		  break;
+
+		case 'atajos':
+		  content = `
+			<div style="${styles.card}">
+			  <h3 style="${styles.title}"><i class="fas fa-keyboard"></i> Atajos de Teclado</h3>
+			  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 15px;">
+				<div style="display: flex; align-items: center; gap: 10px; background: #f8fafc; padding: 10px; border-radius: 8px;">
+				  <kbd style="background: #2d3748; color: white; padding: 4px 8px; border-radius: 4px;">Ctrl + U</kbd>
+				  <span>Cargar archivo</span>
+				</div>
+				<div style="display: flex; align-items: center; gap: 10px; background: #f8fafc; padding: 10px; border-radius: 8px;">
+				  <kbd style="background: #2d3748; color: white; padding: 4px 8px; border-radius: 4px;">Ctrl + F</kbd>
+				  <span>Ir a Búsqueda</span>
+				</div>
+				<div style="display: flex; align-items: center; gap: 10px; background: #f8fafc; padding: 10px; border-radius: 8px;">
+				  <kbd style="background: #2d3748; color: white; padding: 4px 8px; border-radius: 4px;">Ctrl + H</kbd>
+				  <span>Abrir esta guía</span>
+				</div>
+				<div style="display: flex; align-items: center; gap: 10px; background: #f8fafc; padding: 10px; border-radius: 8px;">
+				  <kbd style="background: #2d3748; color: white; padding: 4px 8px; border-radius: 4px;">Ctrl + S</kbd>
+				  <span>Respaldo JSON</span>
+				</div>
+				<div style="display: flex; align-items: center; gap: 10px; background: #f8fafc; padding: 10px; border-radius: 8px;">
+				  <kbd style="background: #2d3748; color: white; padding: 4px 8px; border-radius: 4px;">Esc</kbd>
+				  <span>Cerrar ventanas</span>
+				</div>
+			  </div>
+			</div>
+		  `;
+		  break;
+
+		case 'soporte':
+		  content = `
+			<div style="${styles.card}">
+			  <h3 style="${styles.title}"><i class="fas fa-headset"></i> Soporte Técnico</h3>
+			  <p>¿Tienes dudas o encontraste un error?</p>
+			  <div style="margin: 20px 0; text-align: center;">
+				<a href="mailto:carlos.santiago2987@correo.policia.gov.co" style="display: inline-block; background: linear-gradient(135deg, #06402b, #0a5c3d); color: white; padding: 12px 24px; border-radius: 10px; text-decoration: none; font-weight: 600; margin: 8px;">
+				  <i class="fas fa-envelope"></i> Enviar correo
+				</a>
+				<a href="tel:+573152380960" style="display: inline-block; background: linear-gradient(135deg, #06402b, #0a5c3d); color: white; padding: 12px 24px; border-radius: 10px; text-decoration: none; font-weight: 600; margin: 8px;">
+				  <i class="fas fa-phone"></i> Llamar ahora
+				</a>
+			  </div>
+			  <p style="font-size: 0.9rem; color: #64748b; margin-top: 20px;">
+				<strong>Desarrollado por:</strong> SI. Santiago Escorcia Carlos Andrés<br>
+				<strong>Versión:</strong> 1.1 • Noviembre 2025
+			  </p>
+			</div>
+		  `;
+		  break;
+	  }
+
+	  container.innerHTML = content;
+	}
 
     // ========== SISTEMA DE ATAJOS DE TECLADO ==========
     function initKeyboardShortcuts() {
@@ -7539,7 +7881,6 @@ body {
 		});
 	  });
 	  initExportSystem();
-	  initHelpSystem();
 	  initKeyboardShortcuts();
 	  initSaldos();
 	  cargarDesdeSupabaseAutomatico();
@@ -7552,6 +7893,27 @@ body {
 	  document.getElementById('btnCargarNubeTop').addEventListener('click', () => {
 		cargarDesdeSupabase();
 	  });
+	  
+	  // Botón flotante de ayuda global
+      document.getElementById('floatingHelpBtn').addEventListener('click', showHelpModal);
+	  
+	  // Ejecutar una vez al inicio (dentro de DOMContentLoaded)
+		setTimeout(() => {
+		  const helpBtn = document.getElementById('floatingHelpBtn');
+		  if (helpBtn) {
+			helpBtn.classList.add('pulse');
+			setTimeout(() => helpBtn.classList.remove('pulse'), 5000);
+		  }
+		}, 1000);
+		
+		// Aplicar tema guardado al iniciar
+		const savedTheme = localStorage.getItem('theme') || 'light';
+		document.documentElement.setAttribute('data-theme', savedTheme);
+		// Actualizar ícono si ya existe
+		if (savedTheme === 'dark') {
+		  const icon = document.getElementById('themeToggleIcon');
+		  if (icon) icon.className = 'fas fa-moon';
+		}
 
 	  // ✅ Inicialización del módulo CONSOLIDADO
 	  document.querySelectorAll('.nav-link').forEach(link => {
