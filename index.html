@@ -93,8 +93,9 @@ body::after {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: 1;
+  z-index: 2; /* Por encima del body::before que probablemente tiene z-index: -1 o 0 */
   overflow: hidden;
+  background: transparent;
 }
 
 /* Estrellas mejoradas con múltiples capas de profundidad */
@@ -109,7 +110,7 @@ body::after {
   animation: twinkle 3s ease-in-out infinite;
 }
 
-/* Estrellas brillantes (agregar clase adicional a algunas estrellas) */
+/* Estrellas brillantes */
 .star-bright {
   background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,255,255,0.8) 30%, rgba(139, 195, 74, 0.3) 60%, transparent 100%);
   box-shadow: 
@@ -120,10 +121,10 @@ body::after {
   animation: pulse-star 4s ease-in-out infinite;
 }
 
-/* Estrellas distantes (agregar clase adicional para estrellas de fondo) */
+/* Estrellas distantes */
 .star-distant {
-  opacity: 0.4;
-  box-shadow: 0 0 4px rgba(255,255,255,0.5);
+  opacity: 0.5;
+  box-shadow: 0 0 4px rgba(255,255,255,0.6);
   animation: twinkle-slow 5s ease-in-out infinite;
 }
 
@@ -132,75 +133,65 @@ body::after {
   position: absolute;
   top: 50%;
   left: 50%;
-  border: 2px solid rgba(57, 255, 20, 0.3);
+  border: 2px solid rgba(139, 195, 74, 0.35);
   border-radius: 50%;
   transform: translate(-50%, -50%);
   animation: expandRing 10s ease-out infinite;
   box-shadow: 
-    0 0 20px rgba(57, 255, 20, 0.3),
-    inset 0 0 20px rgba(57, 255, 20, 0.2);
+    0 0 25px rgba(139, 195, 74, 0.4),
+    inset 0 0 25px rgba(139, 195, 74, 0.3);
+  background: transparent;
 }
 
 .wave-ring:nth-child(1) {
   animation-delay: 0s;
-  border-color: rgba(139, 195, 74, 0.4);
+  border-color: rgba(139, 195, 74, 0.45);
   box-shadow: 
-    0 0 25px rgba(139, 195, 74, 0.4),
-    inset 0 0 25px rgba(139, 195, 74, 0.3);
+    0 0 30px rgba(139, 195, 74, 0.5),
+    inset 0 0 30px rgba(139, 195, 74, 0.35);
 }
 
 .wave-ring:nth-child(2) {
   animation-delay: 3.3s;
-  border-color: rgba(76, 175, 80, 0.3);
+  border-color: rgba(76, 175, 80, 0.35);
   box-shadow: 
-    0 0 20px rgba(76, 175, 80, 0.3),
-    inset 0 0 20px rgba(76, 175, 80, 0.2);
+    0 0 25px rgba(76, 175, 80, 0.4),
+    inset 0 0 25px rgba(76, 175, 80, 0.3);
 }
 
 .wave-ring:nth-child(3) {
   animation-delay: 6.6s;
-  border-color: rgba(57, 255, 20, 0.25);
+  border-color: rgba(57, 255, 20, 0.3);
   box-shadow: 
-    0 0 15px rgba(57, 255, 20, 0.25),
-    inset 0 0 15px rgba(57, 255, 20, 0.2);
+    0 0 20px rgba(57, 255, 20, 0.35),
+    inset 0 0 20px rgba(57, 255, 20, 0.25);
 }
 
-/* Nebulosa de fondo sutil */
-.star-field::before {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: 
-    radial-gradient(ellipse at 30% 40%, rgba(45, 90, 39, 0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at 70% 60%, rgba(6, 64, 43, 0.06) 0%, transparent 50%);
-  animation: nebula-shift 25s ease-in-out infinite alternate;
-  pointer-events: none;
-}
 
-/* Polvo estelar */
+
+/* Polvo estelar - Complementa tu fondo */
 .star-field::after {
   content: '';
   position: absolute;
   width: 100%;
   height: 100%;
   background-image: 
-    radial-gradient(1px 1px at 25% 35%, rgba(255, 255, 255, 0.15), transparent),
-    radial-gradient(1px 1px at 65% 75%, rgba(255, 255, 255, 0.12), transparent),
-    radial-gradient(1px 1px at 45% 55%, rgba(255, 255, 255, 0.08), transparent),
-    radial-gradient(1px 1px at 85% 15%, rgba(255, 255, 255, 0.18), transparent),
-    radial-gradient(1px 1px at 15% 85%, rgba(255, 255, 255, 0.1), transparent);
+    radial-gradient(1px 1px at 25% 35%, rgba(255, 255, 255, 0.12), transparent),
+    radial-gradient(1px 1px at 65% 75%, rgba(255, 255, 255, 0.09), transparent),
+    radial-gradient(1px 1px at 45% 55%, rgba(255, 255, 255, 0.06), transparent),
+    radial-gradient(1px 1px at 85% 15%, rgba(139, 195, 74, 0.15), transparent),
+    radial-gradient(1px 1px at 15% 85%, rgba(76, 175, 80, 0.08), transparent);
   background-size: 250% 250%, 300% 300%, 280% 280%, 320% 320%, 270% 270%;
   background-position: 0% 0%, 100% 100%, 50% 50%, 20% 80%, 80% 20%;
   animation: drift 70s linear infinite;
-  opacity: 0.5;
+  opacity: 0.4;
   pointer-events: none;
 }
 
 /* Animaciones mejoradas */
 @keyframes twinkle { 
   0%, 100% { 
-    opacity: 0.6; 
+    opacity: 0.7; 
     transform: scale(1); 
   } 
   50% { 
@@ -211,10 +202,10 @@ body::after {
 
 @keyframes twinkle-slow {
   0%, 100% { 
-    opacity: 0.3; 
+    opacity: 0.4; 
   }
   50% { 
-    opacity: 0.7; 
+    opacity: 0.8; 
   }
 }
 
@@ -224,7 +215,7 @@ body::after {
     transform: scale(1);
   }
   50% { 
-    opacity: 0.8; 
+    opacity: 0.85; 
     transform: scale(1.5);
   }
 }
@@ -256,7 +247,7 @@ body::after {
 @keyframes nebula-shift {
   0% { 
     transform: translateX(-15px) translateY(-15px) scale(1); 
-    opacity: 0.8;
+    opacity: 0.7;
   }
   100% { 
     transform: translateX(15px) translateY(15px) scale(1.05); 
@@ -288,6 +279,18 @@ body::after {
     transform: translateX(400px) translateY(400px) rotate(45deg);
     opacity: 0;
   }
+}
+body::before {
+  z-index: -1; /* Tu fondo atrás de todo */
+}
+
+.star-field, .gravity-waves {
+  z-index: 1; /* Efectos visuales */
+}
+
+/* Tu contenido principal */
+.contenido-principal {
+  z-index: 10; /* Por encima de estrellas */
 }
 
 /* --- LAYOUT Y SIDEBAR --- */
@@ -1679,39 +1682,79 @@ body {
   box-shadow: 0 -2px 8px rgba(0,0,0,0.2);
 }
 
-/* ===== ACCESIBILIDAD ===== */
-.accesibilidad-alto-contraste {
-  background: black !important;
-  color: white !important;
-}
-.accesibilidad-alto-contraste .section-card,
-.accesibilidad-alto-contraste .card,
-.accesibilidad-alto-contraste .btn,
-.accesibilidad-alto-contraste input,
-.accesibilidad-alto-contraste select {
+/* ===== ACCESIBILIDAD: ALTO CONTRASTE COMPLETO ===== */
+.accesibilidad-alto-contraste,
+.accesibilidad-alto-contraste * {
   background: white !important;
   color: black !important;
-  border-color: white !important;
-}
-.accesibilidad-alto-contraste h1,
-.accesibilidad-alto-contraste h2,
-.accesibilidad-alto-contraste h3,
-.accesibilidad-alto-contraste h4,
-.accesibilidad-alto-contraste p,
-.accesibilidad-alto-contraste span,
-.accesibilidad-alto-contraste div {
-  color: white !important;
+  border-color: black !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background-color: white !important;
+  background-image: none !important;
 }
 
-/* TAMAÑO TEXTO */
-.tamano-texto-s {
-  font-size: 0.85em !important;
+/* Excepción: botones y controles interactivos */
+.accesibilidad-alto-contraste button,
+.accesibilidad-alto-contraste .btn,
+.accesibilidad-alto-contraste input,
+.accesibilidad-alto-contraste select,
+.accesibilidad-alto-contraste textarea {
+  background: #f0f0f0 !important;
+  border: 2px solid black !important;
+  color: black !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3) !important;
 }
-.tamano-texto-m {
-  font-size: 1em !important;
+
+/* Topbar y sidebar */
+.accesibilidad-alto-contraste .topbar,
+.accesibilidad-alto-contraste .sidebar,
+.accesibilidad-alto-contraste .sidebar-header {
+  background: white !important;
+  color: black !important;
 }
-.tamano-texto-l {
-  font-size: 1.25em !important;
+
+/* Enlaces de navegación */
+.accesibilidad-alto-contraste .nav-link,
+.accesibilidad-alto-contraste .nav-link:hover,
+.accesibilidad-alto-contraste .nav-link.active {
+  background: #f0f0f0 !important;
+  color: black !important;
+  border-color: black !important;
+  box-shadow: none !important;
+}
+
+/* Tablas */
+.accesibilidad-alto-contraste table,
+.accesibilidad-alto-contraste th,
+.accesibilidad-alto-contraste td {
+  border: 1px solid black !important;
+  background: white !important;
+}
+
+/* Badges de estado */
+.accesibilidad-alto-contraste .badge-estado {
+  background: #e0e0e0 !important;
+  color: black !important;
+  border: 1px solid #999 !important;
+}
+
+/* Títulos dentro de cards */
+.accesibilidad-alto-contraste .section-card h1,
+.accesibilidad-alto-contraste .section-card h2,
+.accesibilidad-alto-contraste .section-card h3,
+.accesibilidad-alto-contraste .section-card h4 {
+  color: black !important;
+}
+
+/* Inputs dentro de section-card */
+.accesibilidad-alto-contraste .section-card input,
+.accesibilidad-alto-contraste .section-card select {
+  background: white !important;
+  color: black !important;
+  border: 1px solid black !important;
 }
 
 /* ✅ UNIFORMIZAR ALTURA DE TODOS LOS SELECTORES DE FILTRO */
