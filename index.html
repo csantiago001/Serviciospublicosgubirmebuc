@@ -2183,10 +2183,15 @@ body {
 	  document.querySelectorAll('#tbodySaldos tr').forEach(tr => tr.classList.remove('editando'));
 	}
 
-	// Función para cargar datos en el formulario para edición
+	// === EDITAR ===
 	function cargarDatosParaEdicion(unidad, servicio) {
+	  if (!isAdminMode) {
+		showNotification('🔒 No tienes permisos de administrador para editar registros.', 'error', 3000);
+		return;
+	  }
+
 	  if (!appData.saldos[unidad] || !appData.saldos[unidad][servicio]) return;
-	  
+
 	  const config = appData.saldos[unidad][servicio];
 	  document.getElementById('editarUnidad').value = unidad;
 	  document.getElementById('editarServicio').value = servicio;
@@ -2195,11 +2200,31 @@ body {
 	  document.getElementById('editarDicAnterior').value = config.dicAnterior || '';
 	  document.getElementById('tituloFormulario').textContent = 'Editar Presupuesto';
 	  document.getElementById('btnLimpiarForm').style.display = 'inline-block';
-	  
 	  registroEditando = { unidad, servicio };
-	  
+
 	  // Scroll al formulario
 	  document.getElementById('editarUnidad').scrollIntoView({ behavior: 'smooth', block: 'center' });
+	}
+
+	// === ELIMINAR REGISTRO (CON CONTROL DE ADMIN) ===
+	function eliminarRegistro(unidad, servicio) {
+	  // 🔒 Validar permisos de administrador
+	  if (!isAdminMode) {
+		showNotification('🔒 No tienes permisos de administrador para eliminar registros.', 'error', 3000);
+		return;
+	  }
+
+	  // ✅ Verificar que el registro exista
+	  if (!appData.saldos[unidad] || !appData.saldos[unidad][servicio]) {
+		showNotification('❌ Registro no encontrado', 'error');
+		return;
+	  }
+
+	  // 📌 Guardar referencia global para confirmación
+	  registroEditando = { unidad, servicio };
+
+	  // 💬 Mostrar modal de confirmación
+	  document.getElementById('modalEliminar').style.display = 'flex';
 	}
 	
 	// Función para validar el formulario
@@ -3930,22 +3955,7 @@ body {
 	  }
 	}
 	
-	// ========== FUNCIÓN PARA INICIAR LA ELIMINACIÓN DE UN REGISTRO ==========
-	function eliminarRegistro(unidad, servicio) {
-	  // Verificar que el registro exista
-	  if (!appData.saldos[unidad] || !appData.saldos[unidad][servicio]) {
-		showNotification('❌ Registro no encontrado', 'error');
-		return;
-	  }
-
-	  // Guardar el registro seleccionado globalmente
-	  registroEditando = { unidad, servicio };
-
-	  // Mostrar el modal de confirmación
-	  document.getElementById('modalEliminar').style.display = 'flex';
-	}
-
-    // ========== NAVEGACIÓN ==========
+	// ========== NAVEGACIÓN ==========
     document.querySelectorAll('.nav-link').forEach(link => {
       link.addEventListener('click', function() {
         const section = this.getAttribute('data-section');
