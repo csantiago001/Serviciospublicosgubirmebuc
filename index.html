@@ -909,7 +909,7 @@ table tr:last-child td {
   border-bottom: none;
 }
 
-/* === BOTÓN FLOTANTE DE AYUDA MODERNO === */
+/* === BOTÓN FLOTANTE DE AYUDA VERDE FLUORESCENTE === */
 .floating-help {
   position: fixed;
   bottom: 30px;
@@ -917,12 +917,15 @@ table tr:last-child td {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
-  color: white;
+  background: linear-gradient(135deg, #39ff14, #00ff66);
+  color: black;
   border: none;
+
+  /* SOMBRA VERDE NEÓN */
   box-shadow:
-    0 8px 20px rgba(124, 58, 237, 0.4),
-    0 2px 6px rgba(0, 0, 0, 0.15);
+    0 8px 22px rgba(57, 255, 20, 0.7),
+    0 2px 10px rgba(0, 255, 102, 0.4);
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -936,10 +939,13 @@ table tr:last-child td {
 
 .floating-help:hover {
   transform: scale(1.15) rotate(10deg);
+
+  /* SOMBRA MÁS INTENSA EN HOVER */
   box-shadow:
-    0 12px 30px rgba(124, 58, 237, 0.6),
-    0 4px 12px rgba(0, 0, 0, 0.2);
-  background: linear-gradient(135deg, #6d28d9, #5b21b6);
+    0 14px 35px rgba(57, 255, 20, 0.9),
+    0 6px 16px rgba(0, 255, 102, 0.6);
+
+  background: linear-gradient(135deg, #00ff66, #39ff14);
 }
 
 .floating-help:active {
@@ -1715,7 +1721,7 @@ body {
           <div id="estadisticasContent">
             <div class="section-card">
               <p style="text-align:center;color:#64748b;font-size:1.1rem;">
-                <i class="fas fa-info-circle"></i> Carga archivos para visualizar estadísticas
+                <i class="fas fa-info-circle"></i> seleciona un servicio para visualizar estadísticas
               </p>
             </div>
           </div>
@@ -1733,7 +1739,7 @@ body {
           <div id="graficosContent">
             <div class="section-card">
               <p style="text-align:center;color:#64748b;font-size:1.1rem;">
-                <i class="fas fa-chart-area"></i> Los gráficos se mostrarán al cargar datos
+                <i class="fas fa-chart-area"></i> seleciona un servicio para visualizar Los gráficos
               </p>
             </div>
           </div>
@@ -1820,20 +1826,28 @@ body {
 				<div style="font-size:0.7rem;margin-top:5px;opacity:0.7;">Restante vigencia</div>
 			  </div>
 			  <div class="kpi-card" style="text-align:center;padding:15px;background:rgba(255,255,255,0.1);border-radius:8px;transition:all 0.3s ease;cursor:pointer;border:2px solid transparent;">
-				  <div style="font-weight:700;margin-bottom:8px;font-size:0.85rem;opacity:0.9;">Proy. Mes Próximo</div>
-				  <div class="amount" id="proyeccionMensual" style="font-size:1.5rem;color:#fbbf24;font-weight:bold;">$0</div>
-				  <div style="font-size:0.7rem;margin-top:5px;opacity:0.7;">Estimación dinámica</div>
-				</div>
-				<div class="kpi-card" style="text-align:center;padding:15px;background:rgba(255,255,255,0.1);border-radius:8px;transition:all 0.3s ease;cursor:pointer;border:2px solid transparent;">
-				  <div style="font-weight:700;margin-bottom:8px;font-size:0.85rem;opacity:0.9;">Presupuesto 2026</div>
-				  <div class="amount" id="proyeccionAnual" style="font-size:1.5rem;color:#fbbf24;font-weight:bold;">$0</div>
-				  <div style="font-size:0.7rem;margin-top:5px;opacity:0.7;">IPC +15%</div>
-				</div>
+				<div style="font-weight:700;margin-bottom:8px;font-size:0.85rem;opacity:0.9;">Proy. Mes Próximo</div>
+				<div class="amount" id="proyeccionMensual" style="font-size:1.5rem;color:#fbbf24;font-weight:bold;">$0</div>
+				<div style="font-size:0.7rem;margin-top:5px;opacity:0.7;">Estimación dinámica</div>
+			  </div>
+			  <div class="kpi-card" style="text-align:center;padding:15px;background:rgba(255,255,255,0.1);border-radius:8px;transition:all 0.3s ease;cursor:pointer;border:2px solid transparent;">
+				<div style="font-weight:700;margin-bottom:8px;font-size:0.85rem;opacity:0.9;">Presupuesto 2026</div>
+				<div class="amount" id="proyeccionAnual" style="font-size:1.5rem;color:#fbbf24;font-weight:bold;">$0</div>
+				<div style="font-size:0.7rem;margin-top:5px;opacity:0.7;">IPC +15%</div>
+			  </div>
 			</div>
 		  </div>
 
-		  <!-- Formulario para Editar/Agregar Presupuesto -->
-		  <div class="section-card saldos-section" style="padding:20px;background:white;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+		  <!-- 🔑 Desbloqueo de Administrador -->
+		  <div class="section-card saldos-section" id="adminUnlockSection" style="padding:20px;background:#f0fdf4;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1);text-align:center;">
+			<h3 style="color:#06402b;margin:0 0 15px;"><i class="fas fa-lock"></i> Modo Administrador</h3>
+			<p style="color:#4b5563;margin-bottom:15px;">Ingresa la clave para habilitar la edición de presupuestos.</p>
+			<input type="password" id="adminPassword" placeholder="Clave de administrador" style="padding:10px 15px;width:250px;border:2px solid #ddd;border-radius:8px;margin-right:10px;">
+			<button id="btnUnlockAdmin" class="btn" style="background:linear-gradient(135deg, #06402b, #0a5c3d);color:white;padding:10px 20px;">Desbloquear</button>
+		  </div>
+
+		  <!-- Formulario para Editar/Agregar Presupuesto (oculto por defecto) -->
+		  <di<div class="section-card saldos-section" id="adminFormSection" style="display:none;">
 			<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
 			  <h3 style="color:#06402b;margin:0;"><i class="fas fa-edit"></i> <span id="tituloFormulario">Agregar Presupuesto</span></h3>
 			  <button id="btnLimpiarForm" class="btn-secondary" style="padding:6px 12px;font-size:0.85rem;background:#6b7280;color:white;border:none;border-radius:6px;cursor:pointer;display:none;">
@@ -1887,14 +1901,14 @@ body {
 			  <div style="display:flex;gap:15px;flex-wrap:wrap;flex:1;">
 				<div style="flex:1;min-width:150px;">
 				  <label style="display:block;margin-bottom:6px;font-weight:600;font-size:0.9rem;color:#374151;"><i class="fas fa-building"></i> Filtrar por Unidad</label>
-					<select id="filtroUnidadSaldos" class="filter-select" ...>
-					  <option value="todas">Todas las unidades</option>
-					  <option value="mebuc">MEBUC</option>
-					  <option value="desan">DESAN</option>
-					  <option value="demam">DEMAM</option>
-					  <option value="setra">SETRA</option>
-					  <option value="asturias">ASTURIAS</option>
-					</select>
+				  <select id="filtroUnidadSaldos" class="filter-select">
+					<option value="todas">Todas las unidades</option>
+					<option value="mebuc">MEBUC</option>
+					<option value="desan">DESAN</option>
+					<option value="demam">DEMAM</option>
+					<option value="setra">SETRA</option>
+					<option value="asturias">ASTURIAS</option>
+				  </select>
 				</div>
 				<div style="flex:1;min-width:150px;">
 				  <label style="display:block;margin-bottom:6px;font-weight:600;font-size:0.9rem;color:#374151;"><i class="fas fa-list"></i> Filtrar por Servicio</label>
@@ -1922,66 +1936,66 @@ body {
 			  </div>
 			</div>
 		  </div>
-		  
+
 		  <!-- Modal de Confirmación -->
-			<div id="modalEliminar" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;">
-			  <div style="background:white;padding:25px;border-radius:12px;max-width:400px;box-shadow:0 10px 40px rgba(0,0,0,0.3);">
-				<h3 style="color:#06402b;margin:0 0 15px 0;"><i class="fas fa-exclamation-triangle" style="color:#f59e0b;"></i> Confirmar Eliminación</h3>
-				<p style="color:#6b7280;margin-bottom:20px;">¿Está seguro que desea eliminar este registro? Esta acción no se puede deshacer.</p>
-				<div style="display:flex;gap:10px;justify-content:flex-end;">
-				  <button id="btnCancelarEliminar" style="padding:8px 16px;background:#e5e7eb;color:#374151;border:none;border-radius:6px;cursor:pointer;font-weight:600;">Cancelar</button>
-				  <button id="btnConfirmarEliminar" style="padding:8px 16px;background:#ef4444;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600;">Eliminar</button>
-				</div>
+		  <div id="modalEliminar" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;">
+			<div style="background:white;padding:25px;border-radius:12px;max-width:400px;box-shadow:0 10px 40px rgba(0,0,0,0.3);">
+			  <h3 style="color:#06402b;margin:0 0 15px 0;"><i class="fas fa-exclamation-triangle" style="color:#f59e0b;"></i> Confirmar Eliminación</h3>
+			  <p style="color:#6b7280;margin-bottom:20px;">¿Está seguro que desea eliminar este registro? Esta acción no se puede deshacer.</p>
+			  <div style="display:flex;gap:10px;justify-content:flex-end;">
+				<button id="btnCancelarEliminar" style="padding:8px 16px;background:#e5e7eb;color:#374151;border:none;border-radius:6px;cursor:pointer;font-weight:600;">Cancelar</button>
+				<button id="btnConfirmarEliminar" style="padding:8px 16px;background:#ef4444;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600;">Eliminar</button>
 			  </div>
 			</div>
+		  </div>
 
 		  <!-- Tabla con Scroll Mejorado -->
 		  <div class="section-card saldos-section" style="padding:0;background:white;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1);overflow:hidden;">
 			<div style="padding:15px 20px;background:#f9fafb;border-bottom:2px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center;">
 			  <h3 style="color:#000 !important;margin:0;font-size:1.1rem;font-weight:700 !important;">
-				  <i class="fas fa-table"></i>
-				  <span style="color:#000 !important;">Detalle de Saldos</span>
-				  <span id="contadorFilas" style="color:#000 !important;font-size:0.9rem;font-weight:700 !important;">
-					(19 registros)
-				  </span>
-				</h3>
+				<i class="fas fa-table"></i>
+				<span style="color:#000 !important;">Detalle de Saldos</span>
+				<span id="contadorFilas" style="color:#000 !important;font-size:0.9rem;font-weight:700 !important;">
+				  (19 registros)
+				</span>
+			  </h3>
 			  <div style="display:flex;gap:10px;align-items:center;">
 				<span style="font-size:0.85rem;color:#6b7280;">Auto-guardado: <span id="estadoGuardado" style="color:#10b981;"><i class="fas fa-check-circle"></i> Activo</span></span>
 			  </div>
 			</div>
 			<div id="tablaContainer" style="width:100%;overflow-x:auto;position:relative;display:block;-webkit-overflow-scrolling:touch;">
-              <table id="tablaSaldos" style="min-width:3500px;width:3500px;border-collapse:collapse;background:white;">
-				  <thead style="position:sticky;top:0;z-index:20;">
-					<tr style="background:linear-gradient(135deg, #06402b, #0a5c3d);color:white;">
-					  <th>Unidad</th>
-					  <th>Servicio</th>
-					  <th>CDP</th>
-					  <th id="headerAsignacion">Asignación 2025</th>
-					  <th id="headerDicAnterior">Dic 2024</th>
-					  <th>Ene</th>
-					  <th>Feb</th>
-					  <th>Mar</th>
-					  <th>Abr</th>
-					  <th>May</th>
-					  <th>Jun</th>
-					  <th>Jul</th>
-					  <th>Ago</th>
-					  <th>Sep</th>
-					  <th>Oct</th>
-					  <th>Nov</th>
-					  <th>Dic</th>
-					  <th>Total Tramitado</th>
-					  <th>Promedio</th>
-					  <th>Saldo Ejec.</th>
-					  <th>Term. Vig.</th>
-					  <th>Sobra/Falta</th>
-					  <th>% Ejec.</th>
-					  <th>Acciones</th>
-					</tr>
-				  </thead>
-				  <tbody id="tbodySaldos"></tbody>
-				  <tfoot id="tfootSaldos" style="position:sticky;bottom:0;z-index:15;"></tfoot>
-				</table>
+			  <table id="tablaSaldos" style="min-width:3500px;width:3500px;border-collapse:collapse;background:white;">
+				<thead style="position:sticky;top:0;z-index:20;">
+				  <tr style="background:linear-gradient(135deg, #06402b, #0a5c3d);color:white;">
+					<th>Unidad</th>
+					<th>Servicio</th>
+					<th>CDP</th>
+					<th id="headerAsignacion">Asignación 2025</th>
+					<th id="headerDicAnterior">Dic 2024</th>
+					<th>Ene</th>
+					<th>Feb</th>
+					<th>Mar</th>
+					<th>Abr</th>
+					<th>May</th>
+					<th>Jun</th>
+					<th>Jul</th>
+					<th>Ago</th>
+					<th>Sep</th>
+					<th>Oct</th>
+					<th>Nov</th>
+					<th>Dic</th>
+					<th>Total Tramitado</th>
+					<th>Promedio</th>
+					<th>Saldo Ejec.</th>
+					<th>Term. Vig.</th>
+					<th>Sobra/Falta</th>
+					<th>% Ejec.</th>
+					<th>Acciones</th>
+				  </tr>
+				</thead>
+				<tbody id="tbodySaldos"></tbody>
+				<tfoot id="tfootSaldos" style="position:sticky;bottom:0;z-index:15;"></tfoot>
+			  </table>
 			</div>
 		  </div>
 
@@ -2141,6 +2155,19 @@ body {
 	  document.getElementById('headerDicAnterior').textContent = `Dic ${añoAnterior}`;
 	}
 	
+	// 🔑 Desbloquear modo administrador para edición de presupuesto
+	function unlockAdminMode() {
+	  const password = document.getElementById('adminPassword').value;
+	  if (password === ADMIN_PASSWORD) {
+		isAdminMode = true;
+		document.getElementById('adminUnlockSection').style.display = 'none';
+		document.getElementById('adminFormSection').style.display = 'block';
+		showNotification('🔓 Modo administrador activado', 'success', 2000);
+	  } else {
+		showNotification('❌ Clave incorrecta', 'error', 2000);
+	  }
+	}
+
 	// Función para limpiar el formulario
 	function limpiarFormulario() {
 	  document.getElementById('editarUnidad').value = '';
@@ -3748,6 +3775,10 @@ body {
 	// Guardar en Supabase + localStorage
 	async function guardarEdicionPresupuesto() {
 	  if (!validarFormulario()) return;
+	    if (!isAdminMode) {
+		showNotification('🔒 Necesitas permisos de administrador para guardar cambios', 'error', 3000);
+		return;
+	  }
 
 	  const unidad = document.getElementById('editarUnidad').value;
 	  const servicio = document.getElementById('editarServicio').value;
@@ -3802,7 +3833,11 @@ body {
 		showNotification(`❌ Error al cargar datos automáticamente: ${error.message}`, 'error', 5000);
 	  }
 	}
- 
+	
+	// 🔐 Control de acceso para modo administrador en Saldos Presupuestales
+	let isAdminMode = false;
+	const ADMIN_PASSWORD = "123456789"; // 👈 ¡Cambia esto!
+
 	// ========== VARIABLES GLOBALES ==========
 	let appData = {
 	  energia: { mebuc: {}, desan: {}, demam: {}, setra: {} },
@@ -7893,6 +7928,12 @@ body {
 	  document.getElementById('btnCargarNubeTop').addEventListener('click', () => {
 		cargarDesdeSupabase();
 	  });
+	  
+	  // Vincular botón de desbloqueo de administrador
+		const btnUnlock = document.getElementById('btnUnlockAdmin');
+		if (btnUnlock) {
+		  btnUnlock.addEventListener('click', unlockAdminMode);
+		}
 	  
 	  // Botón flotante de ayuda global
       document.getElementById('floatingHelpBtn').addEventListener('click', showHelpModal);
