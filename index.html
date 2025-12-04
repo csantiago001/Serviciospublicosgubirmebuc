@@ -96,29 +96,198 @@ body::after {
   z-index: 1;
   overflow: hidden;
 }
+
+/* Estrellas mejoradas con múltiples capas de profundidad */
 .star {
   position: absolute;
-  background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,255,255,0.3) 100%);
+  background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,255,255,0.6) 40%, rgba(255,255,255,0) 100%);
   border-radius: 50%;
-  box-shadow: 0 0 8px rgba(255,255,255,1), 0 0 15px rgba(255,255,255,0.8);
+  box-shadow: 
+    0 0 8px rgba(255,255,255,1), 
+    0 0 15px rgba(255,255,255,0.8),
+    0 0 25px rgba(139, 195, 74, 0.3);
   animation: twinkle 3s ease-in-out infinite;
 }
+
+/* Estrellas brillantes (agregar clase adicional a algunas estrellas) */
+.star-bright {
+  background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,255,255,0.8) 30%, rgba(139, 195, 74, 0.3) 60%, transparent 100%);
+  box-shadow: 
+    0 0 12px rgba(255,255,255,1), 
+    0 0 25px rgba(255,255,255,0.9),
+    0 0 40px rgba(139, 195, 74, 0.4),
+    0 0 60px rgba(139, 195, 74, 0.2);
+  animation: pulse-star 4s ease-in-out infinite;
+}
+
+/* Estrellas distantes (agregar clase adicional para estrellas de fondo) */
+.star-distant {
+  opacity: 0.4;
+  box-shadow: 0 0 4px rgba(255,255,255,0.5);
+  animation: twinkle-slow 5s ease-in-out infinite;
+}
+
+/* Ondas gravitacionales mejoradas */
 .wave-ring {
   position: absolute;
   top: 50%;
   left: 50%;
-  border: 2px solid rgba(57, 255, 20, 0.25);
+  border: 2px solid rgba(57, 255, 20, 0.3);
   border-radius: 50%;
   transform: translate(-50%, -50%);
   animation: expandRing 10s ease-out infinite;
+  box-shadow: 
+    0 0 20px rgba(57, 255, 20, 0.3),
+    inset 0 0 20px rgba(57, 255, 20, 0.2);
 }
+
+.wave-ring:nth-child(1) {
+  animation-delay: 0s;
+  border-color: rgba(139, 195, 74, 0.4);
+  box-shadow: 
+    0 0 25px rgba(139, 195, 74, 0.4),
+    inset 0 0 25px rgba(139, 195, 74, 0.3);
+}
+
+.wave-ring:nth-child(2) {
+  animation-delay: 3.3s;
+  border-color: rgba(76, 175, 80, 0.3);
+  box-shadow: 
+    0 0 20px rgba(76, 175, 80, 0.3),
+    inset 0 0 20px rgba(76, 175, 80, 0.2);
+}
+
+.wave-ring:nth-child(3) {
+  animation-delay: 6.6s;
+  border-color: rgba(57, 255, 20, 0.25);
+  box-shadow: 
+    0 0 15px rgba(57, 255, 20, 0.25),
+    inset 0 0 15px rgba(57, 255, 20, 0.2);
+}
+
+/* Nebulosa de fondo sutil */
+.star-field::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(ellipse at 30% 40%, rgba(45, 90, 39, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 60%, rgba(6, 64, 43, 0.06) 0%, transparent 50%);
+  animation: nebula-shift 25s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+/* Polvo estelar */
+.star-field::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(1px 1px at 25% 35%, rgba(255, 255, 255, 0.15), transparent),
+    radial-gradient(1px 1px at 65% 75%, rgba(255, 255, 255, 0.12), transparent),
+    radial-gradient(1px 1px at 45% 55%, rgba(255, 255, 255, 0.08), transparent),
+    radial-gradient(1px 1px at 85% 15%, rgba(255, 255, 255, 0.18), transparent),
+    radial-gradient(1px 1px at 15% 85%, rgba(255, 255, 255, 0.1), transparent);
+  background-size: 250% 250%, 300% 300%, 280% 280%, 320% 320%, 270% 270%;
+  background-position: 0% 0%, 100% 100%, 50% 50%, 20% 80%, 80% 20%;
+  animation: drift 70s linear infinite;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Animaciones mejoradas */
 @keyframes twinkle { 
-  0%, 100% { opacity: 0.5; transform: scale(1); } 
-  50% { opacity: 1; transform: scale(1.3); } 
+  0%, 100% { 
+    opacity: 0.6; 
+    transform: scale(1); 
+  } 
+  50% { 
+    opacity: 1; 
+    transform: scale(1.4); 
+  } 
 }
+
+@keyframes twinkle-slow {
+  0%, 100% { 
+    opacity: 0.3; 
+  }
+  50% { 
+    opacity: 0.7; 
+  }
+}
+
+@keyframes pulse-star {
+  0%, 100% { 
+    opacity: 1; 
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.8; 
+    transform: scale(1.5);
+  }
+}
+
 @keyframes expandRing { 
-  0% { width: 100px; height: 100px; opacity: 1; } 
-  100% { width: 1200px; height: 1200px; opacity: 0; } 
+  0% { 
+    width: 80px; 
+    height: 80px; 
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  } 
+  100% { 
+    width: 1400px; 
+    height: 1400px; 
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.2);
+  } 
+}
+
+@keyframes drift {
+  0% { 
+    background-position: 0% 0%, 100% 100%, 50% 50%, 20% 80%, 80% 20%; 
+  }
+  100% { 
+    background-position: 100% 100%, 0% 0%, 70% 30%, 80% 20%, 20% 80%; 
+  }
+}
+
+@keyframes nebula-shift {
+  0% { 
+    transform: translateX(-15px) translateY(-15px) scale(1); 
+    opacity: 0.8;
+  }
+  100% { 
+    transform: translateX(15px) translateY(15px) scale(1.05); 
+    opacity: 1;
+  }
+}
+
+/* Estrellas fugaces opcionales */
+.shooting-star {
+  position: absolute;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(255,255,255,1), rgba(139, 195, 74, 0.6), transparent);
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(255,255,255,0.8);
+  animation: shoot 3s ease-out infinite;
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes shoot {
+  0% {
+    transform: translateX(0) translateY(0) rotate(45deg);
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateX(400px) translateY(400px) rotate(45deg);
+    opacity: 0;
+  }
 }
 
 /* --- LAYOUT Y SIDEBAR --- */
@@ -1559,28 +1728,178 @@ input.search-bar {
   color: #374151 !important;
   box-sizing: border-box !important;
 }
+
+/* ===== BOTONES DE CARGA EN ALTO RELIEVE FUTURISTA (TOPBAR) ===== */
+.topbar-btn {
+  position: relative;
+  padding: 10px 24px !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.5px !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 12px !important;
+  cursor: pointer;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  background: linear-gradient(145deg, #2d5a27, #06402b) !important;
+  box-shadow:
+    0 8px 24px rgba(45, 90, 39, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.5),
+    inset 0 2px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.3) !important;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  text-shadow: 
+    0 0 10px rgba(139, 195, 74, 0.4),
+    0 2px 4px rgba(0, 0, 0, 0.6) !important;
+  transform: translateY(0) !important;
+  overflow: hidden;
+}
+
+/* Efecto de brillo futurista */
+.topbar-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(139, 195, 74, 0.3),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.topbar-btn:hover::before {
+  left: 100%;
+}
+
+/* Borde de neón sutil en tono verde */
+.topbar-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  padding: 1px;
+  background: linear-gradient(145deg, rgba(139, 195, 74, 0.5), rgba(76, 175, 80, 0.2));
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.topbar-btn:hover {
+  background: linear-gradient(145deg, #3a752f, #0a5c3d) !important;
+  box-shadow:
+    0 12px 32px rgba(58, 117, 47, 0.5),
+    0 6px 16px rgba(0, 0, 0, 0.6),
+    inset 0 2px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.35) !important;
+  transform: translateY(-4px) scale(1.02) !important;
+  text-shadow: 
+    0 0 15px rgba(139, 195, 74, 0.6),
+    0 2px 4px rgba(0, 0, 0, 0.6) !important;
+}
+
+.topbar-btn:hover::after {
+  opacity: 1;
+}
+
+.topbar-btn:active {
+  transform: translateY(0) scale(0.98) !important;
+  box-shadow:
+    0 4px 12px rgba(45, 90, 39, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.5),
+    inset 0 2px 4px rgba(0, 0, 0, 0.4),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1) !important;
+  transition: all 0.1s ease !important;
+}
+
+/* Iconos dentro del botón con efecto de brillo */
+.topbar-btn i {
+  font-size: 1rem !important;
+  margin-right: 4px !important;
+  filter: drop-shadow(0 0 4px rgba(139, 195, 74, 0.5));
+  transition: filter 0.3s ease;
+}
+
+.topbar-btn:hover i {
+  filter: drop-shadow(0 0 8px rgba(139, 195, 74, 0.8));
+  animation: pulse-icon 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-icon {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
 </style>
 </head>
 <body>
-  <div class="star-field">
-  <!-- Estrellas blancas -->
-  <div class="star" style="top: 15%; left: 10%; width: 2px; height: 2px; animation-delay: 0s;"></div>
-  <div class="star" style="top: 25%; left: 85%; width: 3px; height: 3px; animation-delay: 1s;"></div>
-  <div class="star" style="top: 45%; left: 50%; width: 2px; height: 2px; animation-delay: 2s;"></div>
-  <div class="star" style="top: 65%; left: 75%; width: 4px; height: 4px; animation-delay: 1.5s;"></div>
-  <div class="star" style="top: 80%; left: 30%; width: 2px; height: 2px; animation-delay: 0.5s;"></div>
-  <div class="star" style="top: 10%; left: 60%; width: 3px; height: 3px; animation-delay: 2.5s;"></div>
-  <div class="star" style="top: 55%; left: 20%; width: 3px; height: 3px; animation-delay: 1.8s;"></div>
-  <div class="star" style="top: 90%; left: 70%; width: 2px; height: 2px; animation-delay: 0.8s;"></div>
-  <div class="star" style="top: 35%; left: 40%; width: 2px; height: 2px; animation-delay: 1.2s;"></div>
-  <div class="star" style="top: 70%; left: 90%; width: 4px; height: 4px; animation-delay: 2.2s;"></div>
-  <div class="star" style="top: 50%; left: 5%; width: 2px; height: 2px; animation-delay: 0.3s;"></div>
-  <div class="star" style="top: 20%; left: 95%; width: 3px; height: 3px; animation-delay: 1.7s;"></div>
-  <div class="star" style="top: 5%; left: 30%; width: 2px; height: 2px; animation-delay: 2.8s;"></div>
-  <div class="star" style="top: 85%; left: 55%; width: 3px; height: 3px; animation-delay: 0.9s;"></div>
-  <div class="star" style="top: 40%; left: 80%; width: 2px; height: 2px; animation-delay: 2.3s;"></div>
-  <div class="star" style="top: 60%; left: 15%; width: 4px; height: 4px; animation-delay: 1.4s;"></div>
-</div>
+ <div class="star-field">
+    <!-- Nebulosa de fondo -->
+    <div class="nebula"></div>
+    
+    <!-- Polvo estelar -->
+    <div class="stardust"></div>
+
+    <!-- Estrellas lejanas (capa de fondo) -->
+    <div class="star-distant" style="top: 8%; left: 15%; width: 1px; height: 1px; animation-delay: 0.5s;"></div>
+    <div class="star-distant" style="top: 22%; left: 45%; width: 1px; height: 1px; animation-delay: 1.2s;"></div>
+    <div class="star-distant" style="top: 38%; left: 72%; width: 1px; height: 1px; animation-delay: 2.1s;"></div>
+    <div class="star-distant" style="top: 52%; left: 28%; width: 1px; height: 1px; animation-delay: 0.8s;"></div>
+    <div class="star-distant" style="top: 68%; left: 88%; width: 1px; height: 1px; animation-delay: 1.9s;"></div>
+    <div class="star-distant" style="top: 82%; left: 12%; width: 1px; height: 1px; animation-delay: 2.5s;"></div>
+    <div class="star-distant" style="top: 12%; left: 92%; width: 1px; height: 1px; animation-delay: 1.5s;"></div>
+    <div class="star-distant" style="top: 48%; left: 58%; width: 1px; height: 1px; animation-delay: 0.3s;"></div>
+
+    <!-- Estrellas normales -->
+    <div class="star" style="top: 15%; left: 10%; width: 2px; height: 2px; animation-delay: 0s;"></div>
+    <div class="star" style="top: 25%; left: 85%; width: 3px; height: 3px; animation-delay: 1s;"></div>
+    <div class="star" style="top: 45%; left: 50%; width: 2px; height: 2px; animation-delay: 2s;"></div>
+    <div class="star" style="top: 65%; left: 75%; width: 2px; height: 2px; animation-delay: 1.5s;"></div>
+    <div class="star" style="top: 80%; left: 30%; width: 2px; height: 2px; animation-delay: 0.5s;"></div>
+    <div class="star" style="top: 10%; left: 60%; width: 3px; height: 3px; animation-delay: 2.5s;"></div>
+    <div class="star" style="top: 55%; left: 20%; width: 3px; height: 3px; animation-delay: 1.8s;"></div>
+    <div class="star" style="top: 90%; left: 70%; width: 2px; height: 2px; animation-delay: 0.8s;"></div>
+    <div class="star" style="top: 35%; left: 40%; width: 2px; height: 2px; animation-delay: 1.2s;"></div>
+    <div class="star" style="top: 70%; left: 90%; width: 2px; height: 2px; animation-delay: 2.2s;"></div>
+    <div class="star" style="top: 50%; left: 5%; width: 2px; height: 2px; animation-delay: 0.3s;"></div>
+    <div class="star" style="top: 20%; left: 95%; width: 3px; height: 3px; animation-delay: 1.7s;"></div>
+    <div class="star" style="top: 5%; left: 30%; width: 2px; height: 2px; animation-delay: 2.8s;"></div>
+    <div class="star" style="top: 85%; left: 55%; width: 3px; height: 3px; animation-delay: 0.9s;"></div>
+    <div class="star" style="top: 40%; left: 80%; width: 2px; height: 2px; animation-delay: 2.3s;"></div>
+    <div class="star" style="top: 60%; left: 15%; width: 2px; height: 2px; animation-delay: 1.4s;"></div>
+
+    <!-- Estrellas brillantes (foreground) -->
+    <div class="star-bright" style="top: 18%; left: 25%; width: 8px; height: 8px; animation-delay: 0.2s;"></div>
+    <div class="star-bright" style="top: 42%; left: 65%; width: 10px; height: 10px; animation-delay: 1.3s;"></div>
+    <div class="star-bright" style="top: 72%; left: 38%; width: 9px; height: 9px; animation-delay: 2.1s;"></div>
+    <div class="star-bright" style="top: 28%; left: 78%; width: 7px; height: 7px; animation-delay: 0.7s;"></div>
+    <div class="star-bright" style="top: 88%; left: 82%; width: 8px; height: 8px; animation-delay: 1.9s;"></div>
+
+    <!-- Líneas de constelación -->
+    <div class="constellation-line" style="top: 18%; left: 25%; width: 150px; transform: rotate(25deg); animation-delay: 0s;"></div>
+    <div class="constellation-line" style="top: 42%; left: 65%; width: 120px; transform: rotate(-15deg); animation-delay: 2s;"></div>
+    <div class="constellation-line" style="top: 72%; left: 38%; width: 100px; transform: rotate(45deg); animation-delay: 4s;"></div>
+
+    <!-- Estrellas fugaces -->
+    <div class="shooting-star" style="top: 20%; left: 10%; width: 80px; animation-delay: 2s; animation-duration: 2s;"></div>
+    <div class="shooting-star" style="top: 60%; left: 70%; width: 100px; animation-delay: 5s; animation-duration: 2.5s;"></div>
+    <div class="shooting-star" style="top: 35%; left: 50%; width: 70px; animation-delay: 8s; animation-duration: 1.8s;"></div>
+  </div>
+
+  <!-- Ondas gravitacionales -->
   <div class="gravity-waves">
     <div class="wave-ring"></div>
     <div class="wave-ring"></div>
@@ -1655,34 +1974,10 @@ input.search-bar {
 			gap: 10px;
 			z-index: 10;
 		  ">
-			<button id="btnCargarLocalTop" class="btn topbar-btn" style="
-			  background: linear-gradient(135deg, #06402b, #0a5c3d);
-			  color: white;
-			  padding: 6px 14px;
-			  font-size: 0.82rem;
-			  border: none;
-			  border-radius: 8px;
-			  display: flex;
-			  align-items: center;
-			  gap: 6px;
-			  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-			  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-			">
+			<button id="btnCargarLocalTop" class="btn topbar-btn">
 			  <i class="fas fa-folder-open"></i> Local
 			</button>
-			<button id="btnCargarNubeTop" class="btn topbar-btn" style="
-			  background: linear-gradient(135deg, #06402b, #0a5c3d);
-			  color: white;
-			  padding: 6px 14px;
-			  font-size: 0.82rem;
-			  border: none;
-			  border-radius: 8px;
-			  display: flex;
-			  align-items: center;
-			  gap: 6px;
-			  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-			  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-			">
+			<button id="btnCargarNubeTop" class="btn topbar-btn">
 			  <i class="fas fa-cloud-download-alt"></i> Nube
 			</button>
 		  </div>
@@ -1856,7 +2151,7 @@ input.search-bar {
 		  <!-- 🔑 Desbloqueo de Administrador -->
 		  <div class="section-card saldos-section" id="adminUnlockSection" style="padding:20px;background:#f0fdf4;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1);text-align:center;">
 			<h3 style="color:#06402b;margin:0 0 15px;"><i class="fas fa-lock"></i> Modo Administrador</h3>
-			<p style="color:#4b5563;margin-bottom:15px;">Ingresa la clave para habilitar la edición de presupuestos.</p>
+			<p style="color:#fcfcfc;margin-bottom:15px;">Ingresa la clave para habilitar la edición de presupuestos.</p>
 			<input type="password" id="adminPassword" placeholder="Clave de administrador" style="padding:10px 15px;width:250px;border:2px solid #ddd;border-radius:8px;margin-right:10px;">
 			<button id="btnUnlockAdmin" class="btn" style="background:linear-gradient(135deg, #06402b, #0a5c3d);color:white;padding:10px 20px;">Desbloquear</button>
 		  </div>
