@@ -2053,6 +2053,118 @@ input.search-bar {
 #helpTabs::-webkit-scrollbar-thumb:hover {
   background: rgba(6,64,43,0.5);
 }
+
+/* ============================================
+   ESTILOS PARA MODAL DE PROYECCIONES
+   ============================================ */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.modal-header-gradient {
+  background: linear-gradient(135deg, #06402b 0%, #0a5c3d 50%, #0d7c52 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.modal-header-gradient::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  animation: rotate 20s linear infinite;
+}
+
+.info-badge {
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+  border-left: 4px solid #06402b;
+  transition: all 0.3s ease;
+}
+
+.info-badge:hover {
+  box-shadow: 0 4px 12px rgba(6,64,43,0.15);
+  transform: translateY(-2px);
+}
+
+.modal-proyecciones tbody tr {
+  transition: background-color 0.2s;
+}
+
+.modal-proyecciones tbody tr:hover {
+  background-color: #f9fafb !important;
+}
+
+.btn-close-modal {
+  transition: all 0.3s ease;
+}
+
+.btn-close-modal:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(107,114,128,0.3);
+}
+
+.totals-card {
+  background: linear-gradient(135deg, #06402b, #0a5c3d);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(6,64,43,0.2);
+  animation: fadeInUp 0.5s ease;
+}
+
+.unidad-card {
+  margin-bottom: 28px;
+  animation: fadeInUp 0.4s ease both;
+}
+
+.unidad-header {
+  background: linear-gradient(135deg, #06402b 0%, #0a5c3d 100%);
+  padding: 14px 18px;
+  border-radius: 10px 10px 0 0;
+  box-shadow: 0 2px 8px rgba(6,64,43,0.15);
+}
+
+.unidad-table-container {
+  overflow-x: auto;
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.servicio-icon {
+  color: #06402b;
+  margin-right: 8px;
+  width: 20px;
+}
+
+.modal-scroll-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 28px 20px;
+  margin-right: 4px;
+}
+
+.modal-footer {
+  padding: 20px 28px;
+  background: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  border-radius: 0 0 12px 12px;
+  text-align: center;
+}
 </style>
 </head>
 <body>
@@ -2314,6 +2426,7 @@ input.search-bar {
 		  <h1 style="text-align:center;color:white;font-size:2.0rem;margin-bottom:20px;width:100%;">
 			<i class="fas fa-balance-scale"></i> Saldos Presupuestales
 		  </h1>
+		  
 
 		  <!-- Resumen Ejecutivo con Animaciones -->
 		  <div class="section-card saldos-section" style="padding:20px;background:linear-gradient(135deg, #06402b, #0a5c3d);color:white;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.15);min-width:3500px;width:3500px;">
@@ -2413,14 +2526,16 @@ input.search-bar {
 			</div>
 		  </div>
 
-		  <!-- Filtros y Búsqueda -->
-		  <div class="section-card saldos-section" style="padding:20px;background:white;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
-			<div style="display:flex;gap:15px;flex-wrap:wrap;align-items:end;justify-content:space-between;">
-			  <div style="display:flex;gap:15px;flex-wrap:wrap;flex:1;">
-				<div style="flex:1;min-width:150px;">
-				  <label style="display:block;margin-bottom:6px;font-weight:600;font-size:0.9rem;color:#374151;"><i class="fas fa-building"></i> Filtrar por Unidad</label>
+			<!-- 🔧 CONTROLES UNIFICADOS: FILTROS + IPC + DESGLOSE -->
+			<div class="section-card saldos-section" style="padding:20px;background:white;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+			  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;align-items:end;">
+				<!-- Filtro por Unidad -->
+				<div>
+				  <label style="display:block;margin-bottom:6px;font-weight:600;font-size:0.9rem;color:#374151;">
+					<i class="fas fa-building"></i> Unidad
+				  </label>
 				  <select id="filtroUnidadSaldos" class="filter-select">
-					<option value="todas">Todas las unidades</option>
+					<option value="todas">Todas</option>
 					<option value="mebuc">MEBUC</option>
 					<option value="desan">DESAN</option>
 					<option value="demam">DEMAM</option>
@@ -2428,10 +2543,14 @@ input.search-bar {
 					<option value="asturias">ASTURIAS</option>
 				  </select>
 				</div>
-				<div style="flex:1;min-width:150px;">
-				  <label style="display:block;margin-bottom:6px;font-weight:600;font-size:0.9rem;color:#374151;"><i class="fas fa-list"></i> Filtrar por Servicio</label>
-				  <select id="filtroServicioSaldos" class="filter-select" style="padding:8px 12px;font-size:0.9rem;width:100%;border:2px solid #e5e7eb;border-radius:6px;">
-					<option value="todos">Todos los servicios</option>
+
+				<!-- Filtro por Servicio -->
+				<div>
+				  <label style="display:block;margin-bottom:6px;font-weight:600;font-size:0.9rem;color:#374151;">
+					<i class="fas fa-list"></i> Servicio
+				  </label>
+				  <select id="filtroServicioSaldos" class="filter-select">
+					<option value="todos">Todos</option>
 					<option value="Energía">Energía</option>
 					<option value="Alumbrado Público">Alumbrado Público</option>
 					<option value="Acueducto">Acueducto</option>
@@ -2439,21 +2558,45 @@ input.search-bar {
 					<option value="Gas">Gas</option>
 				  </select>
 				</div>
-				<div style="flex:1;min-width:200px;">
-				  <label style="display:block;margin-bottom:6px;font-weight:600;font-size:0.9rem;color:#374151;"><i class="fas fa-search"></i> Búsqueda rápida</label>
-				  <input type="text" id="busquedaRapida" class="search-bar" placeholder="Buscar en tabla..." style="padding:8px 12px;font-size:0.9rem;width:100%;border:2px solid #e5e7eb;border-radius:6px;">
+
+				<!-- Búsqueda rápida -->
+				<div>
+				  <label style="display:block;margin-bottom:6px;font-weight:600;font-size:0.9rem;color:#374151;">
+					<i class="fas fa-search"></i> Búsqueda
+				  </label>
+				  <input type="text" id="busquedaRapida" class="search-bar" placeholder="Predio, CDP...">
+				</div>
+
+				<!-- Selector de IPC -->
+				<div>
+				  <label style="display:block;margin-bottom:6px;font-weight:600;font-size:0.9rem;color:#374151;">
+					<i class="fas fa-percentage"></i> IPC 2026
+				  </label>
+				  <select id="selectIPC" class="filter-select">
+					<option value="0.10">10%</option>
+					<option value="0.12">12%</option>
+					<option value="0.15" selected>15%</option>
+					<option value="0.17">17%</option>
+					<option value="0.20">20%</option>
+				  </select>
+				</div>
+
+				<!-- Botón de desglose (ocupa 2 columnas en pantallas pequeñas) -->
+				<div style="grid-column: span 2 / span 2; display:flex; justify-content:flex-end; align-items:end; gap:12px; flex-wrap:wrap;">
+				  <button id="btnVerDesglose" class="btn" style="background:linear-gradient(135deg, #06402b, #0a5c3d);color:white;padding:10px 20px;font-size:0.9rem;font-weight:600;">
+					<i class="fas fa-table"></i> Ver Desglose
+				  </button>
+				  <div style="display:flex;gap:10px;">
+					<button id="btnLimpiarFiltros" class="btn-secondary" style="padding:10px 16px;background:#6b7280;color:white;border:none;border-radius:6px;font-size:0.85rem;white-space:nowrap;">
+					  <i class="fas fa-undo"></i> Limpiar
+					</button>
+					<button id="btnExportarExcel" class="btn-secondary" style="padding:10px 16px;background:#10b981;color:white;border:none;border-radius:6px;font-size:0.85rem;white-space:nowrap;">
+					  <i class="fas fa-file-excel"></i> Exportar
+					</button>
+				  </div>
 				</div>
 			  </div>
-			  <div style="display:flex;gap:10px;align-items:end;">
-				<button id="btnLimpiarFiltros" class="btn-secondary" style="padding:8px 16px;height:40px;font-size:0.85rem;background:#6b7280;color:white;border:none;border-radius:6px;cursor:pointer;white-space:nowrap;">
-				  <i class="fas fa-undo"></i> Limpiar
-				</button>
-				<button id="btnExportarExcel" class="btn-secondary" style="padding:8px 16px;height:40px;font-size:0.85rem;background:#10b981;color:white;border:none;border-radius:6px;cursor:pointer;white-space:nowrap;">
-				  <i class="fas fa-file-excel"></i> Exportar
-				</button>
-			  </div>
 			</div>
-		  </div>
 
 		  <!-- Modal de Confirmación -->
 		  <div id="modalEliminar" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;">
@@ -2668,12 +2811,6 @@ input.search-bar {
 	let autoGuardadoInterval = null;
 	let chartInstances = {};
 
-	// === VARIABLES CONFIGURABLES DE PROYECCIÓN ===
-	const CONFIG_PROYECCION = {
-	  IPC_ANUAL: 0.08,      // IPC base (8%)
-	  MARGEN_ADICIONAL: 0.15, // Margen de gestión (+15%)
-	  FACTOR_ANUAL_TOTAL: 0.23 // IPC_ANUAL + MARGEN_ADICIONAL (23%)
-	};
   // Función para actualizar nombres de columnas según el año
 	function actualizarNombresColumnas() {
 	  const añoActual = new Date().getFullYear();
@@ -2909,68 +3046,13 @@ input.search-bar {
 	function calcularProyeccionMensual() {
 	  const datos = calcularValoresPorMesYUnidad();
 	  const hoy = new Date();
-	  const mesActualIdx = hoy.getMonth(); // 0 = Enero
-	  const añoActual = hoy.getFullYear();
-
+	  const mesActualIdx = hoy.getMonth(); // 0 = Enero, 11 = Diciembre
+	  const mesesKeys = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
+	  
+	  // ✅ SOLO meses ANTERIORES al actual (excluye mes en curso)
+	  const mesesAConsiderar = mesesKeys.slice(0, mesActualIdx);
+	  
 	  let totalProyectado = 0;
-
-	  // Unidades y servicios relevantes
-	  const unidades = ['mebuc', 'desan', 'demam', 'setra', 'asturias'];
-	  const servicios = ['Energía', 'Alumbrado Público', 'Acueducto', 'Alcantarillado', 'Gas'];
-
-	  unidades.forEach(unidad => {
-		if (!appData.saldos[unidad]) return;
-		servicios.forEach(servicio => {
-		  const config = appData.saldos[unidad][servicio];
-		  if (!config) return;
-
-		  // Obtener los últimos 12 meses de datos reales
-		  const mesesReales = [];
-		  let totalMeses = 0;
-		  for (let i = 0; i <= mesActualIdx; i++) {
-			const mesKey = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'][i];
-			const valor = datos[unidad]?.[servicio]?.[mesKey] || 0;
-			mesesReales.push(valor);
-			if (valor > 0) totalMeses++;
-		  }
-
-		  if (totalMeses === 0) return;
-
-		  let proyeccionMesSiguiente = 0;
-
-		  if (totalMeses >= 3) {
-			// Regresión lineal simple en los últimos 3 meses con datos
-			const ultimosValores = mesesReales.slice(-3).filter(v => v > 0);
-			if (ultimosValores.length >= 2) {
-			  const n = ultimosValores.length;
-			  const sumX = n * (n - 1) / 2;
-			  const sumY = ultimosValores.reduce((a, b) => a + b, 0);
-			  const sumXY = ultimosValores.map((v, i) => v * i).reduce((a, b) => a + b, 0);
-			  const sumX2 = (n - 1) * n * (2 * n - 1) / 6;
-
-			  const pendiente = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-			  const intercepto = (sumY - pendiente * sumX) / n;
-			  proyeccionMesSiguiente = Math.max(0, intercepto + pendiente * n);
-			} else {
-			  proyeccionMesSiguiente = ultimosValores[ultimosValores.length - 1];
-			}
-		  } else {
-			// Promedio simple si <3 meses
-			proyeccionMesSiguiente = mesesReales.reduce((a, b) => a + b, 0) / totalMeses;
-		  }
-
-		  totalProyectado += proyeccionMesSiguiente;
-		});
-	  });
-
-	  return Math.round(totalProyectado);
-	}
-	
-	// Función para calcular proyección presupuestal anual con IPC + margen
-	function calcularProyeccionAnual() {
-	  const factor = 1 + CONFIG_PROYECCION.FACTOR_ANUAL_TOTAL; // 1.23
-	  let totalEjecutado = 0;
-
 	  const unidades = ['mebuc', 'desan', 'demam', 'setra', 'asturias'];
 	  const servicios = ['Energía', 'Alumbrado Público', 'Acueducto', 'Alcantarillado', 'Gas'];
 
@@ -2979,12 +3061,121 @@ input.search-bar {
 		servicios.forEach(servicio => {
 		  const config = appData.saldos[unidad]?.[servicio];
 		  if (!config) return;
-		  totalEjecutado += (config.asignacion || 0);
+
+		  let totalTramitado = 0;
+		  let mesesConDatos = 0;
+
+		  mesesAConsiderar.forEach(mes => {
+			const valor = datos[unidad]?.[servicio]?.[mes] || 0;
+			if (valor > 0) {
+			  totalTramitado += valor;
+			  mesesConDatos++;
+			}
+		  });
+
+		  if (mesesConDatos === 0) return;
+
+		  // ✅ Proyección = promedio de lo tramitado en meses anteriores
+		  const promedio = totalTramitado / mesesConDatos;
+		  totalProyectado += promedio;
 		});
 	  });
 
-	  // Proyección = asignación total × (1 + IPC + margen)
-	  return Math.round(totalEjecutado * factor);
+	  return Math.round(totalProyectado);
+	}
+	
+	function calcularProyeccionAnual() {
+	  // ✅ Leer IPC seleccionado por el usuario
+	  const ipcSelect = document.getElementById('selectIPC');
+	  const factorIPC = ipcSelect ? parseFloat(ipcSelect.value) : 0.15; // fallback 15%
+	  
+	  let totalAsignado = 0;
+	  const unidades = ['mebuc', 'desan', 'demam', 'setra', 'asturias'];
+	  const servicios = ['Energía', 'Alumbrado Público', 'Acueducto', 'Alcantarillado', 'Gas'];
+
+	  unidades.forEach(unidad => {
+		if (!appData.saldos[unidad]) return;
+		servicios.forEach(servicio => {
+		  const config = appData.saldos[unidad]?.[servicio];
+		  if (!config) return;
+		  totalAsignado += (config.asignacion || 0);
+		});
+	  });
+
+	  // Proyección = asignación total × (1 + IPC seleccionado)
+	  return Math.round(totalAsignado * (1 + factorIPC));
+	}
+	
+	// ✅ Calcular proyección mensual DETALLADA por unidad y servicio (excluye mes actual)
+	function calcularProyeccionMensualDetallada() {
+	  const datos = calcularValoresPorMesYUnidad();
+	  const hoy = new Date();
+	  const mesActualIdx = hoy.getMonth(); // 0 = enero
+	  const mesesKeys = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
+	  const mesesAConsiderar = mesesKeys.slice(0, mesActualIdx); // ✅ excluye mes actual
+
+	  const resultado = {};
+	  const unidades = ['mebuc', 'desan', 'demam', 'setra', 'asturias'];
+	  const servicios = ['Energía', 'Alumbrado Público', 'Acueducto', 'Alcantarillado', 'Gas'];
+
+	  unidades.forEach(unidad => {
+		if (!appData.saldos[unidad]) return;
+		resultado[unidad] = {};
+
+		servicios.forEach(servicio => {
+		  const config = appData.saldos[unidad]?.[servicio];
+		  if (!config) return;
+
+		  let totalTramitado = 0;
+		  let mesesConDatos = 0;
+
+		  mesesAConsiderar.forEach(mes => {
+			const valor = datos[unidad]?.[servicio]?.[mes] || 0;
+			if (valor > 0) {
+			  totalTramitado += valor;
+			  mesesConDatos++;
+			}
+		  });
+
+		  if (mesesConDatos === 0) {
+			resultado[unidad][servicio] = 0;
+			return;
+		  }
+
+		  // ✅ Proyección = promedio de meses anteriores
+		  resultado[unidad][servicio] = Math.round(totalTramitado / mesesConDatos);
+		});
+	  });
+
+	  return resultado;
+	}
+
+	// ✅ Calcular proyección anual DETALLADA por unidad y servicio (con IPC seleccionado)
+	function calcularProyeccionAnualDetallada() {
+	  const ipcSelect = document.getElementById('selectIPC');
+	  const factorIPC = ipcSelect ? parseFloat(ipcSelect.value) : 0.15;
+
+	  const resultado = {};
+	  const unidades = ['mebuc', 'desan', 'demam', 'setra', 'asturias'];
+	  const servicios = ['Energía', 'Alumbrado Público', 'Acueducto', 'Alcantarillado', 'Gas'];
+
+	  unidades.forEach(unidad => {
+		if (!appData.saldos[unidad]) return;
+		resultado[unidad] = {};
+
+		servicios.forEach(servicio => {
+		  const config = appData.saldos[unidad]?.[servicio];
+		  if (!config) {
+			resultado[unidad][servicio] = 0;
+			return;
+		  }
+
+		  const asignacion = config.asignacion || 0;
+		  resultado[unidad][servicio] = Math.round(asignacion * (1 + factorIPC));
+		});
+	  });
+
+	  return resultado;
 	}
 	
 	// Función para filtrar filas según búsqueda
@@ -3211,6 +3402,266 @@ input.search-bar {
 		if (proyeccionAnualEl) {
 		  proyeccionAnualEl.textContent = `$${calcularProyeccionAnual().toLocaleString('es-CO')}`;
 		}
+	// Mostrar el % usado en el subtítulo
+	const ipcUsado = parseFloat(document.getElementById('selectIPC')?.value || 0.15) * 100;
+	document.querySelector('#proyeccionAnual').closest('.kpi-card').querySelector('div[style*="opacity:0.7"]').textContent = `IPC +${ipcUsado}%`;
+	
+	// ✅ Renderizar desglose detallado
+	renderDesgloseProyecciones();
+	}
+	
+	// ✅ Renderizar el desglose de proyecciones en la UI
+	function renderDesgloseProyecciones() {
+	  const proyMensual = calcularProyeccionMensualDetallada();
+	  const proyAnual = calcularProyeccionAnualDetallada();
+
+	  // === Proyección mensual ===
+	  let htmlMensual = '';
+	  Object.keys(proyMensual).forEach(unidad => {
+		Object.keys(proyMensual[unidad]).forEach(servicio => {
+		  const valor = proyMensual[unidad][servicio];
+		  if (valor > 0) {
+			htmlMensual += `
+			  <div style="background:#f8f9fa;padding:10px;border-radius:8px;border-left:3px solid #fbbf24;">
+				<strong>${unidad.toUpperCase()} — ${servicio}:</strong> 
+				<span style="color:#06402b;font-weight:bold;">$${valor.toLocaleString('es-CO')}</span>
+			  </div>
+			`;
+		  }
+		});
+	  });
+	  document.getElementById('proyeccionMensualDetalle').innerHTML = htmlMensual || '<p style="color:#64748b;">No hay datos para proyectar</p>';
+
+	  // === Proyección anual ===
+	  const ipcUsado = parseFloat(document.getElementById('selectIPC')?.value || 0.15) * 100;
+	  document.getElementById('ipcAplicado').textContent = `${ipcUsado}%`;
+
+	  let htmlAnual = '';
+	  Object.keys(proyAnual).forEach(unidad => {
+		Object.keys(proyAnual[unidad]).forEach(servicio => {
+		  const valor = proyAnual[unidad][servicio];
+		  if (valor > 0) {
+			htmlAnual += `
+			  <div style="background:#f0fdf4;padding:10px;border-radius:8px;border-left:3px solid #22c55e;">
+				<strong>${unidad.toUpperCase()} — ${servicio}:</strong> 
+				<span style="color:#06402b;font-weight:bold;">$${valor.toLocaleString('es-CO')}</span>
+			  </div>
+			`;
+		  }
+		});
+	  });
+	  document.getElementById('proyeccionAnualDetalle').innerHTML = htmlAnual || '<p style="color:#64748b;">No hay datos para proyectar</p>';
+	}
+	
+	// ✅ Mostrar desglose en modal con diseño profesional mejorado
+	function mostrarDesgloseEnModal() {
+	  const proyMensual = calcularProyeccionMensualDetallada();
+	  const proyAnual = calcularProyeccionAnualDetallada();
+	  const ipcUsado = parseFloat(document.getElementById('selectIPC')?.value || 0.15) * 100;
+	  
+	  // Calcular totales generales
+	  let totalMensual = 0;
+	  let totalAnual = 0;
+	  
+	  // Definir unidades y servicios
+	  const unidades = ['mebuc', 'desan', 'demam', 'setra', 'asturias'];
+	  const nombresUnidades = {
+		'mebuc': 'MEBUC',
+		'desan': 'DESAN',
+		'demam': 'DEMAM',
+		'setra': 'SETRA',
+		'asturias': 'ASTURIAS'
+	  };
+	  const servicios = ['Energía', 'Alumbrado Público', 'Acueducto', 'Alcantarillado', 'Gas'];
+	  const iconosServicios = {
+		'Energía': 'fa-bolt',
+		'Alumbrado Público': 'fa-lightbulb',
+		'Acueducto': 'fa-tint',
+		'Alcantarillado': 'fa-water',
+		'Gas': 'fa-fire'
+	  };
+	  
+	  // Generar contenido organizado por unidad
+	  let contenidoUnidades = '';
+	  let contadorUnidades = 0;
+	  
+	  unidades.forEach(unidad => {
+		let filasUnidad = '';
+		let tieneDatos = false;
+		let subtotalMensual = 0;
+		let subtotalAnual = 0;
+		
+		servicios.forEach(servicio => {
+		  const valorMensual = proyMensual[unidad]?.[servicio] || 0;
+		  const valorAnual = proyAnual[unidad]?.[servicio] || 0;
+		  
+		  if (valorMensual > 0 || valorAnual > 0) {
+			tieneDatos = true;
+			subtotalMensual += valorMensual;
+			subtotalAnual += valorAnual;
+			
+			filasUnidad += `
+			  <tr>
+				<td style="padding:14px 16px;text-align:left;border-bottom:1px solid #e5e7eb;">
+				  <i class="fas ${iconosServicios[servicio]} servicio-icon"></i>
+				  <span style="color:#374151;font-weight:500;">${servicio}</span>
+				</td>
+				<td style="padding:14px 16px;text-align:right;color:#06402b;font-weight:600;border-bottom:1px solid #e5e7eb;font-size:0.95rem;">
+				  $${valorMensual.toLocaleString('es-CO', {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+				</td>
+				<td style="padding:14px 16px;text-align:right;color:#06402b;font-weight:600;border-bottom:1px solid #e5e7eb;font-size:0.95rem;">
+				  $${valorAnual.toLocaleString('es-CO', {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+				</td>
+			  </tr>
+			`;
+		  }
+		});
+		
+		if (tieneDatos) {
+		  contadorUnidades++;
+		  totalMensual += subtotalMensual;
+		  totalAnual += subtotalAnual;
+		  
+		  // Fila de subtotales
+		  filasUnidad += `
+			<tr style="background:linear-gradient(135deg, #f0fdf4, #dcfce7);font-weight:700;">
+			  <td style="padding:14px 16px;text-align:left;color:#065f46;border-top:2px solid #06402b;">
+				<i class="fas fa-calculator" style="margin-right:8px;"></i>
+				Subtotal ${nombresUnidades[unidad]}
+			  </td>
+			  <td style="padding:14px 16px;text-align:right;color:#065f46;border-top:2px solid #06402b;font-size:1rem;">
+				$${subtotalMensual.toLocaleString('es-CO', {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+			  </td>
+			  <td style="padding:14px 16px;text-align:right;color:#065f46;border-top:2px solid #06402b;font-size:1rem;">
+				$${subtotalAnual.toLocaleString('es-CO', {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+			  </td>
+			</tr>
+		  `;
+		  
+		  contenidoUnidades += `
+			<div class="unidad-card" style="animation-delay:${contadorUnidades * 0.1}s;">
+			  <div class="unidad-header">
+				<h4 style="color:white;margin:0;font-size:1.15rem;display:flex;align-items:center;gap:10px;">
+				  <i class="fas fa-building" style="font-size:1.2rem;"></i>
+				  <span style="flex:1;">${nombresUnidades[unidad]}</span>
+				  <span style="font-size:0.85rem;opacity:0.9;font-weight:400;">
+					<i class="fas fa-chart-line"></i> Unidad ${contadorUnidades}
+				  </span>
+				</h4>
+			  </div>
+			  <div class="unidad-table-container">
+				<table class="modal-proyecciones" style="width:100%;border-collapse:collapse;background:white;">
+				  <thead>
+					<tr style="background:linear-gradient(135deg, #f9fafb, #f3f4f6);">
+					  <th style="padding:14px 16px;text-align:left;color:#374151;font-weight:600;font-size:0.9rem;text-transform:uppercase;letter-spacing:0.5px;">
+						<i class="fas fa-list-ul" style="margin-right:6px;color:#06402b;"></i>
+						Servicio
+					  </th>
+					  <th style="padding:14px 16px;text-align:right;color:#374151;font-weight:600;font-size:0.9rem;text-transform:uppercase;letter-spacing:0.5px;">
+						<i class="fas fa-calendar-alt" style="margin-right:6px;color:#06402b;"></i>
+						Mes Próximo
+					  </th>
+					  <th style="padding:14px 16px;text-align:right;color:#374151;font-weight:600;font-size:0.9rem;text-transform:uppercase;letter-spacing:0.5px;">
+						<i class="fas fa-calendar-check" style="margin-right:6px;color:#06402b;"></i>
+						Presupuesto 2026
+					  </th>
+					</tr>
+				  </thead>
+				  <tbody>
+					${filasUnidad}
+				  </tbody>
+				</table>
+			  </div>
+			</div>
+		  `;
+		}
+	  });
+	  
+	  const contenidoModal = `
+		<div style="max-width:950px;width:95%;max-height:85vh;overflow:hidden;display:flex;flex-direction:column;">
+		  <!-- Header -->
+		  <div class="modal-header-gradient" style="padding:24px 28px;border-radius:12px 12px 0 0;position:relative;z-index:1;">
+			<h3 style="color:white;margin:0;text-align:center;font-size:1.5rem;font-weight:700;text-shadow:0 2px 4px rgba(0,0,0,0.2);">
+			  <i class="fas fa-chart-bar" style="margin-right:12px;font-size:1.6rem;"></i>
+			  Desglose de Proyecciones Presupuestales
+			</h3>
+			<p style="color:rgba(255,255,255,0.9);margin:8px 0 0;text-align:center;font-size:0.95rem;">
+			  Análisis detallado por unidad y servicio
+			</p>
+		  </div>
+		  
+		  <!-- Indicador IPC -->
+		  <div class="info-badge" style="margin:20px 28px;padding:16px 20px;border-radius:10px;">
+			<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+			  <div style="display:flex;align-items:center;gap:12px;">
+				<div style="background:#06402b;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+				  <i class="fas fa-percentage" style="color:white;font-size:1.3rem;"></i>
+				</div>
+				<div>
+				  <div style="color:#6b7280;font-size:0.85rem;font-weight:500;text-transform:uppercase;letter-spacing:0.5px;">
+					Índice de Ajuste Aplicado
+				  </div>
+				  <div style="color:#06402b;font-size:1.4rem;font-weight:700;">
+					+${ipcUsado.toFixed(2)}%
+				  </div>
+				</div>
+			  </div>
+			  <div style="color:#6b7280;font-size:0.9rem;">
+				<i class="fas fa-info-circle" style="margin-right:6px;"></i>
+				IPC para proyección 2026
+			  </div>
+			</div>
+		  </div>
+		  
+		  <!-- Contenido scrolleable -->
+		  <div class="modal-scroll-content">
+			${contenidoUnidades || '<p style="color:#64748b;text-align:center;padding:40px 0;font-size:1.1rem;"><i class="fas fa-inbox" style="font-size:3rem;display:block;margin-bottom:16px;opacity:0.5;"></i>No hay datos para mostrar</p>'}
+			
+			${totalMensual > 0 ? `
+			  <!-- Totales Generales -->
+			  <div class="totals-card" style="margin-top:30px;">
+				<h4 style="color:white;margin:0 0 16px;font-size:1.2rem;display:flex;align-items:center;gap:10px;">
+				  <i class="fas fa-coins"></i>
+				  Totales Generales
+				</h4>
+				<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+				  <div style="background:rgba(255,255,255,0.15);padding:16px;border-radius:8px;backdrop-filter:blur(10px);">
+					<div style="color:rgba(255,255,255,0.9);font-size:0.85rem;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">
+					  <i class="fas fa-calendar-alt" style="margin-right:6px;"></i>
+					  Total Mes Próximo
+					</div>
+					<div style="color:white;font-size:1.6rem;font-weight:700;">
+					  $${totalMensual.toLocaleString('es-CO', {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+					</div>
+				  </div>
+				  <div style="background:rgba(255,255,255,0.15);padding:16px;border-radius:8px;backdrop-filter:blur(10px);">
+					<div style="color:rgba(255,255,255,0.9);font-size:0.85rem;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">
+					  <i class="fas fa-calendar-check" style="margin-right:6px;"></i>
+					  Total Presupuesto 2026
+					</div>
+					<div style="color:white;font-size:1.6rem;font-weight:700;">
+					  $${totalAnual.toLocaleString('es-CO', {minimumFractionDigits: 0, maximumFractionDigits: 0})}
+					</div>
+				  </div>
+				</div>
+			  </div>
+			` : ''}
+		  </div>
+		  
+		  <!-- Footer con botón -->
+		  <div class="modal-footer">
+			<button class="btn btn-close-modal" onclick="closeModal()" 
+					style="background:linear-gradient(135deg, #6b7280, #4b5563);color:white;padding:12px 32px;font-size:0.95rem;border:none;border-radius:8px;cursor:pointer;font-weight:600;">
+			  <i class="fas fa-times-circle" style="margin-right:8px;"></i>
+			  Cerrar
+			</button>
+		  </div>
+		</div>
+	  `;
+	  
+	  // Usar el modal global ya existente
+	  document.getElementById('modalContent').innerHTML = contenidoModal;
+	  document.getElementById('modal').classList.add('active');
 	}
 
 	// Función para generar gráficos mejorados
@@ -3705,9 +4156,18 @@ input.search-bar {
 		  }, index * 100);
 		});
 
+		// ✅ Recalcular proyecciones cuando cambie el IPC
+		document.getElementById('selectIPC')?.addEventListener('change', () => {
+		  renderTablaSaldos(); // Esto regenerará KPIs y desgloses
+		});
+
+		// ✅ Abrir modal de desglose
+        document.getElementById('btnVerDesglose')?.addEventListener('click', mostrarDesgloseEnModal);
+
 		// Renderizar tabla por primera vez
 		renderTablaSaldos();
 	  });
+	  document.getElementById('btnVerDesglose')?.addEventListener('click', mostrarDesgloseEnModal);
 	}
 	
 	// ========== MÓDULO CONSOLIDADO ==========
