@@ -2601,7 +2601,7 @@ input.search-bar {
 			<div class="kpi-card" style="text-align:center;padding:15px;background:rgba(255,255,255,0.1);border-radius:8px;transition:all 0.3s ease;cursor:pointer;border:2px solid transparent;">
 			  <div style="font-weight:700;margin-bottom:8px;font-size:0.85rem;color:#ffffff;">Presupuesto 2026</div>
 			  <div class="amount" id="proyeccionAnual" style="font-size:1.5rem;color:#fbbf24;font-weight:bold;">$0</div>
-			  <div style="font-size:0.7rem;margin-top:5px;color:rgba(255,255,255,0.8);">IPC +15%</div>
+			  <div id="ipcSubtitle" style="font-size:0.7rem;margin-top:5px;color:rgba(255,255,255,0.8);">IPC +15%</div>
 			</div>
 			
 		  </div>
@@ -3678,14 +3678,14 @@ input.search-bar {
 	  }
 
 	  // ✅ Actualizar subtítulo de proyección anual con IPC
-	  const ipcUsado = parseFloat(document.getElementById('selectIPC')?.value || 0.15) * 100;
-	  const kpiCardAnual = proyeccionAnualEl ? proyeccionAnualEl.closest('.kpi-card') : null;
-	  if (kpiCardAnual) {
-		const subtitle = kpiCardAnual.querySelector('div[style*="opacity:0.7"]');
-		if (subtitle) {
-		  subtitle.textContent = `IPC +${ipcUsado}%`;
+		const ipcSelect = document.getElementById('selectIPC');
+		if (ipcSelect) {
+		  const ipcUsado = parseFloat(ipcSelect.value) * 100;
+		  const subtitleEl = document.getElementById('ipcSubtitle');
+		  if (subtitleEl) {
+			subtitleEl.textContent = `IPC +${ipcUsado.toFixed(0)}%`;
+		  }
 		}
-	  }
 
 	  // Generar gráficos
 	  generarGraficosSaldos(filas, datosCalculados);
@@ -6061,7 +6061,7 @@ input.search-bar {
 	  return ultimoMes.charAt(0).toUpperCase() + ultimoMes.slice(1).toLowerCase();
 	}
 
-    // ========== RESUMEN ==========
+	// ========== RESUMEN ==========
 	function updateSummary() {
 	  const container = document.getElementById('summaryCards');
 	  if (!container) return;
@@ -6104,7 +6104,7 @@ input.search-bar {
 
 	  updateTramitacionGrid();
 	}
-	
+
 	function updateTramitacionGrid() {
 	  const grid = document.getElementById('tramitacionGrid');
 	  if (!grid) return;
@@ -6120,10 +6120,12 @@ input.search-bar {
 		acueducto: 'ACUEDUCTO', 
 		gas: 'GAS' 
 	  };
-	  const colors = {
-		energia: { primary: '#fbbf24', secondary: '#f59e0b', bg: '#fffbeb', shadow: 'rgba(251, 191, 36, 0.4)' },
-		acueducto: { primary: '#3b82f6', secondary: '#2563eb', bg: '#eff6ff', shadow: 'rgba(59, 130, 246, 0.4)' },
-		gas: { primary: '#ef4444', secondary: '#dc2626', bg: '#fef2f2', shadow: 'rgba(239, 68, 68, 0.4)' }
+	  // ✅ USO ÚNICO DEL COLOR INSTITUCIONAL
+	  const colorInstitucional = { 
+		primary: '#06402b', 
+		secondary: '#0a5c3d', 
+		bg: 'rgba(6, 64, 43, 0.08)', 
+		shadow: 'rgba(6, 64, 43, 0.4)' 
 	  };
 
 	  let html = `
@@ -6145,7 +6147,7 @@ input.search-bar {
 		  if (stats.total === 0) return;
 
 		  const porcentaje = ((stats.tramitados / stats.total) * 100).toFixed(1);
-		  const color = colors[service];
+		  const color = colorInstitucional; // ✅ Siempre el mismo color
 
 		  html += `
 			<div class="tramitacion-item" style="
