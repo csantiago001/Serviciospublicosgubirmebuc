@@ -378,12 +378,14 @@ body::before {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: sticky;
-  top: 0;
+  position: sticky; /* ✅ Mantén sticky */
+  top: 0; /* ✅ Fija en la parte superior */
   z-index: 999;
   border-bottom: 1px solid rgba(57, 255, 20, 0.2);
-  min-width: 100%;
-  width: auto !important;
+  min-height: 80px; /* ⭐ Añadimos una altura mínima para que ocupe espacio */
+  width: 100%; /* ✅ Asegura que ocupe todo el ancho */
+  /* ✅ Añadimos un padding inferior para que el contenido no se pegue */
+  padding-bottom: 20px;
 }
 .topbar-title span {
   font-weight: 700;
@@ -391,10 +393,12 @@ body::before {
   color: white;
 }
 .content-area {
-  padding: 40px;
+  padding: 40px; /* El padding original */
   overflow-x: visible !important;
   overflow-y: visible !important;
   min-width: 100%;
+  /* ✅ Añadimos un padding-top para compensar la altura del topbar */
+  padding-top: 80px; /* Debe coincidir con min-height del .topbar */
 }
 
 /* ===== BOTONES DE SERVICIO ===== */
@@ -10650,3 +10654,4 @@ input.search-bar {
 	  </main>
 </body>
 </html>
+
