@@ -2297,6 +2297,83 @@ input.search-bar {
   background: #f0f0f0;
   transform: rotate(90deg);
 }
+
+/* ===== GRÁFICOS EN MODO OSCURO ===== */
+[data-theme="dark"] .section-card #graficoCanvasContainer {
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .section-card #graficoCanvasContainer h3 {
+  color: white;
+}
+
+[data-theme="dark"] .section-card #graficoCanvasContainer button.btn-success {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+[data-theme="dark"] .section-card #graficoCanvasContainer canvas {
+  background: transparent;
+}
+
+/* Estilos para el contenedor de selección en modo oscuro */
+[data-theme="dark"] .section-card {
+  background: rgba(15, 23, 42, 0.9);
+  color: white;
+}
+
+[data-theme="dark"] .section-card label {
+  color: white;
+}
+
+[data-theme="dark"] .section-card .filter-select {
+  background: rgba(30, 41, 59, 0.8);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="dark"] .section-card .search-bar {
+  background: rgba(30, 41, 59, 0.8);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="dark"] .section-card .btn.btn-primary {
+  background: linear-gradient(135deg, #06402b, #0a5c3d);
+  color: white;
+}
+
+[data-theme="dark"] .section-card .btn.btn-primary:hover {
+  background: linear-gradient(135deg, #0a5c3d, #06402b);
+}
+
+/* Para los resultados de búsqueda en el gráfico */
+[data-theme="dark"] .card {
+  background: rgba(30, 41, 59, 0.8);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .card:hover {
+  background: rgba(50, 60, 80, 0.8);
+  transform: scale(1.02);
+}
+
+/* Estilos para el título del gráfico */
+#graficoTitle {
+  color: var(--primary-solid) !important;
+}
+
+/* Estilos para el botón de exportar */
+#graficoCanvasContainer .btn-success {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  color: white !important;
+}
+
+#graficoCanvasContainer .btn-success:hover {
+  background: linear-gradient(135deg, #059669, #047857) !important;
+}
 </style>
 </head>
 <body>
@@ -2830,40 +2907,39 @@ input.search-bar {
 				  <i class="fas fa-chart-pie" style="color:#22c55e;"></i> 
 				  Ejecución por Servicio
 				</h4>
-				<div style="position:relative;height:250px;">
+				<div style="position:relative;z-index:10;height:250px;"> <!-- 👈 AQUÍ SE AGREGA position y z-index -->
 				  <canvas id="chartEjecutado"></canvas>
 				</div>
 			  </div>
-			  
 			  <!-- Gráfico 2: Ejecución por Unidad -->
 			  <div class="section-card" style="padding:20px;background:white;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,0.08);transition:all 0.3s ease;border:1px solid #e5e7eb;">
 				<h4 style="color:#06402b;margin:0 0 16px 0;font-size:1rem;font-weight:600;display:flex;align-items:center;gap:8px;">
 				  <i class="fas fa-chart-bar" style="color:#3b82f6;"></i> 
 				  Ejecución por Unidad
 				</h4>
-				<div style="position:relative;height:250px;">
+				<div style="position:relative;z-index:10;height:250px;"> <!-- 👈 AQUÍ SE AGREGA position y z-index -->
 				  <canvas id="chartServicios"></canvas>
 				</div>
 			  </div>
-			  
 			  <!-- Gráfico 3: Tendencia Mensual -->
 			  <div class="section-card" style="padding:20px;background:white;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,0.08);transition:all 0.3s ease;border:1px solid #e5e7eb;">
 				<h4 style="color:#06402b;margin:0 0 16px 0;font-size:1rem;font-weight:600;display:flex;align-items:center;gap:8px;">
 				  <i class="fas fa-chart-line" style="color:#fbbf24;"></i> 
 				  Tendencia Mensual
 				</h4>
-				<div style="position:relative;height:250px;">
+				<div style="position:relative;z-index:10;height:250px;"> <!-- 👈 AQUÍ SE AGREGA position y z-index -->
 				  <canvas id="chartTendencia"></canvas>
 				</div>
 			  </div>
-			  
 			  <!-- Gráfico 4: Estado de Cumplimiento -->
 			  <div class="section-card" style="padding:20px;background:white;border-radius:16px;box-shadow:0 2px 8px rgba(0,0,0,0.08);transition:all 0.3s ease;border:1px solid #e5e7eb;">
 				<h4 style="color:#06402b;margin:0 0 16px 0;font-size:1rem;font-weight:600;display:flex;align-items:center;gap:8px;">
 				  <i class="fas fa-tasks" style="color:#8b5cf6;"></i> 
 				  Estado por Servicio
 				</h4>
-				<div id="chartCumplimiento" style="max-height:250px;overflow-y:auto;padding-right:4px;"></div>
+				<div id="chartCumplimiento" style="position:relative;z-index:10;max-height:250px;overflow-y:auto;padding-right:4px;"> <!-- 👈 AQUÍ SE AGREGA position y z-index -->
+				  <!-- Los datos se generarán aquí dinámicamente -->
+				</div>
 			  </div>
 			</div>
 		</section>
@@ -3923,7 +3999,6 @@ input.search-bar {
 		'Alcantarillado': 'rgba(5, 117, 230, 0.8)',
 		'Gas': 'rgba(245, 175, 25, 0.8)'
 	  };
-
 	  const coloresUnidades = {
 		'mebuc': 'rgba(251, 191, 36, 0.8)',
 		'desan': 'rgba(32, 191, 107, 0.8)',
@@ -3931,277 +4006,240 @@ input.search-bar {
 		'setra': 'rgba(5, 117, 230, 0.8)'
 	  };
 
-	// GRÁFICO 1: Ejecución por Servicio (Doughnut)
-	const servicios = ['Energía', 'Alumbrado Público', 'Acueducto', 'Alcantarillado', 'Gas'];
-	const datosServicios = servicios.map(servicio => {
-	  const total = datos
-		.filter(d => d.servicio === servicio)
-		.reduce((sum, d) => sum + d.totalTramitado, 0);
-	  return total;
-	});
+	  // === OPCIONES COMUNES PARA TEXTO BLANCO ===
+	  const whiteTextOptions = {
+		font: { size: 13, family: "'Inter', sans-serif", weight: '500' },
+		color: '#FFFFFF'
+	  };
 
-	const ctxEjecutado = document.getElementById('chartEjecutado').getContext('2d');
-	chartInstances.ejecutado = new Chart(ctxEjecutado, {
-	  type: 'doughnut',
-	  data: {
-		labels: servicios,
-		datasets: [{
-		  data: datosServicios,
-		  backgroundColor: servicios.map(s => coloresServicios[s]),
-		  borderWidth: 3,
-		  borderColor: '#fff'
-		}]
-	  },
-	  options: {
-		responsive: true,
-		maintainAspectRatio: false,
-		plugins: {
-		  legend: { 
-			position: 'bottom',
-			labels: {
-			  padding: 12,
-			  font: { 
-				size: 13, 
-				family: "'Inter', sans-serif",
-				weight: '500'
-			  },
-			  color: '#1e293b',
-			  usePointStyle: true,
-			  pointStyle: 'circle'
-			}
-		  },
-		  tooltip: {
-			backgroundColor: 'rgba(0, 0, 0, 0.9)',
-			titleColor: '#fff',
-			bodyColor: '#fff',
-			titleFont: { size: 14, weight: 'bold' },
-			bodyFont: { size: 13 },
-			padding: 12,
-			borderColor: '#fff',
-			borderWidth: 1,
-			callbacks: {
-			  label: function(context) {
-				const total = context.dataset.data.reduce((a, b) => a + b, 0);
-				const porcentaje = ((context.raw / total) * 100).toFixed(1);
-				return `${context.label}: $${context.raw.toLocaleString('es-CO')} (${porcentaje}%)`;
-			  }
-			}
-		  }
-		}
-	  }
-	});
-
-	// GRÁFICO 2: Ejecución por Unidad (Bar)
-	const unidades = ['mebuc', 'desan', 'demam', 'setra'];
-	const datosUnidades = unidades.map(unidad => {
-	  const total = datos
-		.filter(d => d.unidad === unidad)
-		.reduce((sum, d) => sum + d.totalTramitado, 0);
-	  return total;
-	});
-
-	const ctxUnidades = document.getElementById('chartServicios').getContext('2d');
-	chartInstances.unidades = new Chart(ctxUnidades, {
-	  type: 'bar',
-	  data: {
-		labels: unidades.map(u => u.toUpperCase()),
-		datasets: [{
-		  label: 'Ejecutado',
-		  data: datosUnidades,
-		  backgroundColor: unidades.map(u => coloresUnidades[u]),
-		  borderWidth: 0,
-		  borderRadius: 8
-		}]
-	  },
-	  options: {
-		responsive: true,
-		maintainAspectRatio: false,
-		scales: {
-		  y: { 
-			beginAtZero: true,
-			ticks: {
-			  font: { 
-				size: 13, 
-				family: "'Inter', sans-serif",
-				weight: '500'
-			  },
-			  color: '#1e293b',
-			  callback: function(value) {
-				return '$' + (value / 1000000).toFixed(1) + 'M';
-			  }
-			},
-			grid: { 
-			  color: 'rgba(0,0,0,0.08)',
-			  drawBorder: false
-			}
-		  },
-		  x: {
-			ticks: {
-			  font: { 
-				size: 13, 
-				family: "'Inter', sans-serif",
-				weight: '600'
-			  },
-			  color: '#1e293b'
-			},
-			grid: { display: false }
-		  }
-		},
-		plugins: {
-		  legend: { display: false },
-		  tooltip: {
-			backgroundColor: 'rgba(0, 0, 0, 0.9)',
-			titleColor: '#fff',
-			bodyColor: '#fff',
-			titleFont: { size: 14, weight: 'bold' },
-			bodyFont: { size: 13 },
-			padding: 12,
-			borderColor: '#fff',
-			borderWidth: 1,
-			callbacks: {
-			  label: function(context) {
-				return `Ejecutado: $${context.raw.toLocaleString('es-CO')}`;
-			  }
-			}
-		  }
-		}
-	  }
-	});
-
-	// GRÁFICO 3: Tendencia Mensual (Line)
-	const meses = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
-	const mesesCompletos = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
-
-	const tendenciaMensual = mesesCompletos.map(mes => {
-	  let total = 0;
-	  unidades.forEach(unidad => {
-		servicios.forEach(servicio => {
-		  if (datosCalculados[unidad] && datosCalculados[unidad][servicio]) {
-			total += datosCalculados[unidad][servicio][mes] || 0;
-		  }
-		});
+	  // GRÁFICO 1: Ejecución por Servicio (Doughnut)
+	  const servicios = ['Energía', 'Alumbrado Público', 'Acueducto', 'Alcantarillado', 'Gas'];
+	  const datosServicios = servicios.map(servicio => {
+		const total = datos
+		  .filter(d => d.servicio === servicio)
+		  .reduce((sum, d) => sum + d.totalTramitado, 0);
+		return total;
 	  });
-	  return total;
-	});
-
-	const ctxTendencia = document.getElementById('chartTendencia').getContext('2d');
-	chartInstances.tendencia = new Chart(ctxTendencia, {
-	  type: 'line',
-	  data: {
-		labels: meses,
-		datasets: [{
-		  label: 'Ejecución Mensual',
-		  data: tendenciaMensual,
-		  borderColor: '#fbbf24',
-		  backgroundColor: 'rgba(251, 191, 36, 0.15)',
-		  borderWidth: 3,
-		  fill: true,
-		  tension: 0.4,
-		  pointRadius: 5,
-		  pointHoverRadius: 7,
-		  pointBackgroundColor: '#fbbf24',
-		  pointBorderColor: '#fff',
-		  pointBorderWidth: 2
-		}]
-	  },
-	  options: {
-		responsive: true,
-		maintainAspectRatio: false,
-		scales: {
-		  y: {
-			beginAtZero: true,
-			ticks: {
-			  font: { 
-				size: 13, 
-				family: "'Inter', sans-serif",
-				weight: '500'
-			  },
-			  color: '#1e293b',
-			  callback: function(value) {
-				return '$' + (value / 1000000).toFixed(1) + 'M';
+	  const ctxEjecutado = document.getElementById('chartEjecutado').getContext('2d');
+	  chartInstances.ejecutado = new Chart(ctxEjecutado, {
+		type: 'doughnut',
+		data: {
+		  labels: servicios,
+		  datasets: [{
+			data: datosServicios,
+			backgroundColor: servicios.map(s => coloresServicios[s]),
+			borderWidth: 3,
+			borderColor: '#fff'
+		  }]
+		},
+		options: {
+		  responsive: true,
+		  maintainAspectRatio: false,
+		  plugins: {
+			legend: {
+			  position: 'bottom',
+			  labels: {
+				padding: 12,
+				font: whiteTextOptions.font,
+				color: whiteTextOptions.color,
+				usePointStyle: true,
+				pointStyle: 'circle'
 			  }
 			},
-			grid: { 
-			  color: 'rgba(0,0,0,0.08)',
-			  drawBorder: false
+			tooltip: {
+			  backgroundColor: 'rgba(0, 0, 0, 0.9)',
+			  titleColor: '#fff',
+			  bodyColor: '#fff',
+			  titleFont: { size: 14, weight: 'bold' },
+			  bodyFont: { size: 13 },
+			  padding: 12,
+			  borderColor: '#fff',
+			  borderWidth: 1,
+			  callbacks: {
+				label: function(context) {
+				  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+				  const porcentaje = ((context.raw / total) * 100).toFixed(1);
+				  return `${context.label}: $${context.raw.toLocaleString('es-CO')} (${porcentaje}%)`;
+				}
+			  }
+			}
+		  }
+		}
+	  });
+
+	  // GRÁFICO 2: Ejecución por Unidad (Bar)
+	  const unidades = ['mebuc', 'desan', 'demam', 'setra'];
+	  const datosUnidades = unidades.map(unidad => {
+		const total = datos
+		  .filter(d => d.unidad === unidad)
+		  .reduce((sum, d) => sum + d.totalTramitado, 0);
+		return total;
+	  });
+	  const ctxUnidades = document.getElementById('chartServicios').getContext('2d');
+	  chartInstances.unidades = new Chart(ctxUnidades, {
+		type: 'bar',
+		data: {
+		  labels: unidades.map(u => u.toUpperCase()),
+		  datasets: [{
+			label: 'Ejecutado',
+			data: datosUnidades,
+			backgroundColor: unidades.map(u => coloresUnidades[u]),
+			borderWidth: 0,
+			borderRadius: 8
+		  }]
+		},
+		options: {
+		  responsive: true,
+		  maintainAspectRatio: false,
+		  scales: {
+			y: {
+			  beginAtZero: true,
+			  ticks: {
+				...whiteTextOptions,
+				callback: function(value) {
+				  return '$' + (value / 1000000).toFixed(1) + 'M';
+				}
+			  },
+			  grid: {
+				color: 'rgba(255,255,255,0.1)'
+			  }
+			},
+			x: {
+			  ticks: whiteTextOptions,
+			  grid: { display: false }
 			}
 		  },
-		  x: {
-			ticks: {
-			  font: { 
-				size: 12, 
-				family: "'Inter', sans-serif",
-				weight: '600'
-			  },
-			  color: '#1e293b'
-			},
-			grid: { 
-			  color: 'rgba(0,0,0,0.05)',
-			  drawBorder: false
-			}
-		  }
-		},
-		plugins: {
-		  legend: { display: false },
-		  tooltip: {
-			backgroundColor: 'rgba(0, 0, 0, 0.9)',
-			titleColor: '#fff',
-			bodyColor: '#fff',
-			titleFont: { size: 14, weight: 'bold' },
-			bodyFont: { size: 13 },
-			padding: 12,
-			borderColor: '#fff',
-			borderWidth: 1,
-			callbacks: {
-			  label: function(context) {
-				return `Total: $${context.raw.toLocaleString('es-CO')}`;
+		  plugins: {
+			legend: { display: false },
+			tooltip: {
+			  backgroundColor: 'rgba(0, 0, 0, 0.9)',
+			  titleColor: '#fff',
+			  bodyColor: '#fff',
+			  titleFont: { size: 14, weight: 'bold' },
+			  bodyFont: { size: 13 },
+			  padding: 12,
+			  borderColor: '#fff',
+			  borderWidth: 1,
+			  callbacks: {
+				label: function(context) {
+				  return `Ejecutado: $${context.raw.toLocaleString('es-CO')}`;
+				}
 			  }
 			}
 		  }
 		}
-	  }
-	});
+	  });
 
-		// GRÁFICO 4: Estado de Cumplimiento (Barras de Progreso)
-		const cumplimientoContainer = document.getElementById('chartCumplimiento');
-		cumplimientoContainer.innerHTML = '';
-
-		const cumplimientoPorServicio = servicios.map(servicio => {
-		  const filasFiltradas = datos.filter(d => d.servicio === servicio);
-		  if (filasFiltradas.length === 0) return null;
-		  
-		  const totalAsignado = filasFiltradas.reduce((sum, d) => sum + d.asignacion, 0);
-		  const totalEjecutado = filasFiltradas.reduce((sum, d) => sum + d.totalTramitado, 0);
-		  const porcentaje = totalAsignado > 0 ? (totalEjecutado / totalAsignado * 100) : 0;
-		  
-		  return { servicio, porcentaje, totalAsignado, totalEjecutado };
-		}).filter(Boolean);
-
-		cumplimientoPorServicio.forEach(item => {
-		  const colorBarra = item.porcentaje > 80 ? '#ef4444' : item.porcentaje > 60 ? '#f59e0b' : '#22c55e';
-		  const colorFondo = item.porcentaje > 80 ? '#fef2f2' : item.porcentaje > 60 ? '#fffbeb' : '#f0fdf4';
-		  
-		  const barraHTML = `
-			<div style="margin-bottom:16px;">
-			  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-				<span style="font-size:0.9rem;font-weight:600;color:#1e293b;">${item.servicio}</span>
-				<span style="font-size:0.85rem;font-weight:700;color:${colorBarra};">${item.porcentaje.toFixed(1)}%</span>
-			  </div>
-			  <div style="width:100%;height:24px;background:${colorFondo};border-radius:12px;overflow:hidden;position:relative;border:1px solid ${colorBarra}20;">
-				<div style="width:${Math.min(item.porcentaje, 100)}%;height:100%;background:${colorBarra};transition:width 0.6s ease;border-radius:12px;box-shadow:inset 0 2px 4px rgba(0,0,0,0.1);"></div>
-			  </div>
-			  <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:0.8rem;color:#475569;font-weight:500;">
-				<span>Ejec: <strong style="color:#1e293b;">$${(item.totalEjecutado / 1000000).toFixed(1)}M</strong></span>
-				<span>Asig: <strong style="color:#1e293b;">$${(item.totalAsignado / 1000000).toFixed(1)}M</strong></span>
-			  </div>
-			</div>
-		  `;
-		  cumplimientoContainer.innerHTML += barraHTML;
+	  // GRÁFICO 3: Tendencia Mensual (Line)
+	  const meses = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
+	  const mesesCompletos = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
+	  const tendenciaMensual = mesesCompletos.map(mes => {
+		let total = 0;
+		unidades.forEach(unidad => {
+		  servicios.forEach(servicio => {
+			if (datosCalculados[unidad] && datosCalculados[unidad][servicio]) {
+			  total += datosCalculados[unidad][servicio][mes] || 0;
+			}
+		  });
 		});
-
-		if (cumplimientoPorServicio.length === 0) {
-		  cumplimientoContainer.innerHTML = '<p style="text-align:center;color:#64748b;padding:20px;font-size:0.9rem;font-weight:500;">No hay datos para mostrar</p>';
+		return total;
+	  });
+	  const ctxTendencia = document.getElementById('chartTendencia').getContext('2d');
+	  chartInstances.tendencia = new Chart(ctxTendencia, {
+		type: 'line',
+		data: {
+		  labels: meses,
+		  datasets: [{
+			label: 'Ejecución Mensual',
+			data: tendenciaMensual,
+			borderColor: '#fbbf24',
+			backgroundColor: 'rgba(251, 191, 36, 0.15)',
+			borderWidth: 3,
+			fill: true,
+			tension: 0.4,
+			pointRadius: 5,
+			pointHoverRadius: 7,
+			pointBackgroundColor: '#fbbf24',
+			pointBorderColor: '#fff',
+			pointBorderWidth: 2
+		  }]
+		},
+		options: {
+		  responsive: true,
+		  maintainAspectRatio: false,
+		  scales: {
+			y: {
+			  beginAtZero: true,
+			  ticks: {
+				...whiteTextOptions,
+				callback: function(value) {
+				  return '$' + (value / 1000000).toFixed(1) + 'M';
+				}
+			  },
+			  grid: { color: 'rgba(255,255,255,0.1)' }
+			},
+			x: {
+			  ticks: whiteTextOptions,
+			  grid: { color: 'rgba(255,255,255,0.15)' }
+			}
+		  },
+		  plugins: {
+			legend: { display: false },
+			tooltip: {
+			  backgroundColor: 'rgba(0, 0, 0, 0.9)',
+			  titleColor: '#fff',
+			  bodyColor: '#fff',
+			  titleFont: { size: 14, weight: 'bold' },
+			  bodyFont: { size: 13 },
+			  padding: 12,
+			  borderColor: '#fff',
+			  borderWidth: 1,
+			  callbacks: {
+				label: function(context) {
+				  return `Total: $${context.raw.toLocaleString('es-CO')}`;
+				}
+			  }
+			}
+		  }
 		}
+	  });
+
+	  // GRÁFICO 4: Estado de Cumplimiento (Barras de Progreso) – ya usa HTML, no Chart.js
+	  const cumplimientoContainer = document.getElementById('chartCumplimiento');
+	  cumplimientoContainer.innerHTML = '';
+	  const cumplimientoPorServicio = servicios.map(servicio => {
+		const filasFiltradas = datos.filter(d => d.servicio === servicio);
+		if (filasFiltradas.length === 0) return null;
+		const totalAsignado = filasFiltradas.reduce((sum, d) => sum + d.asignacion, 0);
+		const totalEjecutado = filasFiltradas.reduce((sum, d) => sum + d.totalTramitado, 0);
+		const porcentaje = totalAsignado > 0 ? (totalEjecutado / totalAsignado * 100) : 0;
+		return { servicio, porcentaje, totalAsignado, totalEjecutado };
+	  }).filter(Boolean);
+
+	  cumplimientoPorServicio.forEach(item => {
+		const colorBarra = item.porcentaje > 80 ? '#ef4444' : item.porcentaje > 60 ? '#f59e0b' : '#22c55e';
+		const colorFondo = item.porcentaje > 80 ? '#331a1a' : item.porcentaje > 60 ? '#332713' : '#0c3321';
+		const barraHTML = `
+		  <div style="margin-bottom:16px;">
+			<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+			  <span style="font-size:0.9rem;font-weight:600;color:white;">${item.servicio}</span>
+			  <span style="font-size:0.85rem;font-weight:700;color:${colorBarra};">${item.porcentaje.toFixed(1)}%</span>
+			</div>
+			<div style="width:100%;height:24px;background:${colorFondo};border-radius:12px;overflow:hidden;position:relative;border:1px solid ${colorBarra}60;">
+			  <div style="width:${Math.min(item.porcentaje, 100)}%;height:100%;background:${colorBarra};transition:width 0.6s ease;border-radius:12px;"></div>
+			</div>
+			<div style="display:flex;justify-content:space-between;margin-top:6px;font-size:0.8rem;color:#cbd5e0;">
+			  <span>Ejec: <strong>$${(item.totalEjecutado / 1000000).toFixed(1)}M</strong></span>
+			  <span>Asig: <strong>$${(item.totalAsignado / 1000000).toFixed(1)}M</strong></span>
+			</div>
+		  </div>
+		`;
+		cumplimientoContainer.innerHTML += barraHTML;
+	  });
+
+	  if (cumplimientoPorServicio.length === 0) {
+		cumplimientoContainer.innerHTML = '<p style="text-align:center;color:#cbd5e0;padding:20px;font-size:0.9rem;">No hay datos para mostrar</p>';
+	  }
 	}
 	
 	// Al final de renderTablaSaldos(), después de generarGraficosSaldos(filas, datosCalculados);
@@ -9353,127 +9391,139 @@ input.search-bar {
 	  });
 	});
 
-    function showGraficos(service, btnElement) {
-      document.querySelectorAll('#graficosButtons .service-btn').forEach(b => b.classList.remove('active'));
-      btnElement.classList.add('active');
-      const content = document.getElementById('graficosContent');
-      content.innerHTML = `
-        <div class="section-card">
-          <h3 style="margin-bottom:20px;color:var(--primary-solid);">📊 Configuración de Análisis Gráfico</h3>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;">
-            <div>
-              <label style="display:block;margin-bottom:8px;font-weight:600;">Tipo de Análisis:</label>
-              <select class="filter-select" id="graficoTipo">
-                <option value="">Selecciona tipo</option>
-                <option value="comparativo">Comparativo por Unidades</option>
-                <option value="temporal">Evolución Temporal</option>
-                <option value="distribucion">Distribución por Unidad</option>
-                <option value="predio">Análisis de Predio Específico</option>
-              </select>
-            </div>
-            <div id="graficoMetricaContainer" class="hidden">
-              <label style="display:block;margin-bottom:8px;font-weight:600;">Métrica:</label>
-              <select class="filter-select" id="graficoMetrica">
-                <option value="">Selecciona métrica</option>
-                ${service === 'energia' ? `
-                  <option value="kwh">Consumo kW/h</option>
-                  <option value="tramitar">Total a Tramitar</option>
-                  <option value="intereses">Intereses</option>
-                ` : service === 'acueducto' ? `
-                  <option value="m3">Consumo M³</option>
-                  <option value="tramitar">Total a Tramitar</option>
-                  <option value="intereses">Intereses</option>
-                ` : `
-                  <option value="m3">Consumo M³</option>
-                  <option value="tramitar">Total a Tramitar</option>
-                  <option value="intereses">Intereses</option>
-                `}
-              </select>
-            </div>
-            <div id="graficoUnidadContainer" class="hidden">
-              <label style="display:block;margin-bottom:8px;font-weight:600;">Unidad:</label>
-              <select class="filter-select" id="graficoUnidad">
-                <option value="todas">Todas las Unidades</option>
-                <option value="mebuc">MEBUC</option>
-                <option value="desan">DESAN</option>
-                <option value="demam">DEMAM</option>
+	function showGraficos(service, btnElement) {
+	  document.querySelectorAll('#graficosButtons .service-btn').forEach(b => b.classList.remove('active'));
+	  btnElement.classList.add('active');
+	  const content = document.getElementById('graficosContent');
+	  const isDarkTheme = document.documentElement.getAttribute('data-theme') === 'dark';
+	  content.innerHTML = `
+		<div class="section-card ${isDarkTheme ? 'dark-mode' : ''}">
+		  <h3 style="margin-bottom:20px;color:var(--primary-solid);">📊 Configuración de Análisis Gráfico</h3>
+		  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;">
+			<div>
+			  <label style="display:block;margin-bottom:8px;font-weight:600;">Tipo de Análisis:</label>
+			  <select class="filter-select" id="graficoTipo">
+				<option value="">Selecciona tipo</option>
+				<option value="comparativo">Comparativo por Unidades</option>
+				<option value="temporal">Evolución Temporal</option>
+				<option value="distribucion">Distribución por Unidad</option>
+				<option value="predio">Análisis de Predio Específico</option>
+			  </select>
+			</div>
+			<div id="graficoMetricaContainer" class="hidden">
+			  <label style="display:block;margin-bottom:8px;font-weight:600;">Métrica:</label>
+			  <select class="filter-select" id="graficoMetrica">
+				<option value="">Selecciona métrica</option>
+				${service === 'energia' ? `
+				  <option value="kwh">Consumo kW/h</option>
+				  <option value="tramitar">Total a Tramitar</option>
+				  <option value="intereses">Intereses</option>
+				` : service === 'acueducto' ? `
+				  <option value="m3">Consumo M³</option>
+				  <option value="tramitar">Total a Tramitar</option>
+				  <option value="intereses">Intereses</option>
+				` : `
+				  <option value="m3">Consumo M³</option>
+				  <option value="tramitar">Total a Tramitar</option>
+				  <option value="intereses">Intereses</option>
+				`}
+			  </select>
+			</div>
+			<div id="graficoUnidadContainer" class="hidden">
+			  <label style="display:block;margin-bottom:8px;font-weight:600;">Unidad:</label>
+			  <select class="filter-select" id="graficoUnidad">
+				<option value="todas">Todas las Unidades</option>
+				<option value="mebuc">MEBUC</option>
+				<option value="desan">DESAN</option>
+				<option value="demam">DEMAM</option>
 				${service === 'gas' ? '<option value="asturias">ASTURIAS</option>' : '<option value="setra">SETRA</option>'}
-              </select>
-            </div>
-          </div>
-          <div id="graficoPredioContainer" class="hidden" style="margin-top:15px;">
-            <label style="display:block;margin-bottom:8px;font-weight:600;">Buscar Predio:</label>
-            <input type="text" class="search-bar" id="graficoPredio" placeholder="Escribe el nombre del predio...">
-            <div id="graficoPredioResults"></div>
-          </div>
-          <button class="btn btn-primary hidden" id="generateGrafico" style="margin-top:20px;">
-            <i class="fas fa-chart-area"></i> Generar Gráfico
-          </button>
-        </div>
-        <div id="graficoCanvasContainer" class="hidden section-card" style="margin-top:25px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-            <h3 style="color:var(--primary-solid);" id="graficoTitle">Gráfico</h3>
-            <button class="btn btn-success" onclick="exportarGrafico()">
-              <i class="fas fa-download"></i> Exportar
-            </button>
-          </div>
-          <canvas id="graficoCanvas" style="max-height:450px;"></canvas>
-        </div>
-      `;
-      const tipoSelect = document.getElementById('graficoTipo');
-      const metricaContainer = document.getElementById('graficoMetricaContainer');
-      const unidadContainer = document.getElementById('graficoUnidadContainer');
-      const predioContainer = document.getElementById('graficoPredioContainer');
-      const generateBtn = document.getElementById('generateGrafico');
-      tipoSelect.addEventListener('change', () => {
-        const tipo = tipoSelect.value;
-        metricaContainer.classList.add('hidden');
-        unidadContainer.classList.add('hidden');
-        predioContainer.classList.add('hidden');
-        generateBtn.classList.add('hidden');
-        document.getElementById('graficoMetrica').value = '';
-        document.getElementById('graficoUnidad').value = 'todas';
-        document.getElementById('graficoPredio').value = '';
-        document.getElementById('graficoPredioResults').innerHTML = '';
-        if (tipo) {
-          metricaContainer.classList.remove('hidden');
-          if (tipo !== 'predio') {
-            unidadContainer.classList.remove('hidden');
-          } else {
-            predioContainer.classList.remove('hidden');
-            setupPredioSearchForChart(service);
-          }
-        }
-      });
-      document.getElementById('graficoMetrica').addEventListener('change', () => {
-        const tipo = tipoSelect.value;
-        const metrica = document.getElementById('graficoMetrica').value;
-        if (tipo && metrica) {
-          if (tipo !== 'predio') {
-            generateBtn.classList.remove('hidden');
-          }
-        }
-      });
-      generateBtn.addEventListener('click', () => {
-        const tipo = tipoSelect.value;
-        const metrica = document.getElementById('graficoMetrica').value;
-        const unidad = document.getElementById('graficoUnidad').value;
-        const predio = document.getElementById('graficoPredio').value;
-        generateAdvancedChart(service, tipo, metrica, unidad, predio);
-      });
-    }
+			  </select>
+			</div>
+		  </div>
+		  <div id="graficoPredioContainer" class="hidden" style="margin-top:15px;">
+			<label style="display:block;margin-bottom:8px;font-weight:600;">Buscar Predio:</label>
+			<input type="text" class="search-bar" id="graficoPredio" placeholder="Escribe el nombre del predio..." style="${isDarkTheme ? 'background: #1e293b; color: white;' : ''}">
+			<div id="graficoPredioResults"></div>
+		  </div>
+		  <button class="btn btn-primary hidden" id="generateGrafico" style="margin-top:20px;">
+			<i class="fas fa-chart-area"></i> Generar Gráfico
+		  </button>
+		</div>
+		<div id="graficoCanvasContainer" class="hidden section-card" style="margin-top:25px;">
+		  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+			<h3 style="color:var(--primary-solid);" id="graficoTitle">Gráfico</h3>
+			<button class="btn btn-success" onclick="exportarGrafico()">
+			  <i class="fas fa-download"></i> Exportar
+			</button>
+		  </div>
+		  <canvas id="graficoCanvas" style="max-height:450px;"></canvas>
+		</div>
+	  `;
+
+	  const tipoSelect = document.getElementById('graficoTipo');
+	  const metricaContainer = document.getElementById('graficoMetricaContainer');
+	  const unidadContainer = document.getElementById('graficoUnidadContainer');
+	  const predioContainer = document.getElementById('graficoPredioContainer');
+	  const generateBtn = document.getElementById('generateGrafico');
+
+	  if (isDarkTheme) {
+		content.querySelectorAll('select, input').forEach(el => {
+		  el.style.background = '#1e293b';
+		  el.style.color = 'white';
+		});
+	  }
+
+	  tipoSelect.addEventListener('change', () => {
+		const tipo = tipoSelect.value;
+		metricaContainer.classList.toggle('hidden', !tipo);
+		unidadContainer.classList.toggle('hidden', tipo === 'predio' || !tipo);
+		predioContainer.classList.toggle('hidden', tipo !== 'predio');
+		generateBtn.classList.add('hidden');
+		document.getElementById('graficoMetrica').value = '';
+		document.getElementById('graficoUnidad').value = 'todas';
+		document.getElementById('graficoPredio').value = '';
+		document.getElementById('graficoPredioResults').innerHTML = '';
+		if (tipo === 'predio') {
+		  setupPredioSearchForChart(service);
+		}
+	  });
+
+	  document.getElementById('graficoMetrica').addEventListener('change', () => {
+		const tipo = tipoSelect.value;
+		const metrica = document.getElementById('graficoMetrica').value;
+		if (tipo && metrica) {
+		  if (tipo === 'predio') {
+			// El botón se activará desde `selectPredioForChart`
+		  } else {
+			generateBtn.classList.remove('hidden');
+		  }
+		} else {
+		  generateBtn.classList.add('hidden');
+		}
+	  });
+
+	  generateBtn.addEventListener('click', () => {
+		const tipo = tipoSelect.value;
+		const metrica = document.getElementById('graficoMetrica').value;
+		const unidad = document.getElementById('graficoUnidad').value;
+		const predio = document.getElementById('graficoPredio').value;
+		generateAdvancedChart(service, tipo, metrica, unidad, predio);
+	  });
+	}
 
 	function generateAdvancedChart(service, tipo, metrica, unidad, predio) {
 	  const ctx = document.getElementById('graficoCanvas');
 	  if (!ctx) return;
 	  const context = ctx.getContext('2d');
+	  const textColor = '#ffffff';
 	  let chartData = {};
 	  let chartTitle = '';
 	  let chartType = 'line';
 
+	  // --- COMPARATIVO ---
 	  if (tipo === 'comparativo') {
 		chartType = 'bar';
-		const unidades = unidad === 'todas' ? ['mebuc', 'desan', 'demam', 'setra'] : [unidad];
+		const unidades = unidad === 'todas' ? ['mebuc', 'desan', 'demam', service === 'gas' ? 'asturias' : 'setra'] : [unidad];
 		const datos = unidades.map(u => {
 		  let total = 0;
 		  if (service === 'gas') {
@@ -9481,13 +9531,9 @@ input.search-bar {
 			  appData.gas[u].forEach(table => {
 				if (Array.isArray(table.data)) {
 				  table.data.forEach(row => {
-					if (metrica === 'kwh' || metrica === 'm3') {
-					  total += row.CONSUMO || 0;
-					} else if (metrica === 'tramitar') {
-					  total += row.TOTAL_TRAMITAR || 0;
-					} else if (metrica === 'intereses') {
-					  total += row.INTERESES || 0;
-					}
+					if (metrica === 'kwh' || metrica === 'm3') total += row.CONSUMO || 0;
+					else if (metrica === 'tramitar') total += row.TOTAL_TRAMITAR || 0;
+					else if (metrica === 'intereses') total += row.INTERESES || 0;
 				  });
 				}
 			  });
@@ -9497,104 +9543,92 @@ input.search-bar {
 			Object.keys(unitData).forEach(month => {
 			  if (Array.isArray(unitData[month])) {
 				unitData[month].forEach(row => {
-				  if (metrica === 'kwh' || metrica === 'm3') {
-					total += row.CONSUMO || 0;
-				  } else if (metrica === 'tramitar') {
-					total += row.TOTAL_TRAMITAR || 0;
-				  } else if (metrica === 'intereses') {
-					total += row.INTERESES || 0;
-				  }
+				  if (metrica === 'kwh' || metrica === 'm3') total += row.CONSUMO || 0;
+				  else if (metrica === 'tramitar') total += row.TOTAL_TRAMITAR || 0;
+				  else if (metrica === 'intereses') total += row.INTERESES || 0;
 				});
 			  }
 			});
 		  }
 		  return { unidad: u.toUpperCase(), valor: total };
 		});
+
 		const metricaLabels = {
 		  kwh: 'kW/h',
 		  m3: 'M³',
 		  tramitar: 'Total a Tramitar ($)',
 		  intereses: 'Intereses ($)'
 		};
+
 		const allColors = [
-		  { bg: 'rgba(102, 126, 234, 0.8)', border: 'rgba(102, 126, 234, 1)', shadow: 'rgba(102, 126, 234, 0.3)' },
-		  { bg: 'rgba(32, 191, 107, 0.8)', border: 'rgba(32, 191, 107, 1)', shadow: 'rgba(32, 191, 107, 0.3)' },
-		  { bg: 'rgba(245, 175, 25, 0.8)', border: 'rgba(245, 175, 25, 1)', shadow: 'rgba(245, 175, 25, 0.3)' },
-		  { bg: 'rgba(239, 68, 68, 0.8)', border: 'rgba(239, 68, 68, 1)', shadow: 'rgba(239, 68, 68, 0.3)' }
+		  { bg: 'rgba(102, 126, 234, 0.8)', border: 'rgba(102, 126, 234, 1)' },
+		  { bg: 'rgba(32, 191, 107, 0.8)', border: 'rgba(32, 191, 107, 1)' },
+		  { bg: 'rgba(245, 175, 25, 0.8)', border: 'rgba(245, 175, 25, 1)' },
+		  { bg: 'rgba(239, 68, 68, 0.8)', border: 'rgba(239, 68, 68, 1)' }
 		];
+
 		chartTitle = `Comparativo por Unidades - ${metricaLabels[metrica]}`;
 		chartData = {
 		  labels: datos.map(d => d.unidad),
 		  datasets: [{
 			label: metricaLabels[metrica],
 			data: datos.map(d => d.valor),
-			backgroundColor: datos.map((_, i) => allColors[i].bg),
-			borderColor: datos.map((_, i) => allColors[i].border),
+			backgroundColor: datos.map((_, i) => allColors[i % allColors.length].bg),
+			borderColor: datos.map((_, i) => allColors[i % allColors.length].border),
 			borderWidth: 3,
 			borderRadius: 8,
-			borderSkipped: false,
-			hoverBackgroundColor: datos.map((_, i) => allColors[i].border),
-			hoverBorderWidth: 4
+			hoverBackgroundColor: datos.map((_, i) => allColors[i % allColors.length].border)
 		  }]
 		};
+
+	  // --- TEMPORAL ---
 	  } else if (tipo === 'temporal') {
 		chartType = 'line';
-		const unidades = unidad === 'todas' ? ['mebuc', 'desan', 'demam', 'setra'] : [unidad];
+		const unidades = unidad === 'todas' ? ['mebuc', 'desan', 'demam', service === 'gas' ? 'asturias' : 'setra'] : [unidad];
 		const mesesSet = new Set();
 		if (service === 'gas') {
 		  unidades.forEach(u => {
 			if (Array.isArray(appData.gas[u])) {
-			  appData.gas[u].forEach(t => {
-				if (t.mes) mesesSet.add(t.mes);
-			  });
+			  appData.gas[u].forEach(t => t.mes && mesesSet.add(t.mes));
 			}
 		  });
 		} else {
-		  unidades.forEach(u => {
-			Object.keys(appData[service][u]).forEach(m => mesesSet.add(m));
-		  });
+		  unidades.forEach(u => Object.keys(appData[service][u]).forEach(m => mesesSet.add(m)));
 		}
+
 		const meses = Array.from(mesesSet).sort((a, b) => {
-		  const order = {
-			'ENERO':1,'FEBRERO':2,'MARZO':3,'ABRIL':4,'MAYO':5,'JUNIO':6,
-			'JULIO':7,'AGOSTO':8,'SEPTIEMBRE':9,'OCTUBRE':10,'NOVIEMBRE':11,'DICIEMBRE':12
-		  };
+		  const order = { 'ENERO':1,'FEBRERO':2,'MARZO':3,'ABRIL':4,'MAYO':5,'JUNIO':6,
+						  'JULIO':7,'AGOSTO':8,'SEPTIEMBRE':9,'OCTUBRE':10,'NOVIEMBRE':11,'DICIEMBRE':12 };
 		  return (order[a.toUpperCase()] || 0) - (order[b.toUpperCase()] || 0);
 		});
+
 		const colores = [
 		  { bg: 'rgba(102, 126, 234, 0.15)', border: 'rgba(102, 126, 234, 1)', point: '#667eea' },
 		  { bg: 'rgba(32, 191, 107, 0.15)', border: 'rgba(32, 191, 107, 1)', point: '#20bf6b' },
 		  { bg: 'rgba(245, 175, 25, 0.15)', border: 'rgba(245, 175, 25, 1)', point: '#f5af19' },
 		  { bg: 'rgba(239, 68, 68, 0.15)', border: 'rgba(239, 68, 68, 1)', point: '#ef4444' }
 		];
+
 		const datasets = unidades.map((u, idx) => {
 		  const valores = meses.map(mes => {
 			let total = 0;
 			if (service === 'gas') {
 			  if (Array.isArray(appData.gas[u])) {
 				const table = appData.gas[u].find(t => t.mes === mes);
-				if (table && Array.isArray(table.data)) {
+				if (table?.data) {
 				  table.data.forEach(row => {
-					if (metrica === 'kwh' || metrica === 'm3') {
-					  total += row.CONSUMO || 0;
-					} else if (metrica === 'tramitar') {
-					  total += row.TOTAL_TRAMITAR || 0;
-					} else if (metrica === 'intereses') {
-					  total += row.INTERESES || 0;
-					}
+					if (metrica === 'kwh' || metrica === 'm3') total += row.CONSUMO || 0;
+					else if (metrica === 'tramitar') total += row.TOTAL_TRAMITAR || 0;
+					else if (metrica === 'intereses') total += row.INTERESES || 0;
 				  });
 				}
 			  }
 			} else {
 			  if (appData[service][u][mes]) {
 				appData[service][u][mes].forEach(row => {
-				  if (metrica === 'kwh' || metrica === 'm3') {
-					total += row.CONSUMO || 0;
-				  } else if (metrica === 'tramitar') {
-					total += row.TOTAL_TRAMITAR || 0;
-				  } else if (metrica === 'intereses') {
-					total += row.INTERESES || 0;
-				  }
+				  if (metrica === 'kwh' || metrica === 'm3') total += row.CONSUMO || 0;
+				  else if (metrica === 'tramitar') total += row.TOTAL_TRAMITAR || 0;
+				  else if (metrica === 'intereses') total += row.INTERESES || 0;
 				});
 			  }
 			}
@@ -9603,35 +9637,35 @@ input.search-bar {
 		  return {
 			label: u.toUpperCase(),
 			data: valores,
-			borderColor: colores[idx].border,
-			backgroundColor: colores[idx].bg,
-			borderWidth: 3,
+			borderColor: colores[idx % colores.length].border,
+			backgroundColor: colores[idx % colores.length].bg,
+			borderWidth: 4,
 			fill: true,
 			tension: 0.4,
-			pointRadius: 5,
-			pointHoverRadius: 8,
-			pointBackgroundColor: colores[idx].point,
+			pointRadius: 6,
+			pointHoverRadius: 9,
+			pointBackgroundColor: colores[idx % colores.length].point,
 			pointBorderColor: '#fff',
-			pointBorderWidth: 3,
-			pointHoverBackgroundColor: '#fff',
-			pointHoverBorderColor: colores[idx].border,
-			pointHoverBorderWidth: 3
+			pointBorderWidth: 3
 		  };
 		});
+
 		const metricaLabels = {
 		  kwh: 'kW/h',
 		  m3: 'M³',
-		  tramitar: 'Total a Tramitar',
-		  intereses: 'Intereses'
+		  tramitar: 'Total a Tramitar ($)',
+		  intereses: 'Intereses ($)'
 		};
+
 		chartTitle = `Evolución Temporal - ${metricaLabels[metrica]}`;
-		chartData = {
-		  labels: meses,
-		  datasets: datasets
-		};
+		chartData = { labels: meses, datasets };
+
+	  // --- DISTRIBUCIÓN ---
 	  } else if (tipo === 'distribucion') {
 		chartType = 'doughnut';
-		const unidades = ['mebuc', 'desan', 'demam', 'setra'];
+		const unidades = unidad === 'todas'
+		  ? ['mebuc', 'desan', 'demam', service === 'gas' ? 'asturias' : 'setra']
+		  : [unidad];
 		const datos = unidades.map(u => {
 		  let total = 0;
 		  if (service === 'gas') {
@@ -9639,13 +9673,9 @@ input.search-bar {
 			  appData.gas[u].forEach(table => {
 				if (Array.isArray(table.data)) {
 				  table.data.forEach(row => {
-					if (metrica === 'kwh' || metrica === 'm3') {
-					  total += row.CONSUMO || 0;
-					} else if (metrica === 'tramitar') {
-					  total += row.TOTAL_TRAMITAR || 0;
-					} else if (metrica === 'intereses') {
-					  total += row.INTERESES || 0;
-					}
+					if (metrica === 'm3') total += row.CONSUMO || 0;
+					else if (metrica === 'tramitar') total += row.TOTAL_TRAMITAR || 0;
+					else if (metrica === 'intereses') total += row.INTERESES || 0;
 				  });
 				}
 			  });
@@ -9655,63 +9685,57 @@ input.search-bar {
 			Object.keys(unitData).forEach(month => {
 			  if (Array.isArray(unitData[month])) {
 				unitData[month].forEach(row => {
-				  if (metrica === 'kwh' || metrica === 'm3') {
-					total += row.CONSUMO || 0;
-				  } else if (metrica === 'tramitar') {
-					total += row.TOTAL_TRAMITAR || 0;
-				  } else if (metrica === 'intereses') {
-					total += row.INTERESES || 0;
-				  }
+				  if (metrica === 'kwh' || metrica === 'm3') total += row.CONSUMO || 0;
+				  else if (metrica === 'tramitar') total += row.TOTAL_TRAMITAR || 0;
+				  else if (metrica === 'intereses') total += row.INTERESES || 0;
 				});
 			  }
 			});
 		  }
-		  return total;
-		});
+		  return { unidad: u.toUpperCase(), valor: total };
+		}).filter(d => d.valor > 0);
+
 		const metricaLabels = {
 		  kwh: 'kW/h',
 		  m3: 'M³',
-		  tramitar: 'Total a Tramitar',
+		  tramitar: 'Tramitado',
 		  intereses: 'Intereses'
 		};
-		const allColors = [
-		  { bg: 'rgba(102, 126, 234, 0.9)', border: 'rgba(102, 126, 234, 1)', hover: 'rgba(102, 126, 234, 1)' },
-		  { bg: 'rgba(32, 191, 107, 0.9)', border: 'rgba(32, 191, 107, 1)', hover: 'rgba(32, 191, 107, 1)' },
-		  { bg: 'rgba(245, 175, 25, 0.9)', border: 'rgba(245, 175, 25, 1)', hover: 'rgba(245, 175, 25, 1)' },
-		  { bg: 'rgba(239, 68, 68, 0.9)', border: 'rgba(239, 68, 68, 1)', hover: 'rgba(239, 68, 68, 1)' }
-		];
+
 		chartTitle = `Distribución por Unidad - ${metricaLabels[metrica]}`;
 		chartData = {
-		  labels: ['MEBUC', 'DESAN', 'DEMAM', 'SETRA'],
+		  labels: datos.map(d => d.unidad),
 		  datasets: [{
-			data: datos,
-			backgroundColor: datos.map((_, i) => allColors[i].bg),
-			borderColor: datos.map((_, i) => allColors[i].border),
-			hoverBackgroundColor: datos.map((_, i) => allColors[i].hover),
-			borderWidth: 3,
-			hoverBorderWidth: 4,
-			hoverOffset: 15
+			data: datos.map(d => d.valor),
+			backgroundColor: [
+			  'rgba(251, 191, 36, 0.8)',   // amarillo
+			  'rgba(32, 191, 107, 0.8)',    // verde
+			  'rgba(5, 117, 230, 0.8)',     // azul
+			  'rgba(239, 68, 68, 0.8)'      // rojo
+			].slice(0, datos.length),
+			borderColor: '#fff',
+			borderWidth: 2
 		  }]
 		};
-	  } else if (tipo === 'predio' && predio) {
+
+	  // --- PREDIO ESPECÍFICO ---
+	  } else if (tipo === 'predio' && (predio || window.selectedPredioForChart)) {
+		const targetPredio = predio || window.selectedPredioForChart;
 		chartType = 'line';
 		const meses = [];
 		const valores = [];
+
 		if (service === 'gas') {
-		  ['mebuc', 'desan', 'demam', 'setra'].forEach(u => {
+		  ['mebuc', 'desan', 'demam', 'asturias'].forEach(u => {
 			if (Array.isArray(appData.gas[u])) {
 			  appData.gas[u].forEach(table => {
 				if (Array.isArray(table.data)) {
-				  const row = table.data.find(r => r.ESTACION === predio);
+				  const row = table.data.find(r => r.ESTACION === targetPredio);
 				  if (row) {
 					meses.push(table.mes);
-					if (metrica === 'm3') {
-					  valores.push(row.CONSUMO || 0);
-					} else if (metrica === 'tramitar') {
-					  valores.push(row.TOTAL_TRAMITAR || 0);
-					} else if (metrica === 'intereses') {
-					  valores.push(row.INTERESES || 0);
-					}
+					if (metrica === 'm3') valores.push(row.CONSUMO || 0);
+					else if (metrica === 'tramitar') valores.push(row.TOTAL_TRAMITAR || 0);
+					else if (metrica === 'intereses') valores.push(row.INTERESES || 0);
 				  }
 				}
 			  });
@@ -9721,28 +9745,26 @@ input.search-bar {
 		  Object.keys(appData[service]).forEach(u => {
 			Object.keys(appData[service][u]).forEach(month => {
 			  if (Array.isArray(appData[service][u][month])) {
-				const row = appData[service][u][month].find(r => r.ESTACION === predio);
+				const row = appData[service][u][month].find(r => r.ESTACION === targetPredio);
 				if (row) {
 				  meses.push(month);
-				  if (metrica === 'kwh' || metrica === 'm3') {
-					valores.push(row.CONSUMO || 0);
-				  } else if (metrica === 'tramitar') {
-					valores.push(row.TOTAL_TRAMITAR || 0);
-				  } else if (metrica === 'intereses') {
-					valores.push(row.INTERESES || 0);
-				  }
+				  if (metrica === 'kwh' || metrica === 'm3') valores.push(row.CONSUMO || 0);
+				  else if (metrica === 'tramitar') valores.push(row.TOTAL_TRAMITAR || 0);
+				  else if (metrica === 'intereses') valores.push(row.INTERESES || 0);
 				}
 			  }
 			});
 		  });
 		}
+
 		const metricaLabels = {
 		  kwh: 'Consumo kW/h',
 		  m3: 'Consumo M³',
 		  tramitar: 'Total a Tramitar ($)',
 		  intereses: 'Intereses ($)'
 		};
-		chartTitle = `${predio} - ${metricaLabels[metrica]}`;
+
+		chartTitle = `${targetPredio} - ${metricaLabels[metrica]}`;
 		chartData = {
 		  labels: meses,
 		  datasets: [{
@@ -9757,208 +9779,131 @@ input.search-bar {
 			pointHoverRadius: 9,
 			pointBackgroundColor: 'rgba(102, 126, 234, 1)',
 			pointBorderColor: '#fff',
-			pointBorderWidth: 3,
-			pointHoverBackgroundColor: '#fff',
-			pointHoverBorderColor: 'rgba(102, 126, 234, 1)',
-			pointHoverBorderWidth: 4,
-			segment: {
-			  borderColor: ctx => {
-				const curr = ctx.p1.parsed.y;
-				const prev = ctx.p0.parsed.y;
-				return curr > prev ? 'rgba(239, 68, 68, 1)' : 'rgba(32, 191, 107, 1)';
-			  }
-			}
+			pointBorderWidth: 3
 		  }]
 		};
 	  }
 
-	  if (window.currentChart) {
-		window.currentChart.destroy();
-	  }
+	  // Destruir gráfico anterior
+	  if (window.currentChart) window.currentChart.destroy();
+
+	  // Mostrar contenedor y título
 	  document.getElementById('graficoCanvasContainer').classList.remove('hidden');
 	  document.getElementById('graficoTitle').textContent = chartTitle;
 
-	  // === OPCIONES MEJORADAS PARA LEGIBILIDAD ===
-	  let chartOptions = {};
-	  if (chartType === 'doughnut') {
-		chartOptions = {
-		  responsive: true,
-		  maintainAspectRatio: true,
-		  plugins: {
-			legend: {
-			  display: true,
-			  position: 'right',
-			  labels: {
-				font: {
-				  size: 13,
-				  weight: '600',
-				  family: "'Inter', sans-serif"
-				},
-				color: '#1e293b',
-				padding: 20,
-				usePointStyle: true
-			  }
-			},
-			tooltip: {
-			  backgroundColor: 'rgba(0, 0, 0, 0.85)',
-			  titleColor: '#fff',
-			  bodyColor: '#f8fafc',
-			  titleFont: {
-				size: 14,
-				weight: 'bold',
-				family: "'Inter', sans-serif"
-			  },
-			  bodyFont: {
-				size: 13,
-				family: "'Inter', sans-serif"
-			  },
-			  cornerRadius: 10
-			}
-		  },
-		  animation: {
-			animateRotate: true,
-			animateScale: true,
-			duration: 1000,
-			easing: 'easeInOutQuart'
+	  // Opciones de gráfico
+	  const chartOptions = chartType === 'doughnut' ? {
+		responsive: true,
+		plugins: {
+		  legend: { labels: { color: textColor, font: { family: "'Inter', sans-serif", size: 13 } } },
+		  tooltip: {
+			backgroundColor: 'rgba(0,0,0,0.85)',
+			titleColor: '#fff',
+			bodyColor: '#f8fafc'
 		  }
-		};
-	  } else {
-		chartOptions = {
-		  responsive: true,
-		  maintainAspectRatio: true,
-		  interaction: { mode: 'index', intersect: false },
-		  plugins: {
-			legend: {
-			  display: true,
-			  position: 'top',
-			  labels: {
-				font: {
-				  size: 13,
-				  weight: '600',
-				  family: "'Inter', sans-serif"
-				},
-				color: '#1e293b',
-				padding: 20,
-				usePointStyle: true,
-				boxWidth: 12
-			  }
-			},
-			tooltip: {
-			  backgroundColor: 'rgba(0, 0, 0, 0.85)',
-			  titleColor: '#fff',
-			  bodyColor: '#f8fafc',
-			  titleFont: {
-				size: 14,
-				weight: 'bold',
-				family: "'Inter', sans-serif"
-			  },
-			  bodyFont: {
-				size: 13,
-				family: "'Inter', sans-serif"
-			  },
-			  cornerRadius: 10
-			}
-		  },
-		  scales: {
-			y: {
-			  beginAtZero: true,
-			  grid: { color: 'rgba(0,0,0,0.06)' },
-			  ticks: {
-				font: { size: 13, family: "'Inter', sans-serif" },
-				color: '#334155',
-				padding: 8,
-				callback: function(value) {
-				  if (metrica === 'kwh' || metrica === 'm3') {
-					return value >= 1000000 ? (value / 1000000).toFixed(1) + 'M' :
-						   value >= 1000 ? (value / 1000).toFixed(1) + 'K' : value.toFixed(0);
-				  } else {
-					return value >= 1000000 ? '$' + (value / 1000000).toFixed(1) + 'M' :
-						   value >= 1000 ? '$' + (value / 1000).toFixed(1) + 'K' : '$' + value.toFixed(0);
-				  }
-				}
-			  }
-			},
-			x: {
-			  grid: { display: false },
-			  ticks: {
-				font: { size: 13, family: "'Inter', sans-serif" },
-				color: '#1e293b',
-				padding: 10
-			  }
-			}
-		  },
-		  animation: {
-			duration: 1200,
-			easing: 'easeInOutQuart'
+		},
+		animation: { animateRotate: true, animateScale: true, duration: 1000 }
+	  } : {
+		responsive: true,
+		interaction: { mode: 'index', intersect: false },
+		plugins: {
+		  legend: { labels: { color: textColor, font: { family: "'Inter', sans-serif", size: 13 } } },
+		  tooltip: {
+			backgroundColor: 'rgba(0,0,0,0.85)',
+			titleColor: '#fff',
+			bodyColor: '#f8fafc'
 		  }
-		};
-	  }
+		},
+		scales: {
+		  y: {
+			beginAtZero: true,
+			grid: { color: 'rgba(255,255,255,0.1)' },
+			ticks: { color: textColor, font: { family: "'Inter', sans-serif" } }
+		  },
+		  x: {
+			grid: { display: false },
+			ticks: { color: textColor, font: { family: "'Inter', sans-serif" } }
+		  }
+		},
+		animation: { duration: 1200 }
+	  };
 
 	  window.currentChart = new Chart(context, {
 		type: chartType,
 		data: chartData,
 		options: chartOptions
 	  });
+	}	
+
+
+	function setupPredioSearchForChart(service) {
+	  const input = document.getElementById('graficoPredio');
+	  const results = document.getElementById('graficoPredioResults');
+	  const generateBtn = document.getElementById('generateGrafico');
+	  let selectedPredio = null;
+
+	  // ✅ Definir isDarkTheme aquí dentro del alcance
+	  const isDarkTheme = document.documentElement.getAttribute('data-theme') === 'dark';
+
+	  input.addEventListener('input', () => {
+		const query = input.value.toLowerCase().trim();
+		if (query.length < 2) {
+		  results.innerHTML = '';
+		  selectedPredio = null;
+		  generateBtn.classList.add('hidden');
+		  return;
+		}
+
+		const predios = new Set();
+		const invalidKeywords = /^(TOTAL|SUBTOTAL|ENERGIA|ACUEDUCTO|GAS|A\.? ?PUBLICO|ASEO|KW\/?H|CONSUMO|FACTURA|INTERESES|SALDOS|MORA|VALOR|PAGAR|TRAMITAR)$/i;
+
+		if (service === 'gas') {
+		  ['mebuc', 'desan', 'demam', 'asturias'].forEach(unit => {
+			if (Array.isArray(appData.gas[unit])) {
+			  appData.gas[unit].forEach(table => {
+				if (Array.isArray(table.data)) {
+				  table.data.forEach(row => {
+					const estacion = String(row.ESTACION || '').trim();
+					if (estacion && estacion.toLowerCase().includes(query) && !invalidKeywords.test(estacion) && estacion.length > 2 && !/^\d+$/.test(estacion)) {
+					  predios.add(estacion);
+					}
+				  });
+				}
+			  });
+			}
+		  });
+		} else {
+		  Object.keys(appData[service]).forEach(unit => {
+			Object.keys(appData[service][unit]).forEach(month => {
+			  if (Array.isArray(appData[service][unit][month])) {
+				appData[service][unit][month].forEach(row => {
+				  const estacion = String(row.ESTACION || '').trim();
+				  if (estacion && estacion.toLowerCase().includes(query) && !invalidKeywords.test(estacion) && estacion.length > 2 && !/^\d+$/.test(estacion)) {
+					predios.add(estacion);
+				  }
+				});
+			  }
+			});
+		  });
+		}
+
+		const predioList = Array.from(predios).slice(0, 10);
+		results.innerHTML = predioList.map(p =>
+		  `<div class="card" style="margin:8px 0;cursor:pointer;background: ${isDarkTheme ? '#1e293b' : '#f8fafc'}; color: ${isDarkTheme ? '#ffffff' : '#1e293b'};" onclick="selectPredioForChart('${p.replace(/'/g, "\\'")}')">${p}</div>`
+		).join('');
+	  });
 	}
 
-    function setupPredioSearchForChart(service) {
-      const input = document.getElementById('graficoPredio');
-      const results = document.getElementById('graficoPredioResults');
-      let selectedPredio = null;
-      input.addEventListener('input', () => {
-        const query = input.value.toLowerCase().trim();
-        if (query.length < 2) {
-          results.innerHTML = '';
-          selectedPredio = null;
-          document.getElementById('generateGrafico').classList.add('hidden');
-          return;
-        }
-        const predios = new Set();
-        const invalidKeywords = /^(TOTAL|SUBTOTAL|ENERGIA|ACUEDUCTO|GAS|A\.? ?PUBLICO|ASEO|KW\/?H|CONSUMO|FACTURA|INTERESES|SALDOS|MORA|VALOR|PAGAR|TRAMITAR)$/i;
-        if (service === 'gas') {
-          ['mebuc', 'desan', 'demam', 'setra'].forEach(unit => {
-            if (Array.isArray(appData.gas[unit])) {
-              appData.gas[unit].forEach(table => {
-                if (Array.isArray(table.data)) {
-                  table.data.forEach(row => {
-                    const estacion = String(row.ESTACION || '').trim();
-                    if (estacion &&  estacion.toLowerCase().includes(query) && !invalidKeywords.test(estacion) && estacion.length > 2 && !/^\d+$/.test(estacion)) {
-                      predios.add(estacion);
-                    }
-                  });
-                }
-              });
-            }
-          });
-        } else {
-          Object.keys(appData[service]).forEach(unit => {
-            Object.keys(appData[service][unit]).forEach(month => {
-              if (Array.isArray(appData[service][unit][month])) {
-                appData[service][unit][month].forEach(row => {
-                  const estacion = String(row.ESTACION || '').trim();
-                  if (estacion &&  estacion.toLowerCase().includes(query) && !invalidKeywords.test(estacion) && estacion.length > 2 && !/^\d+$/.test(estacion)) {
-                    predios.add(estacion);
-                  }
-                });
-              }
-            });
-          });
-        }
-        const predioList = Array.from(predios).slice(0, 10);
-        results.innerHTML = predioList.map(p =>
-          `<div class="card" style="margin:8px 0;cursor:pointer;" onclick="selectPredioForChart('${p.replace(/'/g, "\\'")}')">${p}</div>`
-        ).join('');
-        window.selectPredioForChart = function(predio) {
-          input.value = predio;
-          selectedPredio = predio;
-          results.innerHTML = '';
-          document.getElementById('generateGrafico').classList.remove('hidden');
-          document.getElementById('generateGrafico').onclick = () => {
-            generateAdvancedChart(service, 'predio', document.getElementById('graficoMetrica').value, 'todas', selectedPredio);
-          };
-        };
-      });
-    }
+	// ✅ Función global para selección de predio
+	window.selectPredioForChart = function(predio) {
+	  const input = document.getElementById('graficoPredio');
+	  const results = document.getElementById('graficoPredioResults');
+	  const generateBtn = document.getElementById('generateGrafico');
+	  input.value = predio;
+	  results.innerHTML = '';
+	  window.selectedPredioForChart = predio;
+	  generateBtn.classList.remove('hidden');
+	};
 
     function exportarGrafico() {
       if (!window.currentChart) {
