@@ -46,7 +46,7 @@
 
 body {
   font-family: 'Inter', sans-serif;
-  background: #06402b;
+  /* background: #06402b; */
   color: var(--text-primary);
   overflow-x: auto !important;
   overflow-y: auto !important;
@@ -63,9 +63,8 @@ body::before {
   left: 0;
   right: 0;
   height: 100%;
-  background: url('fondo.jpg') center center / cover no-repeat fixed,
-              linear-gradient(135deg, #06402b 0%, #0a5c3d 100%);
-  z-index: 0;
+  background: url('fondo.jpg') center center / cover no-repeat fixed;
+  z-index: -1; /* ⚠️ Cambiado a -1 para asegurar que esté detrás de todo */
   pointer-events: none;
   min-width: 100%;
   width: 100vw;
@@ -2422,7 +2421,7 @@ input.search-bar {
 		</button>
 
 			<!-- Botones de carga y administrador en esquina superior derecha -->
-			<div style="position: absolute; top: 12px; right: 20px; display: flex; gap: 10px; z-index: 10;">
+			<div style="position: absolute; top: 12px; right: 20px; display: flex; gap: 10px; z-index: 10; align-items: center;">
 			  <button id="btnCargarLocalTop" class="btn topbar-btn">
 				<i class="fas fa-folder-open"></i> Local
 			  </button>
@@ -2431,6 +2430,11 @@ input.search-bar {
 			  </button>
 			  <button id="btnAbrirAdmin" class="btn topbar-btn" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
 				<i class="fas fa-user-shield"></i> Admin
+			  </button>
+			  <!-- Ícono de notificaciones -->
+			  <button id="btnNotificaciones" class="btn topbar-btn" style="background: linear-gradient(135deg, #4f46e5, #7c3aed);" onclick="mostrarModalNotificaciones()">
+				<i class="fas fa-bell"></i>
+				<span id="badgeNotificaciones" style="background: #ef4444; color: white; font-size: 0.7rem; font-weight: bold; padding: 2px 6px; border-radius: 10px; margin-left: 6px; display: none;">0</span>
 			  </button>
 			</div>
 
@@ -5286,6 +5290,28 @@ input.search-bar {
 		}
 	  }
 	};
+	// ========== NOTIFICACIONES ==========
+	let notificaciones = JSON.parse(localStorage.getItem('notificaciones') || '[]');
+
+	// ✅ Eliminar notificaciones con más de 7 días
+	const HACE_7_DIAS = new Date();
+	HACE_7_DIAS.setDate(HACE_7_DIAS.getDate() - 7);
+	notificaciones = notificaciones.filter(n => {
+	  const fechaNotif = new Date(n.timestamp);
+	  return fechaNotif >= HACE_7_DIAS;
+	});
+	// Actualizar en localStorage y badge
+	localStorage.setItem('notificaciones', JSON.stringify(notificaciones));
+	let notificacionesNoLeidas = notificaciones.filter(n => !n.leido).length;
+
+	// ✅ Definir función ACTUALIZAR BADGE temprano para evitar ReferenceError
+	function actualizarBadgeNotificaciones() {
+	  const badge = document.getElementById('badgeNotificaciones');
+	  if (badge) {
+		badge.textContent = notificacionesNoLeidas;
+		badge.style.display = notificacionesNoLeidas > 0 ? 'inline-block' : 'none';
+	  }
+	}
 	
 	// ========== FUNCIÓN PARA CONFIRMAR ELIMINACIÓN DE PRESUPUESTO ==========
 	function confirmarEliminacion() {
@@ -5389,49 +5415,236 @@ input.search-bar {
 	}
 
 	 // ========== UTILIDADES UI ==========
-	function showNotification(message, type = 'success', duration = 3000) {
-	  const notif = document.createElement('div');
-	  notif.className = 'notification';
-	  const icons = {
-		success: 'check-circle',
-		error: 'exclamation-circle',
-		warning: 'exclamation-triangle',
-		info: 'info-circle'
+	function showNotification(message, type = 'success', duration = 3000, timestampCarga = null) {
+	  // 1. Crear objeto de notificación
+	  const notifObj = {
+		id: Date.now(),
+		message,
+		type,
+		timestamp: new Date().toISOString(), // ✅ Fecha exacta
+		leido: false,
+		categoria: type === 'error' ? 'Urgentes' : type === 'warning' ? 'Informativas' : 'Históricas',
+		timestampCarga // ✅ Marca si viene de esta sesión
 	  };
-	  const colors = {
-		success: '#43e97b',
-		error: '#ef4444',
-		warning: '#f59e0b',
-		info: '#3b82f6'
-	  };
-	  notif.style.borderLeftColor = colors[type] || colors.success;
-	  notif.innerHTML = `
-		<div style="display: flex; align-items: center; gap: 12px;">
-		  <i class="fas fa-${icons[type] || icons.success}"
-			 style="font-size: 1.5rem; color: ${colors[type] || colors.success};"></i>
-		  <div style="flex: 1;">
-			<strong style="display: block; margin-bottom: 4px; font-size: 0.95rem;">
-			  ${type.charAt(0).toUpperCase() + type.slice(1)}
-			</strong>
-			<span style="font-size: 0.9rem; color: #64748b;">${message}</span>
+
+	  // 2. Agregar a la lista global
+	  notificaciones.unshift(notifObj);
+
+	  // 3. Mostrar toast SOLO si es nueva (no viene de cargas anteriores)
+	  if (!timestampCarga) {
+		notificacionesNoLeidas++;
+		// Mostrar el toast (tu código visual aquí)
+		const notif = document.createElement('div');
+		notif.className = 'notification';
+		const icons = {
+		  success: 'check-circle',
+		  error: 'exclamation-circle',
+		  warning: 'exclamation-triangle',
+		  info: 'info-circle'
+		};
+		const colors = {
+		  success: '#43e97b',
+		  error: '#ef4444',
+		  warning: '#f59e0b',
+		  info: '#3b82f6'
+		};
+		notif.style.borderLeftColor = colors[type] || colors.success;
+		notif.innerHTML = `
+		  <div style="display: flex; align-items: center; gap: 12px;">
+			<i class="fas fa-${icons[type] || icons.success}"
+			   style="font-size: 1.5rem; color: ${colors[type] || colors.success};"></i>
+			<div style="flex: 1;">
+			  <strong style="display: block; margin-bottom: 4px; font-size: 0.95rem;">
+				${type.charAt(0).toUpperCase() + type.slice(1)}
+			  </strong>
+			  <span style="font-size: 0.9rem; color: #64748b;">${message}</span>
+			</div>
+			<button onclick="this.parentElement.parentElement.remove()"
+					style="background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 1.2rem; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; transition: color 0.2s;">
+			  <i class="fas fa-times"></i>
+			</button>
 		  </div>
-		  <button onclick="this.parentElement.parentElement.remove()"
-				  style="background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 1.2rem; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; transition: color 0.2s;">
-			<i class="fas fa-times"></i>
-		  </button>
+		`;
+		const existingNotifs = document.querySelectorAll('.notification');
+		existingNotifs.forEach((n, i) => {
+		  n.style.top = `${20 + (i + 1) * 90}px`;
+		  n.style.transition = 'all 0.3s ease';
+		});
+		document.body.appendChild(notif);
+		setTimeout(() => {
+		  notif.style.opacity = '0';
+		  notif.style.transform = 'translateX(400px)';
+		  setTimeout(() => notif.remove(), 300);
+		}, duration);
+	  }
+
+	  // 4. Guardar en localStorage (pero luego limpiaremos las antiguas)
+	  localStorage.setItem('notificaciones', JSON.stringify(notificaciones));
+	  actualizarBadgeNotificaciones();
+	}
+	
+	function marcarNotificacionLeida(id, element) {
+	  const notif = notificaciones.find(n => n.id === id);
+	  if (notif && !notif.leido) {
+		notif.leido = true;
+		notificacionesNoLeidas--;
+		localStorage.setItem('notificaciones', JSON.stringify(notificaciones));
+		actualizarBadgeNotificaciones();
+		element.closest('.notif-item').style.opacity = '0.6';
+		element.closest('.notif-item').querySelector('.notif-status').textContent = 'Leída';
+		element.style.display = 'none';
+	  }
+	}
+	
+	function mostrarModalNotificaciones() {
+	  const tipos = {
+		success: { label: 'Éxito', color: '#22c55e' },
+		warning: { label: 'Advertencia', color: '#f59e0b' },
+		error: { label: 'Error', color: '#ef4444' },
+		info: { label: 'Informativo', color: '#3b82f6' }
+	  };
+
+	  let html = `
+		<div style="max-width: 800px; width: 100%;">
+		  <div style="display: flex; justify-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid #e2e8f0;">
+			<h2 style="color: #06402b; margin: 0; font-size: 1.8rem;">
+			  <i class="fas fa-bell" style="margin-right: 10px;"></i> Notificaciones
+			</h2>
+			<button onclick="cerrarNotificaciones()" class="btn" style="padding: 6px 14px; font-size: 0.9rem;">
+			  <i class="fas fa-times"></i> Cerrar
+			</button>
+		  </div>
+		  <div style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center;">
+			<select id="filtroNotifCategoria" class="filter-select" style="flex:1;">
+			  <option value="">Todas las categorías</option>
+			  <option value="Urgentes">Urgentes</option>
+			  <option value="Informativas">Informativas</option>
+			  <option value="Históricas">Históricas</option>
+			</select>
+			<select id="filtroNotifServicio" class="filter-select" style="flex:1;">
+			  <option value="">Todos los servicios</option>
+			  <option value="energia">Energía</option>
+			  <option value="acueducto">Acueducto</option>
+			  <option value="gas">Gas</option>
+			</select>
+			<select id="filtroNotifUnidad" class="filter-select" style="flex:1;">
+			  <option value="">Todas las unidades</option>
+			  <option value="mebuc">MEBUC</option>
+			  <option value="desan">DESAN</option>
+			  <option value="demam">DEMAM</option>
+			  <option value="setra">SETRA</option>
+			  <option value="asturias">ASTURIAS</option>
+			</select>
+			<button id="btnMarcarTodasLeidas" class="btn" style="padding:6px 14px; background:linear-gradient(135deg, #10b981, #059669); color:white; font-size:0.85rem; white-space:nowrap;">
+			  <i class="fas fa-check-double"></i> Marcar todas como leídas
+			</button>
+		  </div>
+		  <div id="listaNotificaciones" style="max-height: 500px; overflow-y: auto;">
+	  `;
+
+	  if (notificaciones.length === 0) {
+		html += `<p style="text-align:center;color:#64748b;padding:30px;">No hay notificaciones</p>`;
+	  } else {
+		notificaciones.forEach(n => {
+		  const tipo = tipos[n.type] || { label: 'Info', color: '#64748b' };
+		  const fecha = new Date(n.timestamp).toLocaleString('es-CO');
+		  html += `
+			<div class="notif-item" style="padding: 16px; border-bottom: 1px solid #e2e8f0; display: flex; gap: 14px;">
+			  <div style="width: 4px; background: ${tipo.color}; border-radius: 2px;"></div>
+			  <div style="flex: 1;">
+				<div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+				  <strong style="color: #1e293b; font-size: 0.95rem;">${tipo.label}</strong>
+				  <span style="color: #94a3b8; font-size: 0.85rem;">${fecha}</span>
+				</div>
+				<p style="margin: 6px 0; color: #1e293b; font-size: 0.95rem;">${n.message}</p>
+				<div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+				  <span class="notif-status" style="font-size: 0.8rem; color: ${n.leido ? '#64748b' : '#06402b'};">
+					${n.leido ? 'Leída' : 'No leída'}
+				  </span>
+				  ${!n.leido ? `
+					<button onclick="marcarNotificacionLeida(${n.id}, this)" style="padding: 4px 10px; font-size: 0.8rem; background: ${tipo.color}; color: white; border: none; border-radius: 4px;">
+					  Marcar como leída
+					</button>
+				  ` : ''}
+				</div>
+			  </div>
+			</div>
+		  `;
+		});
+	  }
+
+	  html += `
+		  </div>
 		</div>
 	  `;
-	  const existingNotifs = document.querySelectorAll('.notification');
-	  existingNotifs.forEach((n, i) => {
-		n.style.top = `${20 + (i + 1) * 90}px`;
-		n.style.transition = 'all 0.3s ease';
+
+	  document.getElementById('modalContent').innerHTML = html;
+	  document.getElementById('modal').classList.add('active');
+
+	  // === Aplicar filtros ===
+	  ['filtroNotifCategoria', 'filtroNotifServicio', 'filtroNotifUnidad'].forEach(id => {
+		const el = document.getElementById(id);
+		if (el) {
+		  el.addEventListener('change', aplicarFiltrosNotificaciones);
+		}
 	  });
-	  document.body.appendChild(notif);
-	  setTimeout(() => {
-		notif.style.opacity = '0';
-		notif.style.transform = 'translateX(400px)';
-		setTimeout(() => notif.remove(), 300);
-	  }, duration);
+
+	  // === Agregar listener al botón "Marcar todas como leídas" ===
+	  const btnMarcarTodas = document.getElementById('btnMarcarTodasLeidas');
+	  if (btnMarcarTodas) {
+		btnMarcarTodas.addEventListener('click', () => {
+		  let algunaMarcada = false;
+		  notificaciones.forEach(n => {
+			if (!n.leido) {
+			  n.leido = true;
+			  notificacionesNoLeidas--;
+			  algunaMarcada = true;
+			}
+		  });
+		  if (algunaMarcada) {
+			localStorage.setItem('notificaciones', JSON.stringify(notificaciones));
+			actualizarBadgeNotificaciones();
+			// Actualizar visual del modal
+			document.querySelectorAll('.notif-item').forEach(item => {
+			  item.style.opacity = '0.6';
+			  const statusEl = item.querySelector('.notif-status');
+			  if (statusEl) statusEl.textContent = 'Leída';
+			  const btn = item.querySelector('button');
+			  if (btn) btn.style.display = 'none';
+			});
+			// Desactivar botón
+			btnMarcarTodas.disabled = true;
+			btnMarcarTodas.style.opacity = '0.6';
+			showNotification('✅ Todas las notificaciones marcadas como leídas', 'success', 1500);
+		  } else {
+			showNotification('ℹ️ No hay notificaciones sin leer', 'info', 1500);
+		  }
+		});
+	  }
+	}
+
+	function aplicarFiltrosNotificaciones() {
+	  const categoria = document.getElementById('filtroNotifCategoria').value;
+	  const servicio = document.getElementById('filtroNotifServicio').value;
+	  const unidad = document.getElementById('filtroNotifUnidad').value;
+
+	  const items = document.querySelectorAll('.notif-item');
+	  items.forEach(item => {
+		const notifText = item.querySelector('p').textContent.toLowerCase();
+		const matchesCategoria = !categoria || 
+		  (categoria === 'Urgentes' && (notifText.includes('crítico') || notifText.includes('requiere revisión'))) ||
+		  (categoria === 'Informativas' && (notifText.includes('alerta') || notifText.includes('aumentaron') || notifText.includes('proyección'))) ||
+		  (categoria === 'Históricas' && !notifText.includes('crítico') && !notifText.includes('alerta'));
+		
+		const matchesServicio = !servicio || notifText.includes(servicio);
+		const matchesUnidad = !unidad || notifText.includes(unidad);
+
+		item.style.display = matchesCategoria && matchesServicio && matchesUnidad ? 'flex' : 'none';
+	  });
+	}
+
+	function cerrarNotificaciones() {
+	  document.getElementById('modal').classList.remove('active');
 	}
 
     function showLoading() { document.getElementById('loading').classList.add('active'); }
@@ -5575,21 +5788,20 @@ input.search-bar {
       return -1;
     }
 
-    // ========== PROCESAMIENTO DE ARCHIVOS ==========
 	async function handleFiles(files) {
 	  if (!files || files.length === 0) return;
-
 	  showLoading();
-
 	  try {
 		const fileArray = Array.from(files);
 		let processedCount = 0;
 
-		// Procesar archivos en paralelo con Promise.all
+		// Registrar marca de tiempo de carga
+		const timestampCarga = new Date().toISOString();
+
 		const processPromises = fileArray.map(async (file) => {
 		  try {
 			const workbook = await readFile(file);
-			await processFile(file.name, workbook);
+			await processFile(file.name, workbook, timestampCarga); // ✅ Pasar timestamp
 			processedCount++;
 			console.log(`✅ Archivo procesado: ${file.name} (${processedCount}/${fileArray.length})`);
 		  } catch (error) {
@@ -5597,23 +5809,242 @@ input.search-bar {
 			showNotification(`Error al procesar ${file.name}`, 'error');
 		  }
 		});
+		
+		// Notificar predios cargados en últimas 24h — incluyendo marca de sesión
+        notificarPrediosTramitadosRecientes(timestampCarga);
 
-		// Esperar a que todos los archivos se procesen
 		await Promise.all(processPromises);
-
 		if (processedCount > 0) {
 		  updateSummary();
-		  // ✅ Inicializar saldos con las unidades/servicios encontrados
 		  inicializarEstructuraSaldosDesdeDatos();
-		  renderTablaSaldos(); // ✅ Refrescar tabla inmediatamente
+		  renderTablaSaldos();
 		}
-
 	  } catch (error) {
 		console.error('❌ Error general:', error);
 		showNotification('Error al procesar archivos', 'error');
 	  } finally {
 		hideLoading();
 	  }
+	}
+	
+	function detectarNuevosServiciosOModulos() {
+	  // Definimos las unidades y servicios esperados por defecto
+	  const unidadesEsperadas = new Set(['mebuc', 'desan', 'demam', 'setra', 'asturias']);
+	  const serviciosEsperados = new Set([
+		'Energía', 'Alumbrado Público', 'Acueducto', 'Alcantarillado', 'Gas', 'Mantenimiento'
+	  ]);
+
+	  // Recopilar unidades y servicios detectados en appData
+	  const unidadesDetectadas = new Set();
+	  const serviciosDetectados = new Set();
+
+	  // Explorar energía y acueducto
+	  ['energia', 'acueducto'].forEach(serv => {
+		const key = serv === 'energia' ? 'Energía' : 'Acueducto';
+		const alumKey = serv === 'energia' ? 'Alumbrado Público' : 'Alcantarillado';
+		Object.keys(appData[serv] || {}).forEach(unidad => {
+		  unidadesDetectadas.add(unidad);
+		  const meses = appData[serv][unidad];
+		  if (meses && Object.keys(meses).length > 0) {
+			serviciosDetectados.add(key);
+			serviciosDetectados.add(alumKey);
+			serviciosDetectados.add('Aseo'); // siempre presente
+		  }
+		});
+	  });
+
+	  // Explorar gas
+	  Object.keys(appData.gas || {}).forEach(unidad => {
+		unidadesDetectadas.add(unidad);
+		if (Array.isArray(appData.gas[unidad]) && appData.gas[unidad].length > 0) {
+		  serviciosDetectados.add('Gas');
+		}
+	  });
+
+	  // También revisar saldos (por si se crearon allí manualmente)
+	  if (appData.saldos) {
+		Object.keys(appData.saldos).forEach(unidad => {
+		  unidadesDetectadas.add(unidad);
+		  Object.keys(appData.saldos[unidad]).forEach(servicio => {
+			serviciosDetectados.add(servicio);
+		  });
+		});
+	  }
+
+	  // Comparar contra lo esperado
+	  let hayNovedades = false;
+	  unidadesDetectadas.forEach(unidad => {
+		if (!unidadesEsperadas.has(unidad)) {
+		  showNotification(`🆕 Nueva unidad detectada: "${unidad.toUpperCase()}" en archivos cargados`, 'info');
+		  hayNovedades = true;
+		}
+	  });
+
+	  serviciosDetectados.forEach(servicio => {
+		if (!serviciosEsperados.has(servicio)) {
+		  showNotification(`🆕 Nuevo servicio detectado: "${servicio}"`, 'info');
+		  hayNovedades = true;
+		}
+	  });
+
+	  if (hayNovedades) {
+		console.log('🔍 Sistema detectó nuevas unidades/servicios no registrados.');
+	  }
+	}
+	
+	function detectarTendenciasInusuales() {
+	  // Umbral configurable
+	  const UMBRAL_PORCENTAJE = 15;
+	  const CONSECUTIVOS = 2;
+
+	  const alertasGeneradas = new Set(); // evitar duplicados
+
+	  // Recorrer todos los servicios y unidades
+	  const servicios = ['energia', 'acueducto', 'gas'];
+	  const unidadesPorServicio = {
+		energia: ['mebuc', 'desan', 'demam', 'setra'],
+		acueducto: ['mebuc', 'desan', 'demam', 'setra'],
+		gas: ['mebuc', 'desan', 'demam', 'asturias']
+	  };
+
+	  servicios.forEach(servicio => {
+		unidadesPorServicio[servicio].forEach(unidad => {
+		  const datosUnidad = servicio === 'gas' 
+			? appData.gas[unidad] 
+			: appData[servicio]?.[unidad];
+
+		  if (!datosUnidad) return;
+
+		  // Normalizar a lista de meses con datos
+		  let registrosPorCuenta = {};
+
+		  if (servicio === 'gas') {
+			// datosUnidad es un array de tablas [{mes, data: [...]}, ...]
+			if (!Array.isArray(datosUnidad)) return;
+			datosUnidad.forEach(tabla => {
+			  if (!tabla?.mes || !Array.isArray(tabla.data)) return;
+			  tabla.data.forEach(row => {
+				if (!row.CUENTA || !row.CONSUMO || row.CONSUMO <= 0) return;
+				const key = `${row.CUENTA}-${unidad}`;
+				if (!registrosPorCuenta[key]) registrosPorCuenta[key] = [];
+				registrosPorCuenta[key].push({
+				  mes: tabla.mes,
+				  consumo: row.CONSUMO,
+				  predio: row.ESTACION || row.CUENTA
+				});
+			  });
+			});
+		  } else {
+			// energía/acueducto: { "ENERO": [...], "FEBRERO": [...] }
+			Object.entries(datosUnidad).forEach(([mes, filas]) => {
+			  if (!Array.isArray(filas)) return;
+			  filas.forEach(row => {
+				if (!row.CUENTA || !row.CONSUMO || row.CONSUMO <= 0) return;
+				const key = `${row.CUENTA}-${unidad}`;
+				if (!registrosPorCuenta[key]) registrosPorCuenta[key] = [];
+				registrosPorCuenta[key].push({
+				  mes,
+				  consumo: row.CONSUMO,
+				  predio: row.ESTACION || row.CUENTA
+				});
+			  });
+			});
+		  }
+
+		  // Ordenar meses y evaluar tendencias
+		  const mesesOrden = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
+		  Object.values(registrosPorCuenta).forEach(registros => {
+			if (registros.length < CONSECUTIVOS) return;
+
+			// Ordenar por mes natural
+			registros.sort((a, b) => 
+			  mesesOrden.indexOf(a.mes.toUpperCase()) - mesesOrden.indexOf(b.mes.toUpperCase())
+			);
+
+			// Verificar incrementos consecutivos
+			let conteoConsecutivo = 0;
+			for (let i = 1; i < registros.length; i++) {
+			  const anterior = registros[i - 1].consumo;
+			  const actual = registros[i].consumo;
+			  if (anterior > 0 && actual > 0) {
+				const porcentaje = ((actual - anterior) / anterior) * 100;
+				if (porcentaje > UMBRAL_PORCENTAJE) {
+				  conteoConsecutivo++;
+				  if (conteoConsecutivo >= CONSECUTIVOS) {
+					const predio = registros[i].predio;
+					const keyNotif = `${predio}-${unidad}-${servicio}`;
+					if (!alertasGeneradas.has(keyNotif)) {
+					  showNotification(
+						`📊 Tendencia crítica: Predio "${predio}" incrementó consumo ${porcentaje.toFixed(1)}% dos meses consecutivos`,
+						'warning'
+					  );
+					  alertasGeneradas.add(keyNotif);
+					}
+					break; // una alerta por predio es suficiente
+				  }
+				} else {
+				  conteoConsecutivo = 0;
+				}
+			  }
+			}
+		  });
+		});
+	  });
+	}
+	
+	function notificarPrediosTramitadosRecientes(timestampCarga) {
+	  const AHORA = new Date();
+	  const HACE_24H = new Date(AHORA.getTime() - 24 * 60 * 60 * 1000);
+	  const resumen = {};
+	  ['energia', 'acueducto'].forEach(serv => {
+		const unidades = ['mebuc', 'desan', 'demam', 'setra'];
+		unidades.forEach(unidad => {
+		  const meses = appData[serv]?.[unidad] || {};
+		  Object.values(meses).forEach(filas => {
+			if (!Array.isArray(filas)) return;
+			filas.forEach(row => {
+			  const ts = row._timestamp_carga;
+			  if (ts && new Date(ts) >= HACE_24H) {
+				const key = `${unidad}-${serv}`;
+				if (!resumen[key]) {
+				  resumen[key] = { unidad, servicio: serv, predios: 0, valor: 0 };
+				}
+				resumen[key].predios++;
+				resumen[key].valor += row.TOTAL_TRAMITAR || 0;
+			  }
+			});
+		  });
+		});
+	  });
+	  ['mebuc', 'desan', 'demam', 'asturias'].forEach(unidad => {
+		const tablas = appData.gas?.[unidad] || [];
+		tablas.forEach(tabla => {
+		  if (!Array.isArray(tabla.data)) return;
+		  tabla.data.forEach(row => {
+			const ts = row._timestamp_carga;
+			if (ts && new Date(ts) >= HACE_24H) {
+			  const key = `${unidad}-gas`;
+			  if (!resumen[key]) {
+				resumen[key] = { unidad, servicio: 'gas', predios: 0, valor: 0 };
+			  }
+			  resumen[key].predios++;
+			  resumen[key].valor += row.TOTAL_TRAMITAR || 0;
+			}
+		  });
+		});
+	  });
+	  Object.values(resumen).forEach(item => {
+		if (item.predios > 0) {
+		  const nombreServicio = item.servicio === 'energia' ? 'Energía' :
+								 item.servicio === 'acueducto' ? 'Acueducto' : 'Gas';
+		  showNotification(
+			`📬 ${item.predios} predios nuevos en ${nombreServicio} (${item.unidad.toUpperCase()}) – $${item.valor.toLocaleString('es-CO')} tramitados`,
+			'info',
+			3000,
+			timestampCarga // ✅ Marcar como de esta sesión → NO mostrar toast si ya fue mostrado
+		  );
+		}
+	  });
 	}
 
     function readFile(file) {
@@ -5633,7 +6064,7 @@ input.search-bar {
       });
     }
 
-	async function processFile(filename, workbook) {
+	async function processFile(filename, workbook, timestampCarga) {
 	  const name = filename.toUpperCase();
 	  let service, unit;
 	  if (name.includes('ENERGIA') || name.includes('ENERGÍA')) {
@@ -5648,7 +6079,7 @@ input.search-bar {
 		else if (name.includes('DEMAM')) unit = 'demam';
 	  } else if (name.includes('GAS')) {
 		service = 'gas';
-		await processGasFile(workbook);
+		await processGasFile(workbook, timestampCarga); // ✅ Pasar timestamp
 		return;
 	  }
 	  if (!service || !unit) {
@@ -5656,7 +6087,6 @@ input.search-bar {
 		return;
 	  }
 
-	  // === INCLUSIÓN DE LA COLUMNA "FACTURA" EN COLUMN_MAPPING ===
 	  const COLUMN_MAPPING = service === 'energia' ? {
 		cuenta: ['cuenta', 'numero cuenta', 'no cuenta', 'cta', 'n° cuenta', 'no. cuenta'],
 		estacion: ['estacion', 'estación', 'predio', 'nombre', 'dependencia'],
@@ -5708,7 +6138,6 @@ input.search-bar {
 			}
 		  }
 		  if (headerRow === -1) return null;
-
 		  const colMap = {};
 		  for (const [key, patterns] of Object.entries(COLUMN_MAPPING)) {
 			colMap[key] = -1;
@@ -5721,12 +6150,10 @@ input.search-bar {
 			}
 		  }
 		  if (colMap.cuenta === -1 && colMap.estacion === -1) return null;
-
 		  const normalizedData = [];
 		  const setaData = [];
 		  let consecutiveEmptyCuenta = 0;
 		  const MAX_EMPTY_CUENTA = 3;
-
 		  for (let r = headerRow + 1; r < maxRows; r++) {
 			const row = [];
 			for (let c = range.s.c; c <= range.e.c; c++) {
@@ -5736,7 +6163,6 @@ input.search-bar {
 			}
 			const estacion = colMap.estacion >= 0 ? row[colMap.estacion] : '';
 			const cuenta = colMap.cuenta >= 0 ? row[colMap.cuenta] : '';
-
 			if (isValidCuenta(cuenta)) {
 			  consecutiveEmptyCuenta = 0;
 			  const upperEstacion = estacion.toUpperCase();
@@ -5744,12 +6170,9 @@ input.search-bar {
 				  upperEstacion.includes('PROMEDIO') || upperEstacion.includes('SUMATORIA')) {
 				continue;
 			  }
-
-			  // ✅ Detectar SETrA por cuenta y nombre
 			  const isSeta = (upperEstacion.includes('SETRA') || upperEstacion.includes('SETRA')) &&
 							((service === 'energia' && cuenta === '488788') ||
 							 (service === 'acueducto' && cuenta === '122944'));
-
 			  let record;
 			  if (service === 'energia') {
 				const kwh = cleanAndParseFloat(row[colMap.kwh]);
@@ -5759,7 +6182,6 @@ input.search-bar {
 				const tramitar = cleanAndParseFloat(row[colMap.tramitar]);
 				const intereses = cleanAndParseFloat(row[colMap.intereses]);
 				const factura = colMap.factura >= 0 ? String(row[colMap.factura]).trim() : '';
-
 				record = {
 				  ESTACION: estacion,
 				  CUENTA: cuenta,
@@ -5771,7 +6193,8 @@ input.search-bar {
 				  ASEO: aseo,
 				  TOTAL_TRAMITAR: tramitar,
 				  INTERESES: intereses,
-				  TOTAL_FACTURA: tramitar + intereses
+				  TOTAL_FACTURA: tramitar + intereses,
+				  _timestamp_carga: timestampCarga // ✅ Registrar timestamp
 				};
 			  } else {
 				const m3 = cleanAndParseFloat(row[colMap.m3]);
@@ -5781,7 +6204,6 @@ input.search-bar {
 				const tramitar = cleanAndParseFloat(row[colMap.tramitar]);
 				const intereses = cleanAndParseFloat(row[colMap.intereses]);
 				const factura = colMap.factura >= 0 ? String(row[colMap.factura]).trim() : '';
-
 				record = {
 				  ESTACION: estacion,
 				  CUENTA: cuenta,
@@ -5792,10 +6214,10 @@ input.search-bar {
 				  ASEO: aseo,
 				  TOTAL_TRAMITAR: tramitar,
 				  INTERESES: intereses,
-				  TOTAL_FACTURA: tramitar + intereses
+				  TOTAL_FACTURA: tramitar + intereses,
+				  _timestamp_carga: timestampCarga // ✅ Registrar timestamp
 				};
 			  }
-
 			  if (isSeta) {
 				setaData.push(record);
 			  } else {
@@ -5806,13 +6228,10 @@ input.search-bar {
 			  if (consecutiveEmptyCuenta >= MAX_EMPTY_CUENTA) break;
 			}
 		  }
-
 		  let result = null;
 		  if (normalizedData.length > 0) {
 			result = { sheetName, data: normalizedData, unit };
 		  }
-
-		  // Procesar SETRA como unidad independiente
 		  if (setaData.length > 0) {
 			return [
 			  result,
@@ -5839,7 +6258,7 @@ input.search-bar {
 	  });
 	}
 
-    async function processGasFile(workbook) {
+	async function processGasFile(workbook, timestampCarga) {
 	  const COLUMN_MAPPING = {
 		cuenta: ['cuenta', 'numero cuenta', 'no cuenta', 'cta', 'n° cuenta'],
 		estacion: ['estacion', 'estación', 'predio', 'nombre', 'dependencia'],
@@ -5873,11 +6292,17 @@ input.search-bar {
 			  table.data.forEach(row => {
 				const cuentaStr = String(row.CUENTA).trim();
 				if (ASTURIAS_CUENTAS.has(cuentaStr)) {
-				  // Forzar asignación a ASTURIAS
-				  asturiasData.push(row);
+				  // Forzar asignación a ASTURIAS y añadir timestamp
+				  asturiasData.push({
+					...row,
+					_timestamp_carga: timestampCarga // ✅ REGISTRO DEL TIMESTAMP
+				  });
 				} else {
-				  // Mantener en la unidad original
-				  mebucData.push(row);
+				  // Mantener en la unidad original y añadir timestamp
+				  mebucData.push({
+					...row,
+					_timestamp_carga: timestampCarga // ✅ REGISTRO DEL TIMESTAMP
+				  });
 				}
 			  });
 
@@ -10256,6 +10681,9 @@ input.search-bar {
 	  if (btnCerrarAdmin) {
 		btnCerrarAdmin.addEventListener('click', cerrarModoAdmin);
 	  }
+	  
+	  // Inicializar badge de notificaciones
+      actualizarBadgeNotificaciones();
 	});
   </script>
 	<!-- Contenido SEO para Google -->
