@@ -1281,10 +1281,17 @@ body {
   .cards-container { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
 }
 @media (max-width: 768px) {
-  .topbar-title span { font-size: 1rem; }
-  .content-area { padding: 20px; }
-  .section-card { padding: 20px; }
-  .service-btn { min-width: 280px; }
+  .topbar {
+    padding: 15px 20px;
+    min-height: 60px; /* Ajusta la altura mínima */
+  }
+  .content-area {
+    padding: 20px;
+    padding-top: 60px; /* Ajusta el padding-top */
+  }
+  .topbar-title span {
+    font-size: 1rem; /* Reduce el tamaño de fuente si es necesario */
+  }
 }
 
 /* === REDUCCIÓN COMPACTA PARA SALDOS PRESUPUESTALES === */
@@ -10654,4 +10661,5 @@ input.search-bar {
 	  </main>
 </body>
 </html>
+
 
