@@ -2440,6 +2440,25 @@ input.search-bar {
     <div class="shooting-star" style="top: 60%; left: 70%; width: 100px; animation-delay: 5s; animation-duration: 2.5s;"></div>
     <div class="shooting-star" style="top: 35%; left: 50%; width: 70px; animation-delay: 8s; animation-duration: 1.8s;"></div>
   </div>
+  
+	<!-- Modal para seleccionar archivos de Excel -->
+	<div id="modalDescargarExcel" class="modal">
+	  <div class="modal-content" style="max-width: 600px; padding: 30px;">
+		<span class="close-modal" id="closeModalDescargarExcel">×</span>
+		<h3 style="text-align: center; margin-bottom: 20px; color: #06402b;">
+		  <i class="fas fa-file-excel"></i> Seleccionar archivos a descargar
+		</h3>
+		<div id="listaArchivosExcel" style="max-height: 300px; overflow-y: auto; margin-bottom: 20px;">
+		  <!-- Los archivos se cargarán aquí dinámicamente -->
+		</div>
+		<div style="text-align: center;">
+		  <button id="btnDescargarSeleccionados" class="btn"
+				  style="background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 10px 24px; font-size: 1rem;">
+			<i class="fas fa-download"></i> Descargar Seleccionados
+		  </button>
+		</div>
+	  </div>
+	</div>
 
   <!-- Ondas gravitacionales -->
   <div class="gravity-waves">
@@ -2518,6 +2537,9 @@ input.search-bar {
 			  </button>
 			  <button id="btnAbrirAdmin" class="btn topbar-btn" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
 				<i class="fas fa-user-shield"></i> Admin
+			  </button>
+			  <button id="btnDescargarExcelSupabase" class="btn topbar-btn" style="background: linear-gradient(135deg, #10b981, #059669);">
+				<i class="fas fa-file-excel"></i> Excel Supabase
 			  </button>
 			  <!-- Ícono de notificaciones -->
 			  <button id="btnNotificaciones" class="btn topbar-btn" style="background: linear-gradient(135deg, #4f46e5, #7c3aed);" onclick="mostrarModalNotificaciones()">
@@ -5029,6 +5051,71 @@ input.search-bar {
 		});
 	  });
 	}
+	
+	// ========== DESCARGAR EXCELES DESDE SUPABASE CON SELECCIÓN ==========
+	const archivosExcel = [
+	  '1- MEBUC ENERGIA.xlsm',
+	  '2- MEBUC ACUEDUCTO.xlsm',
+	  '3- DESAN ENERGIA.xlsm',
+	  '4- DESAN ACUEDUCTO.xlsm',
+	  '5- DEMAM ENERGIA.xlsm',
+	  '6- DEMAM ACUEDUCTO.xlsm',
+	  '7- GAS MEBUC-DESAN-DEMAM.xlsm'
+	];
+
+	// Abrir modal y cargar lista
+	function abrirModalDescargarExcel() {
+	  const contenedor = document.getElementById('listaArchivosExcel');
+	  contenedor.innerHTML = '';
+
+	  archivosExcel.forEach(archivo => {
+		const item = document.createElement('div');
+		item.style.display = 'flex';
+		item.style.alignItems = 'center';
+		item.style.padding = '10px';
+		item.style.borderBottom = '1px solid #eee';
+
+		item.innerHTML = `
+		  <input type="checkbox" id="chk_${archivo}" value="${archivo}" style="margin-right: 12px; transform: scale(1.2);">
+		  <label for="chk_${archivo}" style="font-size: 1rem; cursor: pointer;">${archivo}</label>
+		`;
+		contenedor.appendChild(item);
+	  });
+
+	  document.getElementById('modalDescargarExcel').classList.add('active');
+	}
+
+	// Descargar los archivos seleccionados
+	function descargarArchivosSeleccionados() {
+	  const checkboxes = document.querySelectorAll('#listaArchivosExcel input[type="checkbox"]:checked');
+	  const seleccionados = Array.from(checkboxes).map(cb => cb.value);
+
+	  if (seleccionados.length === 0) {
+		showNotification('⚠️ Debes seleccionar al menos un archivo', 'warning', 2000);
+		return;
+	  }
+
+	  const supabaseUrl = 'https://jjbjgrnhnlmmlilbrqbx.supabase.co/storage/v1/object/public/excels/';
+	  showNotification(`📥 Descargando ${seleccionados.length} archivo(s)... (permite ventanas emergentes si no se descargan)`, 'info', 5000);
+	  
+	  seleccionados.forEach(nombre => {
+		const url = supabaseUrl + encodeURIComponent(nombre);
+		window.open(url, '_blank'); // ✅ Más confiable tras clic de usuario
+	  });
+
+	  document.getElementById('modalDescargarExcel').classList.remove('active');
+	  showNotification(`✅ ${seleccionados.length} archivo(s) abiertos para descarga`, 'success', 3000);
+	}
+
+	// Cerrar modal
+	function cerrarModalDescargarExcel() {
+	  document.getElementById('modalDescargarExcel').classList.remove('active');
+	}
+
+	// Event listeners
+	document.getElementById('btnDescargarExcelSupabase').addEventListener('click', abrirModalDescargarExcel);
+	document.getElementById('closeModalDescargarExcel').addEventListener('click', cerrarModalDescargarExcel);
+	document.getElementById('btnDescargarSeleccionados').addEventListener('click', descargarArchivosSeleccionados);
 	
 	async function descargarComparacionExcel(servicio, unidad, mesA, mesB, filas, unidadMedida) {
 	  const wb = new ExcelJS.Workbook();
@@ -10640,6 +10727,8 @@ input.search-bar {
 	  
 	  // Inicializar badge de notificaciones
       actualizarBadgeNotificaciones();
+	  
+	  document.getElementById('btnDescargarExcelSupabase')?.addEventListener('click', descargarTodosExcelsSupabase);
 	});
   </script>
 	<!-- Contenido SEO para Google -->
@@ -10661,5 +10750,3 @@ input.search-bar {
 	  </main>
 </body>
 </html>
-
-
