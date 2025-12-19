@@ -7764,6 +7764,36 @@ input.search-bar {
 	  `;
 	  content.appendChild(headerSection);
 
+	  // ========== OBTENER MES ACTUAL Y ANTERIOR REAL (CORREGIDO) ==========
+	  // Depuración: ver meses detectados
+	  unidades.forEach(unit => {
+		const months = getAllMonthsByUnit(service, unit);
+		console.log(`[${unit.toUpperCase()}] Meses ordenados:`, months);
+	  });
+
+	  // Obtener el último y penúltimo mes GLOBALES (solo si hay al menos 2 meses)
+	  const allMonthsSet = new Set();
+	  unidades.forEach(unit => {
+		const months = getAllMonthsByUnit(service, unit);
+		months.forEach(m => allMonthsSet.add(m));
+	  });
+
+	  const monthOrder = {
+		'ENERO': 1, 'FEBRERO': 2, 'MARZO': 3, 'ABRIL': 4, 'MAYO': 5,
+		'JUNIO': 6, 'JULIO': 7, 'AGOSTO': 8, 'SEPTIEMBRE': 9,
+		'OCTUBRE': 10, 'NOVIEMBRE': 11, 'DICIEMBRE': 12
+	  };
+
+	  const allMonthsSorted = Array.from(allMonthsSet)
+		.filter(m => typeof m === 'string' && m.trim() !== '')
+		.sort((a, b) => (monthOrder[a.toUpperCase()] || 0) - (monthOrder[b.toUpperCase()] || 0));
+
+	  const mesActual = allMonthsSorted.length > 0 ? allMonthsSorted[allMonthsSorted.length - 1] : 'MES ACTUAL';
+	  const mesAnterior = allMonthsSorted.length > 1 ? allMonthsSorted[allMonthsSorted.length - 2] : 'MES ANTERIOR';
+
+	  const mesActualFmt = mesActual.charAt(0).toUpperCase() + mesActual.slice(1).toLowerCase();
+	  const mesAnteriorFmt = mesAnterior.charAt(0).toUpperCase() + mesAnterior.slice(1).toLowerCase();
+
 	  // ========== SECCIÓN 1: INTERESES POR UNIDAD ==========
 	  const interesesSection = document.createElement('div');
 	  interesesSection.className = 'section-card';
@@ -7776,23 +7806,23 @@ input.search-bar {
 			  Variación de Intereses por Unidad
 			</h3>
 			<p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.9rem;">
-			  Comparativa: Mes actual vs mes anterior
+			  Comparativa: ${mesAnteriorFmt} vs ${mesActualFmt}
 			</p>
 		  </div>
 		</div>
 	  `;
-	  
+
 	  const interesesGrid = document.createElement('div');
 	  interesesGrid.className = 'novedades-grid';
 	  interesesGrid.style.marginTop = '20px';
-	  
+
 	  unidades.forEach(unit => {
 		const comparison = compareInteresesByUnit(service, unit);
 		const variacion = comparison.var;
 		const badge = variacion > 10 ? 'critico' : variacion > 5 ? 'alerta' : 'normal';
 		const badgeText = variacion > 10 ? 'CRÍTICO' : variacion > 5 ? 'ALERTA' : 'NORMAL';
 		const badgeIcon = variacion > 10 ? 'fa-exclamation-circle' : variacion > 5 ? 'fa-exclamation-triangle' : 'fa-check-circle';
-		
+
 		const card = document.createElement('div');
 		card.className = 'novedad-card';
 		card.style.cssText = `
@@ -7812,22 +7842,20 @@ input.search-bar {
 			  <i class="fas ${badgeIcon}"></i> ${badgeText}
 			</span>
 		  </div>
-		  
 		  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
 			<div style="background: rgba(148,163,184,0.1); padding: 12px; border-radius: 8px;">
-			  <p style="margin: 0; font-size: 0.85rem; color: #64748b; font-weight: 600;">MES ANTERIOR</p>
+			  <p style="margin: 0; font-size: 0.85rem; color: #64748b; font-weight: 600;">${mesAnteriorFmt}</p>
 			  <p style="margin: 6px 0 0 0; font-size: 1.15rem; font-weight: 700; color: #475569;">
 				$${comparison.prev.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
 			  </p>
 			</div>
 			<div style="background: ${variacion > 0 ? 'rgba(239,68,68,0.1)' : 'rgba(34,197,94,0.1)'}; padding: 12px; border-radius: 8px;">
-			  <p style="margin: 0; font-size: 0.85rem; color: #64748b; font-weight: 600;">MES ACTUAL</p>
+			  <p style="margin: 0; font-size: 0.85rem; color: #64748b; font-weight: 600;">${mesActualFmt}</p>
 			  <p style="margin: 6px 0 0 0; font-size: 1.15rem; font-weight: 700; color: ${variacion > 0 ? '#ef4444' : '#22c55e'};">
 				$${comparison.curr.toLocaleString('es-CO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
 			  </p>
 			</div>
 		  </div>
-		  
 		  <div style="background: linear-gradient(135deg, ${variacion > 0 ? 'rgba(239,68,68,0.08)' : 'rgba(34,197,94,0.08)'}, rgba(255,255,255,0.5)); 
 					  padding: 14px; border-radius: 10px; text-align: center; border: 1px solid ${variacion > 0 ? 'rgba(239,68,68,0.2)' : 'rgba(34,197,94,0.2)'};">
 			<p style="margin: 0; font-size: 0.9rem; color: #64748b; font-weight: 600;">VARIACIÓN</p>
@@ -7838,7 +7866,7 @@ input.search-bar {
 		`;
 		interesesGrid.appendChild(card);
 	  });
-	  
+
 	  interesesSection.appendChild(interesesGrid);
 	  content.appendChild(interesesSection);
 
@@ -7859,15 +7887,12 @@ input.search-bar {
 		  </div>
 		</div>
 	  `;
-	  
 	  const top5Grid = document.createElement('div');
 	  top5Grid.className = 'novedades-grid';
 	  top5Grid.style.marginTop = '20px';
-	  
 	  unidades.forEach(unit => {
 		const top5 = getTopIncrementByUnit(service, unit, 5);
 		if (top5.length === 0) return;
-		
 		const card = document.createElement('div');
 		card.className = 'novedad-card';
 		card.style.cssText = `
@@ -7877,14 +7902,12 @@ input.search-bar {
 		  padding: 20px;
 		  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 		`;
-		
 		let listHtml = `
 		  <h5 style="margin: 0 0 16px 0; color: #06402b; font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid rgba(6,64,43,0.1);">
 			<i class="fas fa-list-ol"></i> ${unit.toUpperCase()}
 		  </h5>
 		  <div style="display: flex; flex-direction: column; gap: 12px;">
 		`;
-		
 		top5.forEach((p, i) => {
 		  const color = p.incremento > 0 ? '#ef4444' : '#22c55e';
 		  const bgColor = p.incremento > 0 ? 'rgba(239,68,68,0.05)' : 'rgba(34,197,94,0.05)';
@@ -7908,12 +7931,10 @@ input.search-bar {
 			</div>
 		  `;
 		});
-		
 		listHtml += '</div>';
 		card.innerHTML = listHtml;
 		top5Grid.appendChild(card);
 	  });
-	  
 	  top5Section.appendChild(top5Grid);
 	  content.appendChild(top5Section);
 
@@ -7933,15 +7954,12 @@ input.search-bar {
 		  </div>
 		</div>
 	  `;
-	  
 	  const top10Grid = document.createElement('div');
 	  top10Grid.className = 'novedades-grid';
 	  top10Grid.style.marginTop = '20px';
-	  
 	  unidades.forEach(unit => {
 		const top10 = getTopAllMonthsByUnit(service, unit, 10);
 		if (top10.length === 0) return;
-		
 		const card = document.createElement('div');
 		card.className = 'novedad-card';
 		card.style.cssText = `
@@ -7951,17 +7969,14 @@ input.search-bar {
 		  padding: 20px;
 		  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 		`;
-		
 		let listHtml = `
 		  <h5 style="margin: 0 0 16px 0; color: #06402b; font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid rgba(6,64,43,0.1);">
 			<i class="fas fa-layer-group"></i> ${unit.toUpperCase()}
 		  </h5>
 		  <div style="display: flex; flex-direction: column; gap: 10px;">
 		`;
-		
 		const unidad = service === 'energia' ? 'kWh' : 'M³';
 		const maxTotal = Math.max(...top10.map(p => p.total));
-		
 		top10.forEach((p, i) => {
 		  const percentage = (p.total / maxTotal) * 100;
 		  const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
@@ -7984,12 +7999,10 @@ input.search-bar {
 			</div>
 		  `;
 		});
-		
 		listHtml += '</div>';
 		card.innerHTML = listHtml;
 		top10Grid.appendChild(card);
 	  });
-	  
 	  top10Section.appendChild(top10Grid);
 	  content.appendChild(top10Section);
 	}
@@ -8006,35 +8019,48 @@ input.search-bar {
     }
 
     function getAllMonthsByUnit(service, unit) {
-      const months = new Set();
-      if (service === 'gas') {
-        if (Array.isArray(appData.gas[unit])) {
-          appData.gas[unit].forEach(table => {
-            if (table.mes) months.add(table.mes);
-          });
-        }
-      } else {
-        const unitData = appData[service][unit];
-        Object.keys(unitData).forEach(month => months.add(month));
-      }
-      const monthOrder = {
-        'DICIEMBRE': 12, 'ENERO': 1, 'FEBRERO': 2, 'MARZO': 3,
-        'ABRIL': 4, 'MAYO': 5, 'JUNIO': 6, 'JULIO': 7,
-        'AGOSTO': 8, 'SEPTIEMBRE': 9, 'OCTUBRE': 10, 'NOVIEMBRE': 11
-      };
-      return Array.from(months).sort((a, b) => {
-        const aUpper = a.toUpperCase();
-        const bUpper = b.toUpperCase();
-        let aMonth = 0, bMonth = 0;
-        for (let month in monthOrder) {
-          if (aUpper.includes(month)) aMonth = monthOrder[month];
-          if (bUpper.includes(month)) bMonth = monthOrder[month];
-        }
-        if (aMonth === 12) aMonth = 0;
-        if (bMonth === 12) bMonth = 0;
-        return aMonth - bMonth;
-      });
-    }
+	  const months = new Set();
+	  if (service === 'gas') {
+		if (Array.isArray(appData.gas[unit])) {
+		  appData.gas[unit].forEach(table => {
+			if (table.mes) months.add(table.mes);
+		  });
+		}
+	  } else {
+		const unitData = appData[service][unit];
+		if (unitData) {
+		  Object.keys(unitData).forEach(month => {
+			if (month && typeof month === 'string') {
+			  months.add(month.trim());
+			}
+		  });
+		}
+	  }
+
+	  // ✅ ORDEN CORRECTO DE MESES (sin manipulación de diciembre)
+	  const monthOrder = {
+		'ENERO': 1,
+		'FEBRERO': 2,
+		'MARZO': 3,
+		'ABRIL': 4,
+		'MAYO': 5,
+		'JUNIO': 6,
+		'JULIO': 7,
+		'AGOSTO': 8,
+		'SEPTIEMBRE': 9,
+		'OCTUBRE': 10,
+		'NOVIEMBRE': 11,
+		'DICIEMBRE': 12
+	  };
+
+	  return Array.from(months)
+		.filter(m => m && typeof m === 'string')
+		.sort((a, b) => {
+		  const aOrd = monthOrder[a.toUpperCase()] || 0;
+		  const bOrd = monthOrder[b.toUpperCase()] || 0;
+		  return aOrd - bOrd; // ✅ Diciembre = 12 → último
+		});
+	}
 
     function sumFieldByMonthAndUnit(service, unit, month, field) {
       let sum = 0;
@@ -10735,7 +10761,7 @@ input.search-bar {
 	  <main style="display:block; opacity:0; height:0; overflow:hidden;">
 		<h1>Servicios Públicos GUBIRME BUC</h1>
 		<p>
-			Plataforma institucional de Servicios Públicos GUBIRME BUC. 
+			Plataforma institucional de Servicios Públicos GUBIR MEBUC. 
 			Sistema de consulta, análisis, estadísticas y gestión de servicios públicos 
 			(energía, acueducto y gas) para las unidades MEBUC, DESAN, DEMAM y SETRA.
 		</p>
