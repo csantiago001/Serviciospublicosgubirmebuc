@@ -3103,34 +3103,53 @@ input.search-bar {
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
 
+	<script>
+	  // 🔑 Configuración de Supabase (corregida y segura)
+	  const supabaseUrl = 'https://jjbjgrnhnlmmlilbrqbx.supabase.co';
+	  const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqYmpncm5obmxtbWxpbGJycWJ4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MjU0MDg4OSwiZXhwIjoyMDc4MTE2ODg5fQ.m8LZHH1vgRHwWyd2r4lcrHInlAs5KtqDHYhwq9WPuDQ';
+	  
+	  // ✅ Usamos window.supabaseClient para evitar conflictos
+	  if (typeof window.supabase === 'undefined') {
+		console.error('❌ Supabase JS no se cargó correctamente. Verifica el CDN.');
+	  } else {
+		window.supabaseClient = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+		console.log('✅ Cliente de Supabase inicializado correctamente.');
+	  }
+	</script>
   <script>
-    // 🔑 Configuración de Supabase (REEMPLAZA CON TUS CREDENCIALES REALES)
-    const supabaseUrl = 'https://jjbjgrnhnlmmlilbrqbx.supabase.co';
-    const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpqYmpncm5obmxtbWxpbGJycWJ4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MjU0MDg4OSwiZXhwIjoyMDc4MTE2ODg5fQ.m8LZHH1vgRHwWyd2r4lcrHInlAs5KtqDHYhwq9WPuDQ'; // ⚠️ Reemplaza esto con tu key real
-    const supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
-  </script>
-  <script>
-  async function testQuery() {
-    const { data, error } = await supabase
-      .from('saldos_presupuestales')
-      .select('*');
+	async function testQuery() {
+	  if (!window.supabaseClient) {
+		console.error('❌ window.supabaseClient no está definido.');
+		return;
+	  }
 
-    console.log("DATA:", data);
-    console.log("ERROR:", error);
-  }
-
-  testQuery();
+	  try {
+		const { data, error } = await window.supabaseClient
+		  .from('saldos_presupuestales')
+		  .select('*');
+		
+		if (error) throw error;
+		
+		console.log("✅ Datos de prueba cargados:", data);
+	  } catch (error) {
+		console.error("❌ Error en testQuery:", error.message);
+	  }
+	}
+	// Opcional: ejecutar al inicio para diagnóstico
+	// testQuery();
 </script>
   <script>
 	// Variables globales
 	let registroEditando = null;
 	let autoGuardadoInterval = null;
 	let chartInstances = {};
+	// 🔐 Control de acceso para modo administrador en Saldos Presupuestales
+	let isAdminMode = false;
+	const ADMIN_PASSWORD = "1234" 
 
   // Función para actualizar nombres de columnas según el año
 	function actualizarNombresColumnas() {
@@ -3296,8 +3315,13 @@ input.search-bar {
 	  return true;
 	}
 
-	// ✅ GUARDAR EN SUPABASE
+	// ✅ GUARDAR EN SUPABASE (versión corregida y única)
 	async function guardarEdicionPresupuesto() {
+	  if (!isAdminMode) {
+		showNotification('🔒 Necesitas permisos de administrador para guardar cambios', 'error', 3000);
+		return;
+	  }
+
 	  if (!validarFormulario()) return;
 
 	  const unidad = document.getElementById('editarUnidad').value;
@@ -3312,13 +3336,12 @@ input.search-bar {
 		if (!appData.saldos[unidad]) appData.saldos[unidad] = {};
 		appData.saldos[unidad][servicio] = { cdp, asignacion, dicAnterior };
 
-		// ✅ Verificar que supabase esté definido
-		if (typeof supabase === 'undefined') {
-		  throw new Error('Supabase no está inicializado. Verifica el orden de los scripts.');
+		// ✅ Usar window.supabaseClient (definido globalmente con seguridad)
+		if (!window.supabaseClient) {
+		  throw new Error('Cliente de Supabase no inicializado. Verifica la configuración.');
 		}
 
-		// Guardar en Supabase
-		const { error } = await supabase
+		const { error } = await window.supabaseClient
 		  .from('saldos_presupuestales')
 		  .upsert(
 			{
@@ -3558,250 +3581,6 @@ input.search-bar {
 	  });
 
 	  return resultado;
-	}
-	
-	// Función para filtrar filas según búsqueda
-	function renderTablaSaldos() {
-	  const tbody = document.getElementById('tbodySaldos');
-	  const tfoot = document.getElementById('tfootSaldos');
-	  const totalAsignadoEl = document.getElementById('totalAsignado');
-	  const totalEjecutadoEl = document.getElementById('totalEjecutado');
-	  const porcentajeEjecucionEl = document.getElementById('porcentajeEjecucion');
-	  const mesActualEl = document.getElementById('mesActual');
-	  const saldoDisponibleEl = document.getElementById('saldoDisponible');
-	  const estadoEjecucionEl = document.getElementById('estadoEjecucion');
-	  const contadorFilasEl = document.getElementById('contadorFilas');
-	  const proyeccionMensualEl = document.getElementById('proyeccionMensual');
-	  const proyeccionAnualEl = document.getElementById('proyeccionAnual');
-
-	  // ✅ Garantizar que la tabla no falle si tbody/tfoot no existen (aunque deberían estar)
-	  if (!tbody || !tfoot) {
-		console.warn('⚠️ Elementos tbody o tfoot de la tabla de saldos no encontrados.');
-		return;
-	  }
-
-	  tbody.innerHTML = '';
-	  tfoot.innerHTML = '';
-
-	  const datosCalculados = calcularValoresPorMesYUnidad();
-	  const filtroUnidad = document.getElementById('filtroUnidadSaldos').value;
-	  const filtroServicio = document.getElementById('filtroServicioSaldos').value;
-	  const textoBusqueda = document.getElementById('busquedaRapida').value;
-
-	  const unidades = filtroUnidad === 'todas' ? ['mebuc', 'desan', 'demam', 'setra'] : [filtroUnidad];
-	  const servicios = filtroServicio === 'todos' ? ['Energía', 'Alumbrado Público', 'Acueducto', 'Alcantarillado', 'Gas'] : [filtroServicio];
-
-	  let totalGeneralAsignado = 0;
-	  let totalGeneralDicAnterior = 0;
-	  let totalGeneralEne = 0;
-	  let totalGeneralFeb = 0;
-	  let totalGeneralMar = 0;
-	  let totalGeneralAbr = 0;
-	  let totalGeneralMay = 0;
-	  let totalGeneralJun = 0;
-	  let totalGeneralJul = 0;
-	  let totalGeneralAgo = 0;
-	  let totalGeneralSep = 0;
-	  let totalGeneralOct = 0;
-	  let totalGeneralNov = 0;
-	  let totalGeneralDic = 0;
-	  let totalGeneralTotalTramitado = 0;
-	  let totalGeneralPromedio = 0;
-	  let totalGeneralSaldoEjec = 0;
-	  let totalGeneralTerminarVigencia = 0;
-	  let totalGeneralSobraFalta = 0;
-	  let totalGeneralPorcentajeEjec = 0;
-	  let totalFilas = 0;
-
-	  const mesesKeys = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
-	  let filas = [];
-
-	  unidades.forEach(unidad => {
-		if (!appData.saldos[unidad]) return;
-		servicios.forEach(servicio => {
-		  const datosServicio = datosCalculados[unidad][servicio];
-		  const config = appData.saldos[unidad][servicio];
-		  if (!config) return;
-
-		  const asignacion = config.asignacion || 0;
-		  const dicAnterior = config.dicAnterior || 0;
-		  const mesesValores = mesesKeys.map(m => datosServicio[m] || 0);
-		  const totalMeses = mesesValores.reduce((a, b) => a + b, 0);
-		  const totalTramitado = totalMeses + dicAnterior;
-		  const mesesConDatos = mesesValores.filter(v => v > 0).length;
-		  const promedio = mesesConDatos > 0 ? totalMeses / mesesConDatos : 0;
-		  const saldoEjec = asignacion - totalTramitado;
-		  const mesActualIdx = new Date().getMonth(); // 0-11
-		  const mesesRestantes = 11 - mesActualIdx;
-		  const terminarVigencia = promedio * mesesRestantes;
-		  const sobraFalta = saldoEjec - terminarVigencia;
-		  const porcentajeEjec = asignacion > 0 ? (totalTramitado / asignacion * 100) : 0;
-
-		  filas.push({
-			unidad, servicio, cdp: config.cdp, asignacion, dicAnterior,
-			meses: mesesValores,
-			totalMeses, totalTramitado, promedio, saldoEjec,
-			terminarVigencia, sobraFalta, porcentajeEjec
-		  });
-
-		  totalGeneralAsignado += asignacion;
-		  totalGeneralDicAnterior += dicAnterior;
-		  totalGeneralEne += mesesValores[0];
-		  totalGeneralFeb += mesesValores[1];
-		  totalGeneralMar += mesesValores[2];
-		  totalGeneralAbr += mesesValores[3];
-		  totalGeneralMay += mesesValores[4];
-		  totalGeneralJun += mesesValores[5];
-		  totalGeneralJul += mesesValores[6];
-		  totalGeneralAgo += mesesValores[7];
-		  totalGeneralSep += mesesValores[8];
-		  totalGeneralOct += mesesValores[9];
-		  totalGeneralNov += mesesValores[10];
-		  totalGeneralDic += mesesValores[11];
-		  totalGeneralTotalTramitado += totalTramitado;
-		  totalGeneralPromedio += promedio;
-		  totalGeneralSaldoEjec += saldoEjec;
-		  totalGeneralTerminarVigencia += terminarVigencia;
-		  totalGeneralSobraFalta += sobraFalta;
-		  totalGeneralPorcentajeEjec += porcentajeEjec;
-		  totalFilas++;
-		});
-	  });
-
-	  // Aplicar búsqueda
-	  filas = filas.filter(fila => {
-		const query = textoBusqueda.toLowerCase();
-		return !query ||
-		  fila.unidad.toLowerCase().includes(query) ||
-		  fila.servicio.toLowerCase().includes(query) ||
-		  (fila.cdp && fila.cdp.toLowerCase().includes(query));
-	  });
-
-	  // Render filas
-	  filas.forEach(fila => {
-		const mesesHtml = fila.meses.map(val =>
-		  `<td style="padding:6px 8px;text-align:right;font-size:0.73rem;">$${val.toLocaleString('es-CO', { maximumFractionDigits: 0 })}</td>`
-		).join('');
-
-		const totalTramitadoFormateado = `$${fila.totalTramitado.toLocaleString('es-CO', { maximumFractionDigits: 0 })}`;
-		const colorEjec = fila.porcentajeEjec > 80 ? '#ef4444' : fila.porcentajeEjec > 60 ? '#f59e0b' : '#22c55e';
-		let badgeEstado = '<span class="badge-estado badge-normal">NORMAL</span>';
-		if (fila.porcentajeEjec > 80) badgeEstado = '<span class="badge-estado badge-critico">CRÍTICO</span>';
-		else if (fila.porcentajeEjec > 60) badgeEstado = '<span class="badge-estado badge-alerta">ALERTA</span>';
-
-		const row = document.createElement('tr');
-		row.innerHTML = `
-		  <td style="position:sticky;left:0;background:inherit;z-index:9;font-weight:bold;padding:6px 8px;border-right:1px solid #e5e7eb;">${fila.unidad.toUpperCase()}</td>
-		  <td style="padding:6px 8px;font-weight:500;font-size:0.75rem;">${fila.servicio}</td>
-		  <td style="padding:6px 8px;text-align:center;color:#6b7280;font-size:0.7rem;">${fila.cdp || '-'}</td>
-		  <td style="padding:6px 8px;text-align:right;font-weight:600;font-size:0.75rem;">$${fila.asignacion.toLocaleString('es-CO')}</td>
-		  <td style="padding:6px 8px;text-align:right;color:#6b7280;font-size:0.75rem;">$${fila.dicAnterior.toLocaleString('es-CO')}</td>
-		  ${mesesHtml}
-		  <td style="padding:6px 8px;text-align:right;font-weight:600;color:#06402b;font-size:0.75rem;">${totalTramitadoFormateado}</td>
-		  <td style="padding:6px 8px;text-align:right;color:#6b7280;font-size:0.75rem;">$${Math.round(fila.promedio).toLocaleString('es-CO')}</td>
-		  <td style="padding:6px 8px;text-align:right;font-weight:500;font-size:0.75rem;">$${fila.saldoEjec.toLocaleString('es-CO')}</td>
-		  <td style="padding:6px 8px;text-align:right;color:#6b7280;font-size:0.75rem;">$${Math.round(fila.terminarVigencia).toLocaleString('es-CO')}</td>
-		  <td style="padding:6px 8px;text-align:right;color:${fila.sobraFalta >= 0 ? '#22c55e' : '#ef4444'};font-weight:600;font-size:0.75rem;">
-			${fila.sobraFalta >= 0 ? '+' : ''}$${Math.abs(fila.sobraFalta).toLocaleString('es-CO')}
-		  </td>
-		  <td style="padding:6px 8px;text-align:right;font-size:0.75rem;">
-			<div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;">
-			  <span style="font-weight:bold;color:${colorEjec};">${fila.porcentajeEjec.toFixed(1)}%</span>
-			  ${badgeEstado}
-			</div>
-		  </td>
-		  <td style="padding:6px 8px;text-align:center;">
-			<button class="btn-accion btn-editar" onclick="cargarDatosParaEdicion('${fila.unidad}', '${fila.servicio}')" title="Editar">
-			  <i class="fas fa-edit"></i>
-			</button>
-			<button class="btn-accion btn-eliminar" onclick="eliminarRegistro('${fila.unidad}', '${fila.servicio}')" title="Eliminar">
-			  <i class="fas fa-trash"></i>
-			</button>
-		  </td>
-		`;
-		tbody.appendChild(row);
-	  });
-
-	  // ========== TOTALES EN FOOTER ==========
-	  const totalPromedio = totalFilas > 0 ? totalGeneralPromedio / totalFilas : 0;
-	  const totalPorcentajeEjec = totalGeneralAsignado > 0 ? (totalGeneralTotalTramitado / totalGeneralAsignado * 100) : 0;
-
-	  tfoot.innerHTML = `
-		<tr style="background:linear-gradient(135deg, #f9fafb, #f3f4f6);font-weight:bold;border-top:2px solid #06402b;">
-		  <td colspan="3" style="padding:8px;color:#06402b;font-size:0.75rem;">TOTALES</td>
-		  <td style="padding:8px;text-align:right;color:#06402b;font-size:0.75rem;">$${totalGeneralAsignado.toLocaleString('es-CO')}</td>
-		  <td style="padding:8px;text-align:right;color:#6b7280;font-size:0.75rem;">$${totalGeneralDicAnterior.toLocaleString('es-CO')}</td>
-		  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralEne.toLocaleString('es-CO')}</td>
-		  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralFeb.toLocaleString('es-CO')}</td>
-		  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralMar.toLocaleString('es-CO')}</td>
-		  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralAbr.toLocaleString('es-CO')}</td>
-		  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralMay.toLocaleString('es-CO')}</td>
-		  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralJun.toLocaleString('es-CO')}</td>
-		  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralJul.toLocaleString('es-CO')}</td>
-		  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralAgo.toLocaleString('es-CO')}</td>
-		  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralSep.toLocaleString('es-CO')}</td>
-		  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralOct.toLocaleString('es-CO')}</td>
-		  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralNov.toLocaleString('es-CO')}</td>
-		  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralDic.toLocaleString('es-CO')}</td>
-		  <td style="padding:8px;text-align:right;color:#06402b;font-size:0.75rem;">$${totalGeneralTotalTramitado.toLocaleString('es-CO')}</td>
-		  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${Math.round(totalPromedio).toLocaleString('es-CO')}</td>
-		  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralSaldoEjec.toLocaleString('es-CO')}</td>
-		  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${Math.round(totalGeneralTerminarVigencia).toLocaleString('es-CO')}</td>
-		  <td style="padding:8px;text-align:right;color:${totalGeneralSobraFalta >= 0 ? '#22c55e' : '#ef4444'};font-size:0.75rem;">
-			${totalGeneralSobraFalta >= 0 ? '+' : ''}$${Math.abs(totalGeneralSobraFalta).toLocaleString('es-CO')}
-		  </td>
-		  <td style="padding:8px;text-align:right;font-size:0.75rem;">${totalPorcentajeEjec.toFixed(1)}%</td>
-		  <td></td>
-		</tr>
-	  `;
-
-	  // ✅ ACTUALIZAR KPIs solo si existen
-	  if (totalAsignadoEl) totalAsignadoEl.textContent = `$${totalGeneralAsignado.toLocaleString('es-CO')}`;
-	  if (totalEjecutadoEl) totalEjecutadoEl.textContent = `$${totalGeneralTotalTramitado.toLocaleString('es-CO')}`;
-	  if (porcentajeEjecucionEl) porcentajeEjecucionEl.textContent = `${totalPorcentajeEjec.toFixed(1)}%`;
-	  if (saldoDisponibleEl) saldoDisponibleEl.textContent = `$${totalGeneralSaldoEjec.toLocaleString('es-CO')}`;
-
-	  const mesActual = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'][new Date().getMonth()];
-	  if (mesActualEl) mesActualEl.textContent = mesActual;
-
-	  // Estado de ejecución
-	  if (estadoEjecucionEl) {
-		if (totalPorcentajeEjec > 80) {
-		  estadoEjecucionEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Crítico';
-		  estadoEjecucionEl.style.background = '#fecaca'; estadoEjecucionEl.style.color = '#991b1b';
-		} else if (totalPorcentajeEjec > 60) {
-		  estadoEjecucionEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Alerta';
-		  estadoEjecucionEl.style.background = '#fed7aa'; estadoEjecucionEl.style.color = '#92400e';
-		} else {
-		  estadoEjecucionEl.innerHTML = '<i class="fas fa-check-circle"></i> Normal';
-		  estadoEjecucionEl.style.background = '#d1fae5'; estadoEjecucionEl.style.color = '#065f46';
-		}
-	  }
-
-	  if (contadorFilasEl) {
-		contadorFilasEl.textContent = `(${filas.length} registro${filas.length !== 1 ? 's' : ''})`;
-	  }
-
-	  // ✅ Actualizar proyecciones solo si los elementos existen
-	  if (proyeccionMensualEl) {
-		proyeccionMensualEl.textContent = `$${calcularProyeccionMensual().toLocaleString('es-CO')}`;
-	  }
-	  if (proyeccionAnualEl) {
-		proyeccionAnualEl.textContent = `$${calcularProyeccionAnual().toLocaleString('es-CO')}`;
-	  }
-
-	  // ✅ Actualizar subtítulo de proyección anual con IPC
-		const ipcSelect = document.getElementById('selectIPC');
-		if (ipcSelect) {
-		  const ipcUsado = parseFloat(ipcSelect.value) * 100;
-		  const subtitleEl = document.getElementById('ipcSubtitle');
-		  if (subtitleEl) {
-			subtitleEl.textContent = `IPC +${ipcUsado.toFixed(0)}%`;
-		  }
-		}
-
-	  // Generar gráficos
-	  generarGraficosSaldos(filas, datosCalculados);
 	}
 	
 	// ✅ Mostrar desglose en modal con diseño profesional mejorado
@@ -5060,7 +4839,8 @@ input.search-bar {
 	  '4- DESAN ACUEDUCTO.xlsm',
 	  '5- DEMAM ENERGIA.xlsm',
 	  '6- DEMAM ACUEDUCTO.xlsm',
-	  '7- GAS MEBUC-DESAN-DEMAM.xlsm'
+	  '7- GAS MEBUC-DESAN-DEMAM.xlsm',
+	  '8- BIESO Y ASTURIAS.xlsm'
 	];
 
 	// Abrir modal y cargar lista
@@ -5281,19 +5061,24 @@ input.search-bar {
 	
 	// Cargar saldos desde Supabase
 	async function cargarSaldosDesdeSupabase() {
+	  if (!window.supabaseClient) {
+		console.warn('⚠️ Supabase no está disponible. Saltando carga desde nube.');
+		return false;
+	  }
+
 	  try {
-		const { data, error } = await supabase
+		const { data, error } = await window.supabaseClient
 		  .from('saldos_presupuestales')
 		  .select('*');
 
 		if (error) throw error;
 
-		// Reiniciar estructura
+		// Reiniciar estructura local
 		appData.saldos = {
 		  mebuc: {}, desan: {}, demam: {}, setra: {}, asturias: {}
 		};
 
-		// Llenar con datos de la nube
+		// Rellenar con datos desde Supabase
 		data.forEach(row => {
 		  if (!appData.saldos[row.unidad]) appData.saldos[row.unidad] = {};
 		  appData.saldos[row.unidad][row.servicio] = {
@@ -5306,58 +5091,8 @@ input.search-bar {
 		console.log('✅ Saldos cargados desde Supabase:', data.length, 'registros');
 		return true;
 	  } catch (error) {
-		console.warn('⚠️ No se pudieron cargar saldos desde Supabase:', error);
+		console.warn('⚠️ Error al cargar saldos desde Supabase:', error.message);
 		return false;
-	  }
-	}
-
-	// Guardar en Supabase + localStorage
-	async function guardarEdicionPresupuesto() {
-	  if (!validarFormulario()) return;
-	    if (!isAdminMode) {
-		showNotification('🔒 Necesitas permisos de administrador para guardar cambios', 'error', 3000);
-		return;
-	  }
-
-	  const unidad = document.getElementById('editarUnidad').value;
-	  const servicio = document.getElementById('editarServicio').value;
-	  const cdp = document.getElementById('editarCDP').value.trim();
-	  const asignacion = parseFloat(document.getElementById('editarAsignacion').value) || 0;
-	  const dicAnterior = parseFloat(document.getElementById('editarDicAnterior').value) || 0;
-
-	  showLoading();
-	  try {
-		// Actualizar en estructura local
-		if (!appData.saldos[unidad]) appData.saldos[unidad] = {};
-		appData.saldos[unidad][servicio] = { cdp, asignacion, dicAnterior };
-
-		// Guardar en Supabase
-		const { error } = await supabase
-		  .from('saldos_presupuestales')
-		  .upsert(
-			{
-			  unidad,
-			  servicio,
-			  cdp,
-			  asignacion,
-			  dic_anterior: dicAnterior
-			},
-			{ onConflict: 'unidad,servicio' }
-		  );
-
-		if (error) throw error;
-
-		// Respaldo en localStorage
-		localStorage.setItem('appDataSaldos', JSON.stringify(appData.saldos));
-
-		limpiarFormulario();
-		renderTablaSaldos();
-		showNotification(`✅ Presupuesto guardado en la nube para ${servicio} (${unidad.toUpperCase()})`, 'success', 3000);
-	  } catch (error) {
-		console.error('❌ Error al guardar en Supabase:', error);
-		showNotification(`❌ Error: ${error.message}`, 'error', 5000);
-	  } finally {
-		hideLoading();
 	  }
 	}
 
@@ -5372,16 +5107,21 @@ input.search-bar {
 		showNotification(`❌ Error al cargar datos automáticamente: ${error.message}`, 'error', 5000);
 	  }
 	}
-	
-	// 🔐 Control de acceso para modo administrador en Saldos Presupuestales
-	let isAdminMode = false;
-	const ADMIN_PASSWORD = "1234" 
 
 	// ========== VARIABLES GLOBALES ==========
 	let appData = {
-	  energia: { mebuc: {}, desan: {}, demam: {}, setra: {} },
-	  acueducto: { mebuc: {}, desan: {}, demam: {}, setra: {} },
-	  gas: { mebuc: [], desan: [], demam: [], asturias: [] },
+	  energia: { 
+		mebuc: {}, desan: {}, demam: {}, setra: {},
+		nusefa: {}, asturias: {}
+	  },
+	  acueducto: { 
+		mebuc: {}, desan: {}, demam: {}, setra: {},
+		nusefa: {}, asturias: {}
+	  },
+	  gas: { 
+		mebuc: [], desan: [], demam: [], asturias: []
+	  },
+	  
 	  // ========== MÓDULO SALDOS PRESUPUESTALES ==========
 	  saldos: {
 		mebuc: {
@@ -5416,7 +5156,16 @@ input.search-bar {
 		  'Gas': { cdp: '', asignacion: 0, dicAnterior: 0 },
 		  'Mantenimiento': { cdp: '', asignacion: 0, dicAnterior: 0 }
 		},
+		// --- NUEVAS UNIDADES PARA SALDOS ---
 		asturias: {
+		  'Energía': { cdp: '', asignacion: 0, dicAnterior: 0 },
+		  'Alumbrado Público': { cdp: '', asignacion: 0, dicAnterior: 0 },
+		  'Acueducto': { cdp: '', asignacion: 0, dicAnterior: 0 },
+		  'Alcantarillado': { cdp: '', asignacion: 0, dicAnterior: 0 },
+		  'Gas': { cdp: '', asignacion: 0, dicAnterior: 0 },
+		  'Mantenimiento': { cdp: '', asignacion: 0, dicAnterior: 0 }
+		},
+		nusefa: {
 		  'Energía': { cdp: '', asignacion: 0, dicAnterior: 0 },
 		  'Alumbrado Público': { cdp: '', asignacion: 0, dicAnterior: 0 },
 		  'Acueducto': { cdp: '', asignacion: 0, dicAnterior: 0 },
@@ -5426,6 +5175,7 @@ input.search-bar {
 		}
 	  }
 	};
+	
 	// ========== NOTIFICACIONES ==========
 	let notificaciones = JSON.parse(localStorage.getItem('notificaciones') || '[]');
 
@@ -5449,6 +5199,250 @@ input.search-bar {
 	  }
 	}
 	
+	// Función para filtrar filas según búsqueda
+	function renderTablaSaldos() {
+	  const tbody = document.getElementById('tbodySaldos');
+	  const tfoot = document.getElementById('tfootSaldos');
+	  const totalAsignadoEl = document.getElementById('totalAsignado');
+	  const totalEjecutadoEl = document.getElementById('totalEjecutado');
+	  const porcentajeEjecucionEl = document.getElementById('porcentajeEjecucion');
+	  const mesActualEl = document.getElementById('mesActual');
+	  const saldoDisponibleEl = document.getElementById('saldoDisponible');
+	  const estadoEjecucionEl = document.getElementById('estadoEjecucion');
+	  const contadorFilasEl = document.getElementById('contadorFilas');
+	  const proyeccionMensualEl = document.getElementById('proyeccionMensual');
+	  const proyeccionAnualEl = document.getElementById('proyeccionAnual');
+
+	  // ✅ Garantizar que la tabla no falle si tbody/tfoot no existen (aunque deberían estar)
+	  if (!tbody || !tfoot) {
+		console.warn('⚠️ Elementos tbody o tfoot de la tabla de saldos no encontrados.');
+		return;
+	  }
+
+	  tbody.innerHTML = '';
+	  tfoot.innerHTML = '';
+
+	  const datosCalculados = calcularValoresPorMesYUnidad();
+	  const filtroUnidad = document.getElementById('filtroUnidadSaldos').value;
+	  const filtroServicio = document.getElementById('filtroServicioSaldos').value;
+	  const textoBusqueda = document.getElementById('busquedaRapida').value;
+
+	  const unidades = filtroUnidad === 'todas' ? ['mebuc', 'desan', 'demam', 'setra'] : [filtroUnidad];
+	  const servicios = filtroServicio === 'todos' ? ['Energía', 'Alumbrado Público', 'Acueducto', 'Alcantarillado', 'Gas'] : [filtroServicio];
+
+	  let totalGeneralAsignado = 0;
+	  let totalGeneralDicAnterior = 0;
+	  let totalGeneralEne = 0;
+	  let totalGeneralFeb = 0;
+	  let totalGeneralMar = 0;
+	  let totalGeneralAbr = 0;
+	  let totalGeneralMay = 0;
+	  let totalGeneralJun = 0;
+	  let totalGeneralJul = 0;
+	  let totalGeneralAgo = 0;
+	  let totalGeneralSep = 0;
+	  let totalGeneralOct = 0;
+	  let totalGeneralNov = 0;
+	  let totalGeneralDic = 0;
+	  let totalGeneralTotalTramitado = 0;
+	  let totalGeneralPromedio = 0;
+	  let totalGeneralSaldoEjec = 0;
+	  let totalGeneralTerminarVigencia = 0;
+	  let totalGeneralSobraFalta = 0;
+	  let totalGeneralPorcentajeEjec = 0;
+	  let totalFilas = 0;
+
+	  const mesesKeys = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
+	  let filas = [];
+
+	  unidades.forEach(unidad => {
+		if (!appData.saldos[unidad]) return;
+		servicios.forEach(servicio => {
+		  const datosServicio = datosCalculados[unidad][servicio];
+		  const config = appData.saldos[unidad][servicio];
+		  if (!config) return;
+
+		  const asignacion = config.asignacion || 0;
+		  const dicAnterior = config.dicAnterior || 0;
+		  const mesesValores = mesesKeys.map(m => datosServicio[m] || 0);
+		  const totalMeses = mesesValores.reduce((a, b) => a + b, 0);
+		  const totalTramitado = totalMeses + dicAnterior;
+		  const mesesConDatos = mesesValores.filter(v => v > 0).length;
+		  const promedio = mesesConDatos > 0 ? totalMeses / mesesConDatos : 0;
+		  const saldoEjec = asignacion - totalTramitado;
+		  const mesActualIdx = new Date().getMonth(); // 0-11
+		  const mesesRestantes = 11 - mesActualIdx;
+		  const terminarVigencia = promedio * mesesRestantes;
+		  const sobraFalta = saldoEjec - terminarVigencia;
+		  const porcentajeEjec = asignacion > 0 ? (totalTramitado / asignacion * 100) : 0;
+
+		  filas.push({
+			unidad, servicio, cdp: config.cdp, asignacion, dicAnterior,
+			meses: mesesValores,
+			totalMeses, totalTramitado, promedio, saldoEjec,
+			terminarVigencia, sobraFalta, porcentajeEjec
+		  });
+
+		  totalGeneralAsignado += asignacion;
+		  totalGeneralDicAnterior += dicAnterior;
+		  totalGeneralEne += mesesValores[0];
+		  totalGeneralFeb += mesesValores[1];
+		  totalGeneralMar += mesesValores[2];
+		  totalGeneralAbr += mesesValores[3];
+		  totalGeneralMay += mesesValores[4];
+		  totalGeneralJun += mesesValores[5];
+		  totalGeneralJul += mesesValores[6];
+		  totalGeneralAgo += mesesValores[7];
+		  totalGeneralSep += mesesValores[8];
+		  totalGeneralOct += mesesValores[9];
+		  totalGeneralNov += mesesValores[10];
+		  totalGeneralDic += mesesValores[11];
+		  totalGeneralTotalTramitado += totalTramitado;
+		  totalGeneralPromedio += promedio;
+		  totalGeneralSaldoEjec += saldoEjec;
+		  totalGeneralTerminarVigencia += terminarVigencia;
+		  totalGeneralSobraFalta += sobraFalta;
+		  totalGeneralPorcentajeEjec += porcentajeEjec;
+		  totalFilas++;
+		});
+	  });
+
+	  // Aplicar búsqueda
+	  filas = filas.filter(fila => {
+		const query = textoBusqueda.toLowerCase();
+		return !query ||
+		  fila.unidad.toLowerCase().includes(query) ||
+		  fila.servicio.toLowerCase().includes(query) ||
+		  (fila.cdp && fila.cdp.toLowerCase().includes(query));
+	  });
+
+	  // Render filas
+	  filas.forEach(fila => {
+		const mesesHtml = fila.meses.map(val =>
+		  `<td style="padding:6px 8px;text-align:right;font-size:0.73rem;">$${val.toLocaleString('es-CO', { maximumFractionDigits: 0 })}</td>`
+		).join('');
+
+		const totalTramitadoFormateado = `$${fila.totalTramitado.toLocaleString('es-CO', { maximumFractionDigits: 0 })}`;
+		const colorEjec = fila.porcentajeEjec > 80 ? '#ef4444' : fila.porcentajeEjec > 60 ? '#f59e0b' : '#22c55e';
+		let badgeEstado = '<span class="badge-estado badge-normal">NORMAL</span>';
+		if (fila.porcentajeEjec > 80) badgeEstado = '<span class="badge-estado badge-critico">CRÍTICO</span>';
+		else if (fila.porcentajeEjec > 60) badgeEstado = '<span class="badge-estado badge-alerta">ALERTA</span>';
+
+		const row = document.createElement('tr');
+		row.innerHTML = `
+		  <td style="position:sticky;left:0;background:inherit;z-index:9;font-weight:bold;padding:6px 8px;border-right:1px solid #e5e7eb;">${fila.unidad.toUpperCase()}</td>
+		  <td style="padding:6px 8px;font-weight:500;font-size:0.75rem;">${fila.servicio}</td>
+		  <td style="padding:6px 8px;text-align:center;color:#6b7280;font-size:0.7rem;">${fila.cdp || '-'}</td>
+		  <td style="padding:6px 8px;text-align:right;font-weight:600;font-size:0.75rem;">$${fila.asignacion.toLocaleString('es-CO')}</td>
+		  <td style="padding:6px 8px;text-align:right;color:#6b7280;font-size:0.75rem;">$${fila.dicAnterior.toLocaleString('es-CO')}</td>
+		  ${mesesHtml}
+		  <td style="padding:6px 8px;text-align:right;font-weight:600;color:#06402b;font-size:0.75rem;">${totalTramitadoFormateado}</td>
+		  <td style="padding:6px 8px;text-align:right;color:#6b7280;font-size:0.75rem;">$${Math.round(fila.promedio).toLocaleString('es-CO')}</td>
+		  <td style="padding:6px 8px;text-align:right;font-weight:500;font-size:0.75rem;">$${fila.saldoEjec.toLocaleString('es-CO')}</td>
+		  <td style="padding:6px 8px;text-align:right;color:#6b7280;font-size:0.75rem;">$${Math.round(fila.terminarVigencia).toLocaleString('es-CO')}</td>
+		  <td style="padding:6px 8px;text-align:right;color:${fila.sobraFalta >= 0 ? '#22c55e' : '#ef4444'};font-weight:600;font-size:0.75rem;">
+			${fila.sobraFalta >= 0 ? '+' : ''}$${Math.abs(fila.sobraFalta).toLocaleString('es-CO')}
+		  </td>
+		  <td style="padding:6px 8px;text-align:right;font-size:0.75rem;">
+			<div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;">
+			  <span style="font-weight:bold;color:${colorEjec};">${fila.porcentajeEjec.toFixed(1)}%</span>
+			  ${badgeEstado}
+			</div>
+		  </td>
+		  <td style="padding:6px 8px;text-align:center;">
+			<button class="btn-accion btn-editar" onclick="cargarDatosParaEdicion('${fila.unidad}', '${fila.servicio}')" title="Editar">
+			  <i class="fas fa-edit"></i>
+			</button>
+			<button class="btn-accion btn-eliminar" onclick="eliminarRegistro('${fila.unidad}', '${fila.servicio}')" title="Eliminar">
+			  <i class="fas fa-trash"></i>
+			</button>
+		  </td>
+		`;
+		tbody.appendChild(row);
+	  });
+
+	  // ========== TOTALES EN FOOTER ==========
+	  const totalPromedio = totalFilas > 0 ? totalGeneralPromedio / totalFilas : 0;
+	  const totalPorcentajeEjec = totalGeneralAsignado > 0 ? (totalGeneralTotalTramitado / totalGeneralAsignado * 100) : 0;
+
+	  tfoot.innerHTML = `
+		<tr style="background:linear-gradient(135deg, #f9fafb, #f3f4f6);font-weight:bold;border-top:2px solid #06402b;">
+		  <td colspan="3" style="padding:8px;color:#06402b;font-size:0.75rem;">TOTALES</td>
+		  <td style="padding:8px;text-align:right;color:#06402b;font-size:0.75rem;">$${totalGeneralAsignado.toLocaleString('es-CO')}</td>
+		  <td style="padding:8px;text-align:right;color:#6b7280;font-size:0.75rem;">$${totalGeneralDicAnterior.toLocaleString('es-CO')}</td>
+		  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralEne.toLocaleString('es-CO')}</td>
+		  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralFeb.toLocaleString('es-CO')}</td>
+		  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralMar.toLocaleString('es-CO')}</td>
+		  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralAbr.toLocaleString('es-CO')}</td>
+		  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralMay.toLocaleString('es-CO')}</td>
+		  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralJun.toLocaleString('es-CO')}</td>
+		  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralJul.toLocaleString('es-CO')}</td>
+		  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralAgo.toLocaleString('es-CO')}</td>
+		  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralSep.toLocaleString('es-CO')}</td>
+		  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralOct.toLocaleString('es-CO')}</td>
+		  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralNov.toLocaleString('es-CO')}</td>
+		  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralDic.toLocaleString('es-CO')}</td>
+		  <td style="padding:8px;text-align:right;color:#06402b;font-size:0.75rem;">$${totalGeneralTotalTramitado.toLocaleString('es-CO')}</td>
+		  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${Math.round(totalPromedio).toLocaleString('es-CO')}</td>
+		  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralSaldoEjec.toLocaleString('es-CO')}</td>
+		  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${Math.round(totalGeneralTerminarVigencia).toLocaleString('es-CO')}</td>
+		  <td style="padding:8px;text-align:right;color:${totalGeneralSobraFalta >= 0 ? '#22c55e' : '#ef4444'};font-size:0.75rem;">
+			${totalGeneralSobraFalta >= 0 ? '+' : ''}$${Math.abs(totalGeneralSobraFalta).toLocaleString('es-CO')}
+		  </td>
+		  <td style="padding:8px;text-align:right;font-size:0.75rem;">${totalPorcentajeEjec.toFixed(1)}%</td>
+		  <td></td>
+		</tr>
+	  `;
+
+	  // ✅ ACTUALIZAR KPIs solo si existen
+	  if (totalAsignadoEl) totalAsignadoEl.textContent = `$${totalGeneralAsignado.toLocaleString('es-CO')}`;
+	  if (totalEjecutadoEl) totalEjecutadoEl.textContent = `$${totalGeneralTotalTramitado.toLocaleString('es-CO')}`;
+	  if (porcentajeEjecucionEl) porcentajeEjecucionEl.textContent = `${totalPorcentajeEjec.toFixed(1)}%`;
+	  if (saldoDisponibleEl) saldoDisponibleEl.textContent = `$${totalGeneralSaldoEjec.toLocaleString('es-CO')}`;
+
+	  const mesActual = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'][new Date().getMonth()];
+	  if (mesActualEl) mesActualEl.textContent = mesActual;
+
+	  // Estado de ejecución
+	  if (estadoEjecucionEl) {
+		if (totalPorcentajeEjec > 80) {
+		  estadoEjecucionEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Crítico';
+		  estadoEjecucionEl.style.background = '#fecaca'; estadoEjecucionEl.style.color = '#991b1b';
+		} else if (totalPorcentajeEjec > 60) {
+		  estadoEjecucionEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Alerta';
+		  estadoEjecucionEl.style.background = '#fed7aa'; estadoEjecucionEl.style.color = '#92400e';
+		} else {
+		  estadoEjecucionEl.innerHTML = '<i class="fas fa-check-circle"></i> Normal';
+		  estadoEjecucionEl.style.background = '#d1fae5'; estadoEjecucionEl.style.color = '#065f46';
+		}
+	  }
+
+	  if (contadorFilasEl) {
+		contadorFilasEl.textContent = `(${filas.length} registro${filas.length !== 1 ? 's' : ''})`;
+	  }
+
+	  // ✅ Actualizar proyecciones solo si los elementos existen
+	  if (proyeccionMensualEl) {
+		proyeccionMensualEl.textContent = `$${calcularProyeccionMensual().toLocaleString('es-CO')}`;
+	  }
+	  if (proyeccionAnualEl) {
+		proyeccionAnualEl.textContent = `$${calcularProyeccionAnual().toLocaleString('es-CO')}`;
+	  }
+
+	  // ✅ Actualizar subtítulo de proyección anual con IPC
+		const ipcSelect = document.getElementById('selectIPC');
+		if (ipcSelect) {
+		  const ipcUsado = parseFloat(ipcSelect.value) * 100;
+		  const subtitleEl = document.getElementById('ipcSubtitle');
+		  if (subtitleEl) {
+			subtitleEl.textContent = `IPC +${ipcUsado.toFixed(0)}%`;
+		  }
+		}
+
+	  // Generar gráficos
+	  generarGraficosSaldos(filas, datosCalculados);
+	}
+	
 	// ========== FUNCIÓN PARA CONFIRMAR ELIMINACIÓN DE PRESUPUESTO ==========
 	function confirmarEliminacion() {
 	  if (!registroEditando) {
@@ -5461,20 +5455,22 @@ input.search-bar {
 
 	  try {
 		// Eliminar del objeto local
-		if (appData.saldos[unidad] && appData.saldos[unidad][servicio]) {
+		if (appData.saldos[unidad]?.[servicio]) {
 		  delete appData.saldos[unidad][servicio];
 		  localStorage.setItem('appDataSaldos', JSON.stringify(appData.saldos));
 
-		  // Opcional: eliminar en Supabase
-		  supabase
-			.from('saldos_presupuestales')
-			.delete()
-			.match({ unidad, servicio })
-			.then(({ error }) => {
-			  if (error) {
-				console.warn('⚠️ No se pudo eliminar en Supabase:', error);
-			  }
-			});
+		  // ✅ Eliminar en Supabase (si está disponible)
+		  if (window.supabaseClient) {
+			window.supabaseClient
+			  .from('saldos_presupuestales')
+			  .delete()
+			  .match({ unidad, servicio })
+			  .then(({ error }) => {
+				if (error) {
+				  console.warn('⚠️ No se pudo eliminar en Supabase:', error);
+				}
+			  });
+		  }
 
 		  showNotification(`✅ Registro eliminado: ${servicio} (${unidad.toUpperCase()})`, 'success');
 		  renderTablaSaldos();
@@ -5485,7 +5481,6 @@ input.search-bar {
 		console.error('❌ Error al eliminar registro:', error);
 		showNotification('❌ Error al eliminar el registro', 'error');
 	  } finally {
-		// Cerrar modal y limpiar
 		document.getElementById('modalEliminar').style.display = 'none';
 		registroEditando = null;
 	  }
@@ -5814,15 +5809,11 @@ input.search-bar {
 	
 	// ========== FUNCIÓN PARA CARGAR DESDE SUPABASE ==========
 	async function cargarDesdeSupabase() {
-	  // ✅ Ya no intentamos manipular btnCargarNube ni loadingIndicator (fueron eliminados)
 	  try {
-		// Mostrar notificación de inicio
 		showNotification('🔽 Iniciando descarga desde la nube...', 'info', 2000);
-
-		// URL base de Supabase Storage
 		const supabaseUrl = 'https://jjbjgrnhnlmmlilbrqbx.supabase.co/storage/v1/object/public/excels/';
 		
-		// Lista de archivos a descargar
+		// ✅ LISTA COMPLETA: incluye el archivo 8
 		const nombresArchivos = [
 		  '1- MEBUC ENERGIA.xlsm',
 		  '2- MEBUC ACUEDUCTO.xlsm',
@@ -5830,38 +5821,24 @@ input.search-bar {
 		  '4- DESAN ACUEDUCTO.xlsm',
 		  '5- DEMAM ENERGIA.xlsm',
 		  '6- DEMAM ACUEDUCTO.xlsm',
-		  '7- GAS MEBUC-DESAN-DEMAM.xlsm'
+		  '7- GAS MEBUC-DESAN-DEMAM.xlsm',
+		  '8- BIESO Y ASTURIAS.xlsm' // ← 🔑 AGREGADO
 		];
 
-		// Descargar todos los archivos en paralelo
-		const promesasDescarga = nombresArchivos.map(async (nombreArchivo) => {
-		  const url = supabaseUrl + encodeURIComponent(nombreArchivo);
-		  console.log(`📥 Descargando: ${nombreArchivo}`);
+		const promesas = nombresArchivos.map(async (nombre) => {
+		  const url = supabaseUrl + encodeURIComponent(nombre);
 		  const response = await fetch(url);
-		  if (!response.ok) {
-			throw new Error(`Error al descargar ${nombreArchivo}: ${response.status} ${response.statusText}`);
-		  }
+		  if (!response.ok) throw new Error(`Error al descargar ${nombre}`);
 		  const blob = await response.blob();
-		  console.log(`✅ Descargado: ${nombreArchivo} (${(blob.size / 1024).toFixed(2)} KB)`);
-		  // Crear un objeto File virtual
-		  return new File([blob], nombreArchivo, {
-			type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-		  });
+		  return new File([blob], nombre, { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 		});
 
-		// Esperar a que todos los archivos se descarguen
-		const archivos = await Promise.all(promesasDescarga);
-		console.log(`✅ Descargados ${archivos.length} archivos exitosamente`);
-
-		// Procesar los archivos
+		const archivos = await Promise.all(promesas);
 		await handleFiles(archivos);
-
-		// Mostrar notificación de éxito
-		
+		showNotification('✅ Archivos descargados y procesados desde la nube', 'success', 3000);
 	  } catch (error) {
-		console.error('❌ Error al cargar archivos desde Supabase:', error);
-		// Mostrar notificación de error
-		showNotification(`❌ Error al cargar desde la nube: ${error.message}`, 'error', 5000);
+		console.error('❌ Error al cargar desde Supabase Storage:', error);
+		showNotification(`❌ Error: ${error.message}`, 'error', 5000);
 	  }
 	}
 
@@ -5930,28 +5907,34 @@ input.search-bar {
 	  try {
 		const fileArray = Array.from(files);
 		let processedCount = 0;
-
-		// Registrar marca de tiempo de carga
 		const timestampCarga = new Date().toISOString();
 
 		const processPromises = fileArray.map(async (file) => {
 		  try {
 			const workbook = await readFile(file);
-			await processFile(file.name, workbook, timestampCarga); // ✅ Pasar timestamp
+			const fileName = file.name;
+
+			// ✅ Detectar archivo de ASTURIAS/NUSEFA
+			if (fileName.toLowerCase().includes('asturias') || 
+				fileName.toLowerCase().includes('nusefa') || 
+				fileName.toLowerCase().includes('bieso')) {
+			  await processAsturiasNusefaFile(fileName, workbook, timestampCarga);
+			} else {
+			  await processFile(fileName, workbook, timestampCarga);
+			}
+
 			processedCount++;
-			console.log(`✅ Archivo procesado: ${file.name} (${processedCount}/${fileArray.length})`);
+			console.log(`✅ Archivo procesado: ${fileName} (${processedCount}/${fileArray.length})`);
 		  } catch (error) {
 			console.error(`❌ Error procesando ${file.name}:`, error);
 			showNotification(`Error al procesar ${file.name}`, 'error');
 		  }
 		});
-		
-		// Notificar predios cargados en últimas 24h — incluyendo marca de sesión
-        notificarPrediosTramitadosRecientes(timestampCarga);
 
 		await Promise.all(processPromises);
+		
 		if (processedCount > 0) {
-		  updateSummary();
+		  updateSummary(); // Esto llama a updateTramitacionGrid
 		  inicializarEstructuraSaldosDesdeDatos();
 		  renderTablaSaldos();
 		}
@@ -5965,7 +5948,7 @@ input.search-bar {
 	
 	function detectarNuevosServiciosOModulos() {
 	  // Definimos las unidades y servicios esperados por defecto
-	  const unidadesEsperadas = new Set(['mebuc', 'desan', 'demam', 'setra', 'asturias']);
+	  const unidadesEsperadas = new Set(['mebuc', 'desan', 'demam', 'setra', 'asturias', 'nusefa']); // ✅ Añadidas
 	  const serviciosEsperados = new Set([
 		'Energía', 'Alumbrado Público', 'Acueducto', 'Alcantarillado', 'Gas', 'Mantenimiento'
 	  ]);
@@ -6393,7 +6376,214 @@ input.search-bar {
 		}
 	  });
 	}
+	
+	async function processAsturiasNusefaFile(filename, workbook, timestampCarga) {
+	  console.log(`✅ Procesando archivo ASTURIAS/NUSEFA: ${filename}`);
 
+	  // --- DEFINICIÓN DE CUENTAS ---
+	  const NUSEFA_ENERGIA_ACCOUNTS = new Set(['214262']);
+	  const ASTURIAS_ENERGIA_ACCOUNTS = new Set(['1085817', '1085818', '1136898']);
+	  const NUSEFA_ACUEDUCTO_ACCOUNTS = new Set(['039806', '39806']); // acepta con/sin cero inicial
+	  const ASTURIAS_ACUEDUCTO_ACCOUNTS = new Set(['122860']);
+
+	  // Asegurar que las estructuras existan
+	  ['nusefa', 'asturias'].forEach(u => {
+		if (!appData.energia[u]) appData.energia[u] = {};
+		if (!appData.acueducto[u]) appData.acueducto[u] = {};
+	  });
+
+	  // Procesar cada hoja
+	  for (const sheetName of workbook.SheetNames) {
+		const sheetUpper = sheetName.toUpperCase().trim();
+
+		// ✅ Solo procesar ENERGIA y ACUEDUCTO
+		if (sheetUpper !== 'ENERGIA' && sheetUpper !== 'ACUEDUCTO') {
+		  console.log(`⚠️ Hoja ignorada: "${sheetName}"`);
+		  continue;
+		}
+
+		try {
+		  const worksheet = workbook.Sheets[sheetName];
+		  const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
+		  const maxRows = Math.min(range.e.r + 1, 1000);
+		  const headers = [];
+		  let headerRow = -1;
+
+		  // Buscar encabezados
+		  for (let r = 0; r < Math.min(10, maxRows); r++) {
+			const row = [];
+			for (let c = range.s.c; c <= range.e.c; c++) {
+			  const cell = worksheet[XLSX.utils.encode_cell({ r, c })];
+			  row.push(cell ? String(cell.v || '').trim() : '');
+			}
+			const hasKey = row.some(cell => {
+			  const lower = cell.toLowerCase();
+			  return lower.includes('cuenta') || lower.includes('estacion') || lower.includes('estación') || lower.includes('factura');
+			});
+			if (hasKey) {
+			  headers.push(...row);
+			  headerRow = r;
+			  break;
+			}
+		  }
+		  if (headerRow === -1) continue;
+
+		  // Mapeo de columnas
+		  const COLUMN_MAPPING = sheetUpper === 'ENERGIA' ? {
+			cuenta: ['cuenta', 'numero cuenta', 'no cuenta', 'cta', 'n° cuenta', 'no. cuenta'],
+			estacion: ['estacion', 'estación', 'predio', 'nombre', 'dependencia'],
+			factura: ['factura', 'n° factura', 'numero factura', 'no factura'],
+			kwh: ['kw/h', 'kwh', 'kw / h', 'kilowatios'],
+			energia: ['energia', 'consumo', 'valor energia'],
+			aPublico: ['a. publico', 'a.publico', 'alumbrado publico', 'alumbrado público', 'a publico', 'publico'],
+			aseo: ['aseo', 'servicio aseo'],
+			tramitar: ['total a tramitar', 'tramitar', 'a tramitar', 'total tramitar'],
+			intereses: ['intereses', 'int', 'saldos', 'mora', 'intereses y/o saldos'],
+			direccion: ['direccion', 'dirección', 'dir']
+		  } : {
+			cuenta: ['cuenta', 'numero cuenta', 'no cuenta', 'cta', 'n° cuenta', 'no. cuenta'],
+			estacion: ['estacion', 'estación', 'predio', 'nombre', 'dependencia'],
+			factura: ['factura', 'n° factura', 'numero factura', 'no factura'],
+			m3: ['m3', 'm³', 'm 3'],
+			acueducto: ['acueducto', 'agua'],
+			alcantarillado: ['alcantarillado', 'alcant'],
+			aseo: ['aseo', 'servicio aseo'],
+			tramitar: ['total tramite', 'total a tramitar', 'tramitar', 'a tramitar', 'total tramitar'],
+			intereses: ['intereses', 'int', 'saldos', 'mora', 'intereses y/o saldos'],
+			direccion: ['direccion', 'dirección', 'dir']
+		  };
+
+		  const colMap = {};
+		  for (const [key, patterns] of Object.entries(COLUMN_MAPPING)) {
+			colMap[key] = -1;
+			for (let i = 0; i < headers.length; i++) {
+			  const headerLower = headers[i].toLowerCase().trim();
+			  if (patterns.some(pattern => headerLower === pattern.toLowerCase() || headerLower.includes(pattern.toLowerCase()))) {
+				colMap[key] = i;
+				break;
+			  }
+			}
+		  }
+		  if (colMap.cuenta === -1 && colMap.estacion === -1) continue;
+
+		  let consecutiveEmptyCuenta = 0;
+		  const MAX_EMPTY_CUENTA = sheetUpper === 'ENERGIA' ? 3 : 1;
+
+		  // Procesar filas
+		  for (let r = headerRow + 1; r < maxRows; r++) {
+			const row = [];
+			for (let c = range.s.c; c <= range.e.c; c++) {
+			  const cell = worksheet[XLSX.utils.encode_cell({ r, c })];
+			  const val = cell ? String(cell.v || '').trim() : '';
+			  row.push(val);
+			}
+
+			const estacion = colMap.estacion >= 0 ? row[colMap.estacion] : '';
+			const cuenta = colMap.cuenta >= 0 ? row[colMap.cuenta] : '';
+
+			if (isValidCuenta(cuenta)) {
+			  consecutiveEmptyCuenta = 0;
+			  const upperEstacion = estacion.toUpperCase();
+			  if (upperEstacion.includes('TOTAL') || upperEstacion.includes('SUBTOTAL') ||
+				  upperEstacion.includes('PROMEDIO') || upperEstacion.includes('SUMATORIA')) {
+				continue;
+			  }
+
+			  // ✅ Determinar servicio y unidad por FILA
+			  const currentService = sheetUpper === 'ENERGIA' ? 'energia' : 'acueducto';
+			  let unidad;
+			  if (currentService === 'energia') {
+				if (NUSEFA_ENERGIA_ACCOUNTS.has(cuenta)) unidad = 'nusefa';
+				else if (ASTURIAS_ENERGIA_ACCOUNTS.has(cuenta)) unidad = 'asturias';
+			  } else {
+				if (NUSEFA_ACUEDUCTO_ACCOUNTS.has(cuenta)) unidad = 'nusefa';
+				else if (ASTURIAS_ACUEDUCTO_ACCOUNTS.has(cuenta)) unidad = 'asturias';
+			  }
+
+			  if (!unidad) {
+				console.warn(`⚠️ Cuenta no mapeada: ${cuenta} en hoja ${sheetName}`);
+				continue;
+			  }
+
+			  // ✅ Construir registro
+			  let record;
+			  if (currentService === 'energia') {
+				const kwh = cleanAndParseFloat(row[colMap.kwh]);
+				const energia = cleanAndParseFloat(row[colMap.energia]);
+				const aPublico = cleanAndParseFloat(row[colMap.aPublico]);
+				const aseo = cleanAndParseFloat(row[colMap.aseo]);
+				const tramitar = cleanAndParseFloat(row[colMap.tramitar]);
+				const intereses = cleanAndParseFloat(row[colMap.intereses]);
+				const factura = colMap.factura >= 0 ? String(row[colMap.factura]).trim() : '';
+				const direccion = colMap.direccion >= 0 ? row[colMap.direccion] : '';
+
+				record = {
+				  ESTACION: estacion,
+				  CUENTA: cuenta,
+				  FACTURA: factura,
+				  CONSUMO: kwh,
+				  CONSUMO_VALOR: energia,
+				  ENERGIA: energia,
+				  A_PUBLICO: aPublico,
+				  ASEO: aseo,
+				  TOTAL_TRAMITAR: tramitar,
+				  INTERESES: intereses,
+				  TOTAL_FACTURA: tramitar + intereses,
+				  DIRECCION: direccion,
+				  _timestamp_carga: timestampCarga
+				};
+			  } else {
+				const m3 = cleanAndParseFloat(row[colMap.m3]);
+				const acueducto = cleanAndParseFloat(row[colMap.acueducto]);
+				const alcantarillado = cleanAndParseFloat(row[colMap.alcantarillado]);
+				const aseo = cleanAndParseFloat(row[colMap.aseo]);
+				const tramitar = cleanAndParseFloat(row[colMap.tramitar]);
+				const intereses = cleanAndParseFloat(row[colMap.intereses]);
+				const factura = colMap.factura >= 0 ? String(row[colMap.factura]).trim() : '';
+				const direccion = colMap.direccion >= 0 ? row[colMap.direccion] : '';
+
+				record = {
+				  ESTACION: estacion,
+				  CUENTA: cuenta,
+				  FACTURA: factura,
+				  CONSUMO: m3,
+				  ACUEDUCTO: acueducto,
+				  ALCANTARILLADO: alcantarillado,
+				  ASEO: aseo,
+				  TOTAL_TRAMITAR: tramitar,
+				  INTERESES: intereses,
+				  TOTAL_FACTURA: tramitar + intereses,
+				  DIRECCION: direccion,
+				  _timestamp_carga: timestampCarga
+				};
+			  }
+
+			  // ✅ Guardar directamente en la unidad y hoja correctas
+			  if (!appData[currentService][unidad][sheetName]) {
+				appData[currentService][unidad][sheetName] = [];
+			  }
+			  appData[currentService][unidad][sheetName].push(record);
+
+			} else {
+			  consecutiveEmptyCuenta++;
+			  if (consecutiveEmptyCuenta >= MAX_EMPTY_CUENTA) break;
+			}
+		  }
+
+		  // Mostrar resumen
+		  ['nusefa', 'asturias'].forEach(u => {
+			const count = appData[currentService]?.[u]?.[sheetName]?.length || 0;
+			if (count > 0) {
+			  console.log(`✅ ${sheetName} → ${currentService.toUpperCase()} / ${u.toUpperCase()}: ${count} registros`);
+			}
+		  });
+
+		} catch (err) {
+		  console.error(`❌ Error en hoja ${sheetName}:`, err);
+		}
+	  }
+	}
+	
 	async function processGasFile(workbook, timestampCarga) {
 	  const COLUMN_MAPPING = {
 		cuenta: ['cuenta', 'numero cuenta', 'no cuenta', 'cta', 'n° cuenta'],
@@ -6576,22 +6766,22 @@ input.search-bar {
 		'JUNIO': 6, 'JULIO': 7, 'AGOSTO': 8, 'SEPTIEMBRE': 9,
 		'OCTUBRE': 10, 'NOVIEMBRE': 11, 'DICIEMBRE': 12
 	  };
-
 	  const todosMeses = new Set();
 
-	  // Recorrer energía y acueducto (hojas nombradas con mes)
+	  // --- ENERGÍA Y ACUEDUCTO: incluir nusefa y asturias ---
 	  ['energia', 'acueducto'].forEach(servicio => {
-		Object.keys(appData[servicio] || {}).forEach(unidad => {
-		  const mesesUnidad = Object.keys(appData[servicio][unidad] || {});
-		  mesesUnidad.forEach(m => {
-			if (m && typeof m === 'string') {
-			  todosMeses.add(m.trim().toUpperCase());
+		const unidades = ['mebuc', 'desan', 'demam', 'setra', 'asturias', 'nusefa'];
+		unidades.forEach(unidad => {
+		  const mesesUnidad = appData[servicio]?.[unidad] || {};
+		  Object.keys(mesesUnidad).forEach(mes => {
+			if (mes && typeof mes === 'string') {
+			  todosMeses.add(mes.trim().toUpperCase());
 			}
 		  });
 		});
 	  });
 
-	  // Recorrer gas (cada tabla tiene un campo "mes")
+	  // --- GAS: incluir asturias (nusefa no tiene gas) ---
 	  ['mebuc', 'desan', 'demam', 'asturias'].forEach(unidad => {
 		if (Array.isArray(appData.gas[unidad])) {
 		  appData.gas[unidad].forEach(tabla => {
@@ -6609,7 +6799,6 @@ input.search-bar {
 	  // Determinar el "último mes" considerando orden natural
 	  let ultimoMes = mesesArray[0];
 	  let maxOrden = 0;
-
 	  mesesArray.forEach(mes => {
 		const orden = mesesOrden[mes] || 0;
 		if (orden > maxOrden) {
@@ -6641,10 +6830,7 @@ input.search-bar {
 		margin-bottom: 30px;
 	  `;
 
-	  // === OBTENER EL ÚLTIMO MES DISPONIBLE ===
 	  const ultimoMes = obtenerUltimoMesCargado();
-
-	  // TÍTULO: ESTADO DE TRAMITACIÓN
 	  const tituloTramitacion = document.createElement('h2');
 	  tituloTramitacion.style.cssText = `
 		text-align: center;
@@ -6657,7 +6843,6 @@ input.search-bar {
 	  tituloTramitacion.innerHTML = `<i class="fas fa-clipboard-check"></i> Estado de Tramitación – ${ultimoMes}`;
 	  mainContainer.appendChild(tituloTramitacion);
 
-	  // GRID DE TRAMITACIÓN
 	  const tramitacionGrid = document.createElement('div');
 	  tramitacionGrid.id = 'tramitacionGrid';
 	  mainContainer.appendChild(tramitacionGrid);
@@ -6667,331 +6852,164 @@ input.search-bar {
 	}
 
 	function updateTramitacionGrid() {
-	  const grid = document.getElementById('tramitacionGrid');
-	  if (!grid) return;
+		  const grid = document.getElementById('tramitacionGrid');
+		  if (!grid) return;
 
-	  const services = ['energia', 'acueducto', 'gas'];
-	  const icons = { 
-		energia: '⚡', 
-		acueducto: '💧', 
-		gas: '🔥' 
-	  };
-	  const names = { 
-		energia: 'ENERGÍA', 
-		acueducto: 'ACUEDUCTO', 
-		gas: 'GAS' 
-	  };
-	  // ✅ USO ÚNICO DEL COLOR INSTITUCIONAL
-	  const colorInstitucional = { 
-		primary: '#06402b', 
-		secondary: '#0a5c3d', 
-		bg: 'rgba(6, 64, 43, 0.08)', 
-		shadow: 'rgba(6, 64, 43, 0.4)' 
-	  };
+		  const unidades = ['mebuc', 'desan', 'demam', 'asturias', 'nusefa', 'setra'];
+		  const servicios = ['energia', 'acueducto', 'gas'];
+		  const nombresServicios = { energia: 'Energía', acueducto: 'Acueducto', gas: 'Gas' };
+		  const iconos = { energia: 'fa-bolt', acueducto: 'fa-droplet', gas: 'fa-fire' };
 
-	  let html = `
-		<div style="
-		  display: grid;
-		  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-		  gap: 24px;
-		  padding: 4px;
-		">
-	  `;
+		  let html = `<div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; padding: 4px;">`;
 
-	  services.forEach(service => {
-		const unitsForService = service === 'gas'
-		  ? ['mebuc', 'desan', 'demam', 'asturias']
-		  : ['mebuc', 'desan', 'demam', 'setra'];
+		  unidades.forEach(unidad => {
+			const serviciosConDatos = servicios.filter(serv => {
+			  if (serv === 'gas') {
+				return Array.isArray(appData.gas[unidad]) && appData.gas[unidad].length > 0;
+			  } else {
+				const data = appData[serv]?.[unidad];
+				return data && Object.keys(data).length > 0;
+			  }
+			});
 
-		unitsForService.forEach(unit => {
-		  const stats = calculateTramitacionStats(service, unit);
-		  if (stats.total === 0) return;
+			if (serviciosConDatos.length === 0) return;
 
-		  const porcentaje = ((stats.tramitados / stats.total) * 100).toFixed(1);
-		  const color = colorInstitucional; // ✅ Siempre el mismo color
-
-		  html += `
-			<div class="tramitacion-item" style="
-			  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.95) 100%);
-			  backdrop-filter: blur(16px) saturate(180%);
-			  -webkit-backdrop-filter: blur(16px) saturate(180%);
-			  padding: 28px;
-			  border-radius: 20px;
-			  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.6);
-			  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-			  border: 1px solid rgba(255, 255, 255, 0.7);
-			  position: relative;
-			  overflow: hidden;
-			  cursor: pointer;
-			"
-			onmouseenter="this.style.transform='translateY(-8px) scale(1.02)'; this.style.boxShadow='0 16px 40px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.8)';"
-			onmouseleave="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12), 0 0 0 1px rgba(255,255,255,0.6)';">
-			  
-			  <!-- LÍNEA SUPERIOR DECORATIVA -->
-			  <div style="
-				position: absolute;
-				top: 0;
-				left: 0;
-				right: 0;
-				height: 4px;
-				background: linear-gradient(90deg, ${color.primary} 0%, ${color.secondary} 100%);
-			  "></div>
-
-			  <!-- ÍCONO DE FONDO DECORATIVO -->
-			  <div style="
-				position: absolute;
-				top: -20px;
-				right: -20px;
-				font-size: 7rem;
-				opacity: 0.04;
-				color: ${color.primary};
-				transform: rotate(-15deg);
-				pointer-events: none;
-			  ">${icons[service]}</div>
-
-			  <!-- BOTÓN VER DETALLES -->
-			  <div style="
-				position: absolute;
-				top: 16px;
-				right: 16px;
-				width: 40px;
-				height: 40px;
-				border-radius: 50%;
-				background: linear-gradient(135deg, ${color.primary} 0%, ${color.secondary} 100%);
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				cursor: pointer;
-				z-index: 10;
-				transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-				box-shadow: 0 4px 12px ${color.shadow};
-			  " 
-			  title="Ver predios pendientes"
-			  onclick="event.stopPropagation(); mostrarPrediosPendientesModal('${service}', '${unit}');"
-			  onmouseenter="this.style.transform='scale(1.15) rotate(12deg)'; this.style.boxShadow='0 6px 20px ${color.shadow}';"
-			  onmouseleave="this.style.transform='scale(1) rotate(0deg)'; this.style.boxShadow='0 4px 12px ${color.shadow}';">
-				<i class="fas fa-eye" style="font-size: 1.1rem; color: #fff;"></i>
-			  </div>
-
-			  <!-- CONTENIDO PRINCIPAL -->
-			  <div style="position: relative; z-index: 1;">
+			html += `
+			  <div class="tramitacion-item" style="
+				background: #ffffff;
+				padding: 20px;
+				border-radius: 8px;
+				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+				transition: all 0.3s ease;
+				border: 1px solid #e5e7eb;
+			  "
+			  onmouseenter="this.style.boxShadow='0 4px 12px rgba(6, 64, 43, 0.15)'; this.style.borderColor='#06402b';"
+			  onmouseleave="this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.08)'; this.style.borderColor='#e5e7eb';">
 				
-				<!-- HEADER: ÍCONO + TÍTULOS -->
-				<div style="display: flex; align-items: center; margin-bottom: 20px; gap: 14px;">
+				<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid #06402b;">
+				  <div style="font-size: 1.2rem; font-weight: 700; color: #06402b; letter-spacing: 0.5px;">
+					${unidad.toUpperCase()}
+				  </div>
+				  
 				  <div style="
-					width: 60px;
-					height: 60px;
-					background: linear-gradient(135deg, ${color.primary} 0%, ${color.secondary} 100%);
-					border-radius: 18px;
+					width: 32px;
+					height: 32px;
+					border-radius: 50%;
+					background: #06402b;
 					display: flex;
 					align-items: center;
 					justify-content: center;
-					font-size: 1.85rem;
-					box-shadow: 0 6px 20px ${color.shadow};
-					flex-shrink: 0;
-				  ">${icons[service]}</div>
-				  
-				  <div style="flex: 1; min-width: 0;">
-					<div style="
-					  font-weight: 800;
-					  font-size: 1.3rem;
-					  color: #1e293b;
-					  letter-spacing: 0.5px;
-					  line-height: 1.2;
-					  margin-bottom: 4px;
-					">${unit.toUpperCase()}</div>
-					<div style="
-					  font-size: 0.8rem;
-					  color: #64748b;
-					  font-weight: 600;
-					  text-transform: uppercase;
-					  letter-spacing: 1.2px;
-					">${names[service]}</div>
+					cursor: pointer;
+					transition: all 0.3s ease;
+				  "
+				  title="Ver todos los predios pendientes"
+				  onclick="event.stopPropagation(); mostrarPrediosPendientesModal('${unidad}');"
+				  onmouseenter="this.style.background='#084d35'; this.style.transform='scale(1.1)';"
+				  onmouseleave="this.style.background='#06402b'; this.style.transform='scale(1)';">
+					<i class="fas fa-eye" style="font-size: 0.8rem; color: white;"></i>
 				  </div>
 				</div>
 
-				<!-- PANEL DE ESTADÍSTICAS -->
+			`;
+
+			serviciosConDatos.forEach(servicio => {
+			  const stats = calculateTramitacionStats(servicio, unidad);
+			  const porcentaje = ((stats.tramitados / stats.total) * 100).toFixed(1);
+
+			  html += `
 				<div style="
-				  background: ${color.bg};
-				  border-radius: 14px;
-				  padding: 18px;
-				  margin-bottom: 18px;
-				  border: 1px solid ${color.primary}30;
-				  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.04);
+				  background: #f9fafb;
+				  border-radius: 6px;
+				  padding: 14px;
+				  margin-bottom: 12px;
+				  border-left: 3px solid #06402b;
 				">
-				  <!-- Tramitados -->
-				  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-					<span style="color: #10b981; font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
-					  <i class="fas fa-check-circle"></i>
-					  <span>Tramitados</span>
-					</span>
-					<span style="
-					  font-weight: 800;
-					  color: #10b981;
-					  font-size: 1.15rem;
-					  background: #ecfdf5;
-					  padding: 6px 14px;
-					  border-radius: 10px;
-					  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.2);
-					">${stats.tramitados}</span>
-				  </div>
-
-				  <!-- Pendientes -->
-				  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-					<span style="color: #ef4444; font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
-					  <i class="fas fa-clock"></i>
-					  <span>Pendientes</span>
-					</span>
-					<span style="
-					  font-weight: 800;
-					  color: #ef4444;
-					  font-size: 1.15rem;
-					  background: #fef2f2;
-					  padding: 6px 14px;
-					  border-radius: 10px;
-					  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.2);
-					">${stats.pendientes}</span>
-				  </div>
-
-				  <!-- Separador -->
-				  <div style="height: 1px; background: linear-gradient(90deg, transparent, ${color.primary}30, transparent); margin: 14px 0;"></div>
-
-				  <!-- Total -->
-				  <div style="display: flex; justify-content: space-between; align-items: center;">
-					<span style="color: #667eea; font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; gap: 6px;">
-					  <i class="fas fa-layer-group"></i>
-					  <span>Total Predios</span>
-					</span>
-					<span style="
-					  font-weight: 800;
-					  color: #667eea;
-					  font-size: 1.15rem;
-					  background: #eef2ff;
-					  padding: 6px 14px;
-					  border-radius: 10px;
-					  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.2);
-					">${stats.total}</span>
-				  </div>
-				</div>
-
-				<!-- BARRA DE PROGRESO -->
-				<div>
-				  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-					<span style="
-					  color: #475569;
-					  font-weight: 700;
-					  font-size: 0.85rem;
-					  text-transform: uppercase;
-					  letter-spacing: 0.8px;
-					">Progreso General</span>
-					<span style="
-					  font-weight: 800;
-					  color: ${color.primary};
-					  font-size: 1.15rem;
-					  background: ${color.bg};
-					  padding: 4px 12px;
-					  border-radius: 10px;
-					  box-shadow: 0 2px 6px ${color.shadow};
-					">${porcentaje}%</span>
-				  </div>
 				  
-				  <!-- Barra contenedora -->
-				  <div style="
-					background: #e2e8f0;
-					height: 12px;
-					border-radius: 12px;
-					overflow: hidden;
-					box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-					position: relative;
-				  ">
-					<!-- Barra de progreso con animación -->
+				  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+					<i class="fas ${iconos[servicio]}" style="font-size: 0.85rem; color: #06402b;"></i>
+					<span style="font-weight: 600; color: #1f2937; font-size: 0.95rem;">
+					  ${nombresServicios[servicio]}
+					</span>
+				  </div>
+
+				  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 12px;">
+					<div style="text-align: center; padding: 8px; background: #ffffff; border-radius: 4px;">
+					  <div style="font-size: 0.7rem; color: #6b7280; font-weight: 500; margin-bottom: 2px;">Tramitados</div>
+					  <div style="font-weight: 700; font-size: 0.95rem; color: #059669;">${stats.tramitados}</div>
+					</div>
+					<div style="text-align: center; padding: 8px; background: #ffffff; border-radius: 4px;">
+					  <div style="font-size: 0.7rem; color: #6b7280; font-weight: 500; margin-bottom: 2px;">Pendientes</div>
+					  <div style="font-weight: 700; font-size: 0.95rem; color: #dc2626;">${stats.pendientes}</div>
+					</div>
+					<div style="text-align: center; padding: 8px; background: #ffffff; border-radius: 4px;">
+					  <div style="font-size: 0.7rem; color: #6b7280; font-weight: 500; margin-bottom: 2px;">Total</div>
+					  <div style="font-weight: 700; font-size: 0.95rem; color: #06402b;">${stats.total}</div>
+					</div>
+				  </div>
+
+				  <div style="margin-top: 10px;">
+					<div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+					  <span style="font-size: 0.7rem; color: #6b7280; font-weight: 500;">Progreso</span>
+					  <span style="font-weight: 600; color: #06402b; font-size: 0.8rem;">${porcentaje}%</span>
+					</div>
 					<div style="
-					  background: linear-gradient(90deg, ${color.primary} 0%, ${color.secondary} 100%);
-					  height: 100%;
-					  width: ${porcentaje}%;
-					  transition: width 1.4s cubic-bezier(0.4, 0, 0.2, 1);
-					  border-radius: 12px;
-					  box-shadow: 0 2px 8px ${color.shadow};
-					  position: relative;
+					  background: #e5e7eb;
+					  height: 8px;
+					  border-radius: 4px;
 					  overflow: hidden;
 					">
-					  <!-- Efecto shimmer -->
 					  <div style="
-						position: absolute;
-						top: 0;
-						left: 0;
-						right: 0;
-						bottom: 0;
-						background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
-						animation: shimmer 2.5s infinite;
+						background: linear-gradient(90deg, #06402b 0%, #084d35 100%);
+						height: 100%;
+						width: ${porcentaje}%;
+						border-radius: 4px;
+						transition: width 1s ease;
 					  "></div>
 					</div>
 				  </div>
 				</div>
+			  `;
+			});
 
-			  </div>
-			</div>
+			html += `</div>`;
+		  });
+
+		  html += '</div>';
+
+		  html += `
+			<style>
+			  @keyframes fadeInUp {
+				from { opacity: 0; transform: translateY(20px); }
+				to { opacity: 1; transform: translateY(0); }
+			  }
+			  .tramitacion-item {
+				animation: fadeInUp 0.5s ease backwards;
+			  }
+			  .tramitacion-item:nth-child(1) { animation-delay: 0s; }
+			  .tramitacion-item:nth-child(2) { animation-delay: 0.05s; }
+			  .tramitacion-item:nth-child(3) { animation-delay: 0.1s; }
+			  .tramitacion-item:nth-child(4) { animation-delay: 0.15s; }
+			  .tramitacion-item:nth-child(5) { animation-delay: 0.2s; }
+			  .tramitacion-item:nth-child(6) { animation-delay: 0.25s; }
+			</style>
 		  `;
-		});
-	  });
 
-	  html += '</div>';
-
-	  // ESTILOS Y ANIMACIONES
-	  html += `
-		<style>
-		  @keyframes shimmer {
-			0% { transform: translateX(-100%); }
-			100% { transform: translateX(100%); }
-		  }
-		  
-		  @keyframes fadeInUp {
-			from {
-			  opacity: 0;
-			  transform: translateY(30px);
-			}
-			to {
-			  opacity: 1;
-			  transform: translateY(0);
-			}
-		  }
-		  
-		  .tramitacion-item {
-			animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) backwards;
-		  }
-		  
-		  .tramitacion-item:nth-child(1) { animation-delay: 0.05s; }
-		  .tramitacion-item:nth-child(2) { animation-delay: 0.1s; }
-		  .tramitacion-item:nth-child(3) { animation-delay: 0.15s; }
-		  .tramitacion-item:nth-child(4) { animation-delay: 0.2s; }
-		  .tramitacion-item:nth-child(5) { animation-delay: 0.25s; }
-		  .tramitacion-item:nth-child(6) { animation-delay: 0.3s; }
-		  .tramitacion-item:nth-child(7) { animation-delay: 0.35s; }
-		  .tramitacion-item:nth-child(8) { animation-delay: 0.4s; }
-		  .tramitacion-item:nth-child(9) { animation-delay: 0.45s; }
-		  .tramitacion-item:nth-child(10) { animation-delay: 0.5s; }
-		  .tramitacion-item:nth-child(11) { animation-delay: 0.55s; }
-		  .tramitacion-item:nth-child(12) { animation-delay: 0.6s; }
-		</style>
-	  `;
-
-	  grid.innerHTML = html;
-	}
+		  grid.innerHTML = html;
+		}
 
 	function calculateTramitacionStats(service, unit) {
 	  const cuentasMap = new Map();
 
 	  if (service === 'gas') {
+		// Solo unidades con gas: MEBUC, DESAN, DEMAM, ASTURIAS
 		if (Array.isArray(appData.gas[unit])) {
 		  appData.gas[unit].forEach(table => {
 			if (Array.isArray(table.data)) {
 			  table.data.forEach(row => {
 				const cuenta = String(row.CUENTA).trim();
 				if (!cuenta || !isValidCuenta(cuenta)) return;
-
-				// Validar si está tramitado: TOTAL_TRAMITAR > 0 (ignorar "0", "-", "", null)
-				let totalTramitarRaw = row.TOTAL_TRAMITAR;
 				let isTramitado = false;
+				let totalTramitarRaw = row.TOTAL_TRAMITAR;
 				if (typeof totalTramitarRaw === 'number' && totalTramitarRaw > 0) {
 				  isTramitado = true;
 				} else if (typeof totalTramitarRaw === 'string') {
@@ -7001,14 +7019,13 @@ input.search-bar {
 					if (!isNaN(num) && num > 0) isTramitado = true;
 				  }
 				}
-
-				// Registrar una vez por cuenta (último mes ya está implícito en estructura)
 				cuentasMap.set(cuenta, isTramitado);
 			  });
 			}
 		  });
 		}
 	  } else {
+		// Energía o Acueducto → incluye NUSEFA y ASTURIAS
 		const unitData = appData[service][unit];
 		if (unitData) {
 		  const months = Object.keys(unitData)
@@ -7018,15 +7035,15 @@ input.search-bar {
 							  'JULIO':7,'AGOSTO':8,'SEPTIEMBRE':9,'OCTUBRE':10,'NOVIEMBRE':11,'DICIEMBRE':12 };
 			  return (order[b.toUpperCase()] || 0) - (order[a.toUpperCase()] || 0);
 			});
+
 		  if (months.length > 0) {
-			const lastMonth = months[0]; // Último mes alfabéticamente (DICIEMBRE > NOVIEMBRE > ...)
+			const lastMonth = months[0]; // Último mes alfabéticamente
 			if (Array.isArray(unitData[lastMonth])) {
 			  unitData[lastMonth].forEach(row => {
 				const cuenta = String(row.CUENTA).trim();
 				if (!cuenta || !isValidCuenta(cuenta)) return;
-
-				let totalTramitarRaw = row.TOTAL_TRAMITAR;
 				let isTramitado = false;
+				let totalTramitarRaw = row.TOTAL_TRAMITAR;
 				if (typeof totalTramitarRaw === 'number' && totalTramitarRaw > 0) {
 				  isTramitado = true;
 				} else if (typeof totalTramitarRaw === 'string') {
@@ -7036,7 +7053,6 @@ input.search-bar {
 					if (!isNaN(num) && num > 0) isTramitado = true;
 				  }
 				}
-
 				cuentasMap.set(cuenta, isTramitado);
 			  });
 			}
@@ -7044,344 +7060,329 @@ input.search-bar {
 		}
 	  }
 
-	  let tramitados = 0;
-	  let pendientes = 0;
-	  cuentasMap.forEach((estaTramitado) => {
-		if (estaTramitado) {
-		  tramitados++;
-		} else {
-		  pendientes++;
-		}
+	  let tramitados = 0, pendientes = 0;
+	  cuentasMap.forEach(estaTramitado => {
+		if (estaTramitado) tramitados++;
+		else pendientes++;
 	  });
 
-	  return {
-		total: cuentasMap.size,
-		tramitados: tramitados,
-		pendientes: pendientes
-	  };
+	  return { total: cuentasMap.size, tramitados, pendientes };
 	}
 	
-	function mostrarPrediosPendientesModal(service, unit) {
-	  const names = { energia: 'ENERGÍA', acueducto: 'ACUEDUCTO', gas: 'GAS' };
-	  const icons = { energia: '⚡', acueducto: '💧', gas: '🔥' };
-	  const colors = {
-		energia: { primary: '#fbbf24', secondary: '#f59e0b', bg: '#fffbeb' },
-		acueducto: { primary: '#3b82f6', secondary: '#2563eb', bg: '#eff6ff' },
-		gas: { primary: '#ef4444', secondary: '#dc2626', bg: '#fef2f2' }
-	  };
-	  
-	  const pendingList = [];
-	  const unitData = service === 'gas' ? appData.gas[unit] : appData[service][unit];
-	  const color = colors[service];
+	function mostrarPrediosPendientesModal(unit) {
+		  const servicios = ['energia', 'acueducto', 'gas'];
+		  const nombresServicios = { energia: 'Energía', acueducto: 'Acueducto', gas: 'Gas' };
+		  const iconos = { energia: 'fa-bolt', acueducto: 'fa-droplet', gas: 'fa-fire' };
+		  
+		  let todosLosPendientes = [];
+		  let hayDatos = false;
 
-	  if (!unitData) {
-		showSimpleModal(`
-		  <div style="text-align:center;padding:30px;">
-			<i class="fas fa-info-circle" style="font-size:3rem;color:#94a3b8;margin-bottom:16px;"></i>
-			<p style="color:#64748b;font-size:1rem;margin:0;">
-			  No hay datos disponibles para <strong>${unit.toUpperCase()}</strong> - ${names[service]}
-			</p>
-		  </div>
-		`);
-		return;
-	  }
+		  // Recopilar pendientes de todos los servicios
+		  servicios.forEach(service => {
+			const pendingList = [];
+			const unitData = service === 'gas' ? appData.gas[unit] : appData[service][unit];
+			
+			if (!unitData) return;
+			hayDatos = true;
 
-	  if (service === 'gas') {
-		// Solo el último mes de Gas (última tabla en el array)
-		if (Array.isArray(unitData) && unitData.length > 0) {
-		  const lastTable = unitData[unitData.length - 1];
-		  if (lastTable && Array.isArray(lastTable.data)) {
-			lastTable.data.forEach(row => {
-			  const cuenta = String(row.CUENTA).trim();
-			  if (!cuenta || !isValidCuenta(cuenta)) return;
-
-			  let isTramitado = false;
-			  const totalTramitarRaw = row.TOTAL_TRAMITAR;
-			  if (typeof totalTramitarRaw === 'number' && totalTramitarRaw > 0) {
-				isTramitado = true;
-			  } else if (typeof totalTramitarRaw === 'string') {
-				const clean = totalTramitarRaw.trim();
-				if (clean !== '' && clean !== '-' && clean !== '0') {
-				  const num = parseFloat(clean);
-				  if (!isNaN(num) && num > 0) isTramitado = true;
+			if (service === 'gas') {
+			  if (Array.isArray(unitData) && unitData.length > 0) {
+				const lastTable = unitData[unitData.length - 1];
+				if (lastTable && Array.isArray(lastTable.data)) {
+				  lastTable.data.forEach(row => {
+					const cuenta = String(row.CUENTA).trim();
+					if (!cuenta || !isValidCuenta(cuenta)) return;
+					let isTramitado = false;
+					const totalTramitarRaw = row.TOTAL_TRAMITAR;
+					if (typeof totalTramitarRaw === 'number' && totalTramitarRaw > 0) {
+					  isTramitado = true;
+					} else if (typeof totalTramitarRaw === 'string') {
+					  const clean = totalTramitarRaw.trim();
+					  if (clean !== '' && clean !== '-' && clean !== '0') {
+						const num = parseFloat(clean);
+						if (!isNaN(num) && num > 0) isTramitado = true;
+					  }
+					}
+					if (!isTramitado) {
+					  pendingList.push({
+						predio: row.ESTACION || 'Sin nombre',
+						cuenta: cuenta
+					  });
+					}
+				  });
 				}
 			  }
-
-			  if (!isTramitado) {
-				pendingList.push({
-				  predio: row.ESTACION || 'Sin nombre',
-				  cuenta: cuenta
-				});
-			  }
-			});
-		  }
-		}
-	  } else {
-		// Último mes para energía/acueducto
-		const months = Object.keys(unitData).filter(m => Array.isArray(unitData[m]));
-		if (months.length === 0) {
-		  showSimpleModal(`
-			<div style="text-align:center;padding:30px;">
-			  <i class="fas fa-calendar-times" style="font-size:3rem;color:#94a3b8;margin-bottom:16px;"></i>
-			  <p style="color:#64748b;font-size:1rem;margin:0;">
-				No hay datos del último mes para <strong>${unit.toUpperCase()}</strong> - ${names[service]}
-			  </p>
-			</div>
-		  `);
-		  return;
-		}
-		const lastMonth = months.sort((a, b) => {
-		  const order = { 'ENERO':1,'FEBRERO':2,'MARZO':3,'ABRIL':4,'MAYO':5,'JUNIO':6,
-						  'JULIO':7,'AGOSTO':8,'SEPTIEMBRE':9,'OCTUBRE':10,'NOVIEMBRE':11,'DICIEMBRE':12 };
-		  return (order[b.toUpperCase()] || 0) - (order[a.toUpperCase()] || 0);
-		})[0];
-
-		if (Array.isArray(unitData[lastMonth])) {
-		  unitData[lastMonth].forEach(row => {
-			const cuenta = String(row.CUENTA).trim();
-			if (!cuenta || !isValidCuenta(cuenta)) return;
-
-			let isTramitado = false;
-			const totalTramitarRaw = row.TOTAL_TRAMITAR;
-			if (typeof totalTramitarRaw === 'number' && totalTramitarRaw > 0) {
-			  isTramitado = true;
-			} else if (typeof totalTramitarRaw === 'string') {
-			  const clean = totalTramitarRaw.trim();
-			  if (clean !== '' && clean !== '-' && clean !== '0') {
-				const num = parseFloat(clean);
-				if (!isNaN(num) && num > 0) isTramitado = true;
+			} else {
+			  const months = Object.keys(unitData).filter(m => Array.isArray(unitData[m]));
+			  if (months.length > 0) {
+				const lastMonth = months.sort((a, b) => {
+				  const order = { 'ENERO':1,'FEBRERO':2,'MARZO':3,'ABRIL':4,'MAYO':5,'JUNIO':6,
+								  'JULIO':7,'AGOSTO':8,'SEPTIEMBRE':9,'OCTUBRE':10,'NOVIEMBRE':11,'DICIEMBRE':12 };
+				  return (order[b.toUpperCase()] || 0) - (order[a.toUpperCase()] || 0);
+				})[0];
+				if (Array.isArray(unitData[lastMonth])) {
+				  unitData[lastMonth].forEach(row => {
+					const cuenta = String(row.CUENTA).trim();
+					if (!cuenta || !isValidCuenta(cuenta)) return;
+					let isTramitado = false;
+					const totalTramitarRaw = row.TOTAL_TRAMITAR;
+					if (typeof totalTramitarRaw === 'number' && totalTramitarRaw > 0) {
+					  isTramitado = true;
+					} else if (typeof totalTramitarRaw === 'string') {
+					  const clean = totalTramitarRaw.trim();
+					  if (clean !== '' && clean !== '-' && clean !== '0') {
+						const num = parseFloat(clean);
+						if (!isNaN(num) && num > 0) isTramitado = true;
+					  }
+					}
+					if (!isTramitado) {
+					  pendingList.push({
+						predio: row.ESTACION || 'Sin nombre',
+						cuenta: cuenta
+					  });
+					}
+				  });
+				}
 			  }
 			}
 
-			if (!isTramitado) {
-			  pendingList.push({
-				predio: row.ESTACION || 'Sin nombre',
-				cuenta: cuenta
+			if (pendingList.length > 0) {
+			  todosLosPendientes.push({
+				servicio: service,
+				nombre: nombresServicios[service],
+				icono: iconos[service],
+				pendientes: pendingList
 			  });
 			}
 		  });
-		}
-	  }
 
-	  if (pendingList.length === 0) {
-		showSimpleModal(`
-		  <div style="text-align:center;padding:40px;">
-			<div style="
-			  width:80px;
-			  height:80px;
-			  background:linear-gradient(135deg, #10b981, #059669);
-			  border-radius:50%;
-			  display:flex;
-			  align-items:center;
-			  justify-content:center;
-			  margin:0 auto 20px;
-			  box-shadow:0 8px 24px rgba(16,185,129,0.3);
-			">
-			  <i class="fas fa-check" style="font-size:2.5rem;color:#fff;"></i>
-			</div>
-			<h3 style="color:#10b981;margin:0 0 12px 0;font-size:1.5rem;font-weight:700;">
-			  ¡Todo al día!
-			</h3>
-			<p style="color:#64748b;font-size:1rem;margin:0;">
-			  No hay predios pendientes para <strong>${unit.toUpperCase()}</strong> - ${names[service]}
-			</p>
-		  </div>
-		`);
-	  } else {
-		// Tabla mejorada de 2 columnas
-		let tableHtml = `
-		  <div style="padding:8px;">
-			<!-- Header con gradiente -->
-			<div style="
-			  background:linear-gradient(135deg, ${color.primary}, ${color.secondary});
-			  padding:24px;
-			  border-radius:16px 16px 0 0;
-			  text-align:center;
-			  box-shadow:0 4px 12px ${color.primary}40;
-			">
-			  <div style="font-size:2.5rem;margin-bottom:12px;">${icons[service]}</div>
-			  <h3 style="color:#fff;margin:0 0 8px 0;font-size:1.4rem;font-weight:800;">
-				Predios Pendientes
-			  </h3>
-			  <p style="color:rgba(255,255,255,0.9);margin:0;font-size:0.95rem;font-weight:500;">
-				${unit.toUpperCase()} - ${names[service]}
-			  </p>
-			</div>
+		  if (!hayDatos) {
+			showSimpleModal(`
+			  <div style="text-align:center;padding:40px;">
+				<i class="fas fa-info-circle" style="font-size:2.5rem;color:#94a3b8;margin-bottom:16px;"></i>
+				<p style="color:#64748b;font-size:0.95rem;margin:0;">
+				  No hay datos disponibles para <strong>${unit.toUpperCase()}</strong>
+				</p>
+			  </div>
+			`);
+			return;
+		  }
 
-			<!-- Badge con contador -->
-			<div style="
-			  background:${color.bg};
-			  padding:12px;
-			  text-align:center;
-			  border-left:4px solid ${color.primary};
-			  border-right:4px solid ${color.primary};
-			">
-			  <span style="
-				background:#fff;
-				color:${color.primary};
-				padding:8px 20px;
-				border-radius:50px;
-				font-weight:800;
-				font-size:0.9rem;
-				box-shadow:0 2px 8px rgba(0,0,0,0.1);
-				display:inline-block;
-			  ">
-				<i class="fas fa-exclamation-triangle" style="margin-right:6px;"></i>
-				${pendingList.length} ${pendingList.length === 1 ? 'Predio Pendiente' : 'Predios Pendientes'}
-			  </span>
-			</div>
+		  if (todosLosPendientes.length === 0) {
+			showSimpleModal(`
+			  <div style="text-align:center;padding:40px;">
+				<div style="
+				  width:70px;
+				  height:70px;
+				  background:#06402b;
+				  border-radius:50%;
+				  display:flex;
+				  align-items:center;
+				  justify-content:center;
+				  margin:0 auto 20px;
+				">
+				  <i class="fas fa-check" style="font-size:2rem;color:#fff;"></i>
+				</div>
+				<h3 style="color:#06402b;margin:0 0 12px 0;font-size:1.3rem;font-weight:700;">
+				  ¡Todo al día!
+				</h3>
+				<p style="color:#64748b;font-size:0.95rem;margin:0;">
+				  No hay predios pendientes en <strong>${unit.toUpperCase()}</strong>
+				</p>
+			  </div>
+			`);
+			return;
+		  }
 
-			<!-- Tabla -->
-			<div style="max-height:400px;overflow-y:auto;border-left:4px solid ${color.primary};border-right:4px solid ${color.primary};background:#fff;">
-			  <table style="width:100%;border-collapse:collapse;">
-				<thead style="position:sticky;top:0;z-index:10;">
-				  <tr style="background:linear-gradient(135deg, #1e293b, #334155);">
-					<th style="
-					  color:#fff;
-					  padding:14px 16px;
-					  text-align:center;
-					  font-weight:700;
-					  font-size:0.9rem;
-					  text-transform:uppercase;
-					  letter-spacing:0.8px;
-					  border-bottom:3px solid ${color.primary};
-					  white-space:nowrap;
-					">
-					  <i class="fas fa-hashtag" style="margin-right:6px;color:${color.primary};"></i>
-					  Cuenta
-					</th>
-					<th style="
-					  color:#fff;
-					  padding:14px 16px;
-					  text-align:left;
-					  font-weight:700;
-					  font-size:0.9rem;
-					  text-transform:uppercase;
-					  letter-spacing:0.8px;
-					  border-bottom:3px solid ${color.primary};
-					  white-space:nowrap;
-					">
-					  <i class="fas fa-building" style="margin-right:6px;color:${color.primary};"></i>
-					  Predio
-					</th>
-				  </tr>
-				</thead>
-				<tbody>
-		`;
-		
-		pendingList.forEach((p, index) => {
-		  const bgColor = index % 2 === 0 ? '#f8fafc' : '#fff';
-		  tableHtml += `
-			<tr style="
-			  background:${bgColor};
-			  transition:all 0.2s ease;
-			"
-			onmouseenter="this.style.background='${color.bg}'; this.style.transform='scale(1.01)';"
-			onmouseleave="this.style.background='${bgColor}'; this.style.transform='scale(1)';">
-			  <td style="
-				padding:12px 16px;
-				border-bottom:1px solid #e2e8f0;
+		  // Construir modal con todos los servicios
+		  let modalHtml = `
+			<div style="padding:8px;">
+			  <div style="
+				background:#06402b;
+				padding:20px;
+				border-radius:8px 8px 0 0;
 				text-align:center;
-				font-weight:700;
-				color:#1e293b;
-				font-size:0.9rem;
-			  ">${p.cuenta}</td>
-			  <td style="
-				padding:12px 16px;
-				border-bottom:1px solid #e2e8f0;
-				color:#475569;
-				font-size:0.9rem;
-				font-weight:500;
-			  ">${p.predio}</td>
-			</tr>
-		  `;
-		});
-		
-		tableHtml += `
-				</tbody>
-			  </table>
-			</div>
+			  ">
+				<h3 style="color:#fff;margin:0 0 6px 0;font-size:1.2rem;font-weight:700;">
+				  Predios Pendientes
+				</h3>
+				<p style="color:rgba(255,255,255,0.9);margin:0;font-size:0.9rem;font-weight:500;">
+				  ${unit.toUpperCase()}
+				</p>
+			  </div>
 
-			<!-- Footer -->
-			<div style="
-			  background:${color.bg};
-			  padding:16px;
-			  border-radius:0 0 16px 16px;
-			  text-align:center;
-			  border:4px solid ${color.primary};
-			  border-top:none;
-			">
-			  <p style="color:#64748b;font-size:0.85rem;margin:0;">
-				<i class="fas fa-info-circle" style="margin-right:6px;color:${color.primary};"></i>
-				Estos predios requieren tramitación para completar el proceso
-			  </p>
+			  <div style="max-height:500px;overflow-y:auto;background:#f9fafb;">
+		  `;
+
+		  todosLosPendientes.forEach((servicioData, idx) => {
+			const totalPendientes = servicioData.pendientes.length;
+			
+			modalHtml += `
+			  <div style="background:#fff;margin:16px;border-radius:6px;border:1px solid #e5e7eb;overflow:hidden;">
+				<div style="
+				  background:#f9fafb;
+				  padding:12px 16px;
+				  border-bottom:2px solid #06402b;
+				  display:flex;
+				  justify-content:space-between;
+				  align-items:center;
+				">
+				  <div style="display:flex;align-items:center;gap:8px;">
+					<i class="fas ${servicioData.icono}" style="font-size:0.9rem;color:#06402b;"></i>
+					<span style="font-weight:700;color:#1f2937;font-size:0.95rem;">
+					  ${servicioData.nombre}
+					</span>
+				  </div>
+				  <span style="
+					background:#06402b;
+					color:#fff;
+					padding:4px 12px;
+					border-radius:12px;
+					font-weight:600;
+					font-size:0.75rem;
+				  ">
+					${totalPendientes} ${totalPendientes === 1 ? 'pendiente' : 'pendientes'}
+				  </span>
+				</div>
+
+				<div style="max-height:250px;overflow-y:auto;">
+				  <table style="width:100%;border-collapse:collapse;">
+					<thead style="position:sticky;top:0;z-index:10;">
+					  <tr style="background:#1f2937;">
+						<th style="
+						  color:#fff;
+						  padding:10px 12px;
+						  text-align:center;
+						  font-weight:600;
+						  font-size:0.75rem;
+						  text-transform:uppercase;
+						  border-bottom:2px solid #06402b;
+						">Cuenta</th>
+						<th style="
+						  color:#fff;
+						  padding:10px 12px;
+						  text-align:left;
+						  font-weight:600;
+						  font-size:0.75rem;
+						  text-transform:uppercase;
+						  border-bottom:2px solid #06402b;
+						">Predio</th>
+					  </tr>
+					</thead>
+					<tbody>
+			`;
+
+			servicioData.pendientes.forEach((p, index) => {
+			  const bgColor = index % 2 === 0 ? '#f9fafb' : '#fff';
+			  modalHtml += `
+				<tr style="background:${bgColor};transition:background 0.2s;"
+				onmouseenter="this.style.background='#eff6ff';"
+				onmouseleave="this.style.background='${bgColor}';">
+				  <td style="
+					padding:10px 12px;
+					border-bottom:1px solid #e5e7eb;
+					text-align:center;
+					font-weight:600;
+					color:#1f2937;
+					font-size:0.85rem;
+				  ">${p.cuenta}</td>
+				  <td style="
+					padding:10px 12px;
+					border-bottom:1px solid #e5e7eb;
+					color:#475569;
+					font-size:0.85rem;
+				  ">${p.predio}</td>
+				</tr>
+			  `;
+			});
+
+			modalHtml += `
+					</tbody>
+				  </table>
+				</div>
+			  </div>
+			`;
+		  });
+
+		  const totalGeneral = todosLosPendientes.reduce((sum, s) => sum + s.pendientes.length, 0);
+
+		  modalHtml += `
+			  </div>
+			  
+			  <div style="
+				background:#f9fafb;
+				padding:14px;
+				border-radius:0 0 8px 8px;
+				text-align:center;
+				border-top:2px solid #e5e7eb;
+			  ">
+				<p style="color:#64748b;font-size:0.8rem;margin:0;">
+				  <i class="fas fa-info-circle" style="margin-right:6px;color:#06402b;"></i>
+				  Total: <strong style="color:#06402b;">${totalGeneral}</strong> ${totalGeneral === 1 ? 'predio pendiente' : 'predios pendientes'}
+				</p>
+			  </div>
 			</div>
-		  </div>
-		`;
-		
-		showSimpleModal(tableHtml);
-	  }
-	}
+		  `;
+
+		  showSimpleModal(modalHtml);
+		}
 
 	function showSimpleModal(content) {
-	  const modalContent = document.getElementById('modalContent');
-	  const modal = document.getElementById('modal');
-	  
-	  modalContent.innerHTML = `
-		<div style="
-		  max-width:700px;
-		  background:linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,255,255,0.95));
-		  backdrop-filter:blur(20px);
-		  border-radius:24px;
-		  box-shadow:0 20px 60px rgba(0,0,0,0.3);
-		  overflow:hidden;
-		  border:1px solid rgba(255,255,255,0.6);
-		  animation:modalFadeIn 0.3s ease;
-		">
-		  ${typeof content === 'string' ? content : ''}
+		  const modalContent = document.getElementById('modalContent');
+		  const modal = document.getElementById('modal');
 		  
-		  <!-- Botón cerrar -->
-		  <div style="padding:20px;text-align:center;background:rgba(248,250,252,0.8);border-top:1px solid #e2e8f0;">
-			<button 
-			  onclick="closeModal()" 
-			  style="
-				background:linear-gradient(135deg, #06402b, #0a5c3d);
-				color:#fff;
-				border:none;
-				padding:12px 32px;
-				border-radius:12px;
-				font-weight:700;
-				font-size:0.95rem;
-				cursor:pointer;
-				transition:all 0.3s ease;
-				box-shadow:0 4px 12px rgba(6,64,43,0.3);
-				text-transform:uppercase;
-				letter-spacing:0.5px;
-			  "
-			  onmouseenter="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(6,64,43,0.4)';"
-			  onmouseleave="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(6,64,43,0.3)';">
-			  <i class="fas fa-times-circle" style="margin-right:8px;"></i>
-			  Cerrar
-			</button>
-		  </div>
-		</div>
-		
-		<style>
-		  @keyframes modalFadeIn {
-			from {
-			  opacity: 0;
-			  transform: scale(0.9) translateY(-20px);
-			}
-			to {
-			  opacity: 1;
-			  transform: scale(1) translateY(0);
-			}
-		  }
-		</style>
-	  `;
-	  
-	  modal.classList.add('active');
-	}
+		  modalContent.innerHTML = `
+			<div style="
+			  max-width:700px;
+			  background:#ffffff;
+			  border-radius:8px;
+			  box-shadow:0 4px 16px rgba(0,0,0,0.15);
+			  overflow:hidden;
+			  border:1px solid #e5e7eb;
+			  animation:modalFadeIn 0.25s ease;
+			">
+			  ${typeof content === 'string' ? content : ''}
+			  
+			  <div style="padding:16px;text-align:center;background:#f9fafb;border-top:1px solid #e5e7eb;">
+				<button 
+				  onclick="closeModal()" 
+				  style="
+					background:#06402b;
+					color:#fff;
+					border:none;
+					padding:10px 28px;
+					border-radius:6px;
+					font-weight:600;
+					font-size:0.85rem;
+					cursor:pointer;
+					transition:all 0.3s ease;
+					text-transform:uppercase;
+					letter-spacing:0.5px;
+				  "
+				  onmouseenter="this.style.background='#084d35';"
+				  onmouseleave="this.style.background='#06402b';">
+				  <i class="fas fa-times" style="margin-right:6px;"></i>
+				  Cerrar
+				</button>
+			  </div>
+			</div>
+			
+			<style>
+			  @keyframes modalFadeIn {
+				from {
+				  opacity: 0;
+				  transform: translateY(-10px);
+				}
+				to {
+				  opacity: 1;
+				  transform: translateY(0);
+				}
+			  }
+			</style>
+		  `;
+		  
+		  modal.classList.add('active');
+		}
 		
 	function mostrarPrediosPendientes() {
 	  const pendingList = [];
@@ -10774,4 +10775,3 @@ input.search-bar {
 	  </main>
 </body>
 </html>
-
