@@ -6378,210 +6378,211 @@ input.search-bar {
 	}
 	
 	async function processAsturiasNusefaFile(filename, workbook, timestampCarga) {
-	  console.log(`✅ Procesando archivo ASTURIAS/NUSEFA: ${filename}`);
-
-	  // --- DEFINICIÓN DE CUENTAS ---
-	  const NUSEFA_ENERGIA_ACCOUNTS = new Set(['214262']);
-	  const ASTURIAS_ENERGIA_ACCOUNTS = new Set(['1085817', '1085818', '1136898']);
-	  const NUSEFA_ACUEDUCTO_ACCOUNTS = new Set(['039806', '39806']); // acepta con/sin cero inicial
-	  const ASTURIAS_ACUEDUCTO_ACCOUNTS = new Set(['122860']);
-
-	  // Asegurar que las estructuras existan
-	  ['nusefa', 'asturias'].forEach(u => {
-		if (!appData.energia[u]) appData.energia[u] = {};
-		if (!appData.acueducto[u]) appData.acueducto[u] = {};
-	  });
-
-	  // Procesar cada hoja
-	  for (const sheetName of workbook.SheetNames) {
-		const sheetUpper = sheetName.toUpperCase().trim();
-
-		// ✅ Solo procesar ENERGIA y ACUEDUCTO
-		if (sheetUpper !== 'ENERGIA' && sheetUpper !== 'ACUEDUCTO') {
-		  console.log(`⚠️ Hoja ignorada: "${sheetName}"`);
-		  continue;
-		}
-
-		try {
-		  const worksheet = workbook.Sheets[sheetName];
-		  const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
-		  const maxRows = Math.min(range.e.r + 1, 1000);
-		  const headers = [];
-		  let headerRow = -1;
-
-		  // Buscar encabezados
-		  for (let r = 0; r < Math.min(10, maxRows); r++) {
-			const row = [];
-			for (let c = range.s.c; c <= range.e.c; c++) {
-			  const cell = worksheet[XLSX.utils.encode_cell({ r, c })];
-			  row.push(cell ? String(cell.v || '').trim() : '');
-			}
-			const hasKey = row.some(cell => {
-			  const lower = cell.toLowerCase();
-			  return lower.includes('cuenta') || lower.includes('estacion') || lower.includes('estación') || lower.includes('factura');
-			});
-			if (hasKey) {
-			  headers.push(...row);
-			  headerRow = r;
-			  break;
-			}
-		  }
-		  if (headerRow === -1) continue;
-
-		  // Mapeo de columnas
-		  const COLUMN_MAPPING = sheetUpper === 'ENERGIA' ? {
-			cuenta: ['cuenta', 'numero cuenta', 'no cuenta', 'cta', 'n° cuenta', 'no. cuenta'],
-			estacion: ['estacion', 'estación', 'predio', 'nombre', 'dependencia'],
-			factura: ['factura', 'n° factura', 'numero factura', 'no factura'],
-			kwh: ['kw/h', 'kwh', 'kw / h', 'kilowatios'],
-			energia: ['energia', 'consumo', 'valor energia'],
-			aPublico: ['a. publico', 'a.publico', 'alumbrado publico', 'alumbrado público', 'a publico', 'publico'],
-			aseo: ['aseo', 'servicio aseo'],
-			tramitar: ['total a tramitar', 'tramitar', 'a tramitar', 'total tramitar'],
-			intereses: ['intereses', 'int', 'saldos', 'mora', 'intereses y/o saldos'],
-			direccion: ['direccion', 'dirección', 'dir']
-		  } : {
-			cuenta: ['cuenta', 'numero cuenta', 'no cuenta', 'cta', 'n° cuenta', 'no. cuenta'],
-			estacion: ['estacion', 'estación', 'predio', 'nombre', 'dependencia'],
-			factura: ['factura', 'n° factura', 'numero factura', 'no factura'],
-			m3: ['m3', 'm³', 'm 3'],
-			acueducto: ['acueducto', 'agua'],
-			alcantarillado: ['alcantarillado', 'alcant'],
-			aseo: ['aseo', 'servicio aseo'],
-			tramitar: ['total tramite', 'total a tramitar', 'tramitar', 'a tramitar', 'total tramitar'],
-			intereses: ['intereses', 'int', 'saldos', 'mora', 'intereses y/o saldos'],
-			direccion: ['direccion', 'dirección', 'dir']
-		  };
-
-		  const colMap = {};
-		  for (const [key, patterns] of Object.entries(COLUMN_MAPPING)) {
-			colMap[key] = -1;
-			for (let i = 0; i < headers.length; i++) {
-			  const headerLower = headers[i].toLowerCase().trim();
-			  if (patterns.some(pattern => headerLower === pattern.toLowerCase() || headerLower.includes(pattern.toLowerCase()))) {
-				colMap[key] = i;
-				break;
-			  }
-			}
-		  }
-		  if (colMap.cuenta === -1 && colMap.estacion === -1) continue;
-
-		  let consecutiveEmptyCuenta = 0;
-		  const MAX_EMPTY_CUENTA = sheetUpper === 'ENERGIA' ? 3 : 1;
-
-		  // Procesar filas
-		  for (let r = headerRow + 1; r < maxRows; r++) {
-			const row = [];
-			for (let c = range.s.c; c <= range.e.c; c++) {
-			  const cell = worksheet[XLSX.utils.encode_cell({ r, c })];
-			  const val = cell ? String(cell.v || '').trim() : '';
-			  row.push(val);
-			}
-
-			const estacion = colMap.estacion >= 0 ? row[colMap.estacion] : '';
-			const cuenta = colMap.cuenta >= 0 ? row[colMap.cuenta] : '';
-
-			if (isValidCuenta(cuenta)) {
-			  consecutiveEmptyCuenta = 0;
-			  const upperEstacion = estacion.toUpperCase();
-			  if (upperEstacion.includes('TOTAL') || upperEstacion.includes('SUBTOTAL') ||
-				  upperEstacion.includes('PROMEDIO') || upperEstacion.includes('SUMATORIA')) {
+		console.log(`✅ Procesando archivo ASTURIAS/NUSEFA: ${filename}`);
+		
+		// --- DEFINICIÓN DE CUENTAS ---
+		const NUSEFA_ENERGIA_ACCOUNTS = new Set(['214262']);
+		const ASTURIAS_ENERGIA_ACCOUNTS = new Set(['1085817', '1085818', '1136898']);
+		const NUSEFA_ACUEDUCTO_ACCOUNTS = new Set(['039806', '39806']);
+		const ASTURIAS_ACUEDUCTO_ACCOUNTS = new Set(['122860']);
+		
+		// Asegurar que las estructuras existan
+		['nusefa', 'asturias'].forEach(u => {
+			if (!appData.energia[u]) appData.energia[u] = {};
+			if (!appData.acueducto[u]) appData.acueducto[u] = {};
+		});
+		
+		// Procesar cada hoja
+		for (const sheetName of workbook.SheetNames) {
+			const sheetUpper = sheetName.toUpperCase().trim();
+			
+			// ✅ Solo procesar ENERGIA y ACUEDUCTO
+			if (sheetUpper !== 'ENERGIA' && sheetUpper !== 'ACUEDUCTO') {
+				console.log(`⚠️ Hoja ignorada: "${sheetName}"`);
 				continue;
-			  }
-
-			  // ✅ Determinar servicio y unidad por FILA
-			  const currentService = sheetUpper === 'ENERGIA' ? 'energia' : 'acueducto';
-			  let unidad;
-			  if (currentService === 'energia') {
-				if (NUSEFA_ENERGIA_ACCOUNTS.has(cuenta)) unidad = 'nusefa';
-				else if (ASTURIAS_ENERGIA_ACCOUNTS.has(cuenta)) unidad = 'asturias';
-			  } else {
-				if (NUSEFA_ACUEDUCTO_ACCOUNTS.has(cuenta)) unidad = 'nusefa';
-				else if (ASTURIAS_ACUEDUCTO_ACCOUNTS.has(cuenta)) unidad = 'asturias';
-			  }
-
-			  if (!unidad) {
-				console.warn(`⚠️ Cuenta no mapeada: ${cuenta} en hoja ${sheetName}`);
-				continue;
-			  }
-
-			  // ✅ Construir registro
-			  let record;
-			  if (currentService === 'energia') {
-				const kwh = cleanAndParseFloat(row[colMap.kwh]);
-				const energia = cleanAndParseFloat(row[colMap.energia]);
-				const aPublico = cleanAndParseFloat(row[colMap.aPublico]);
-				const aseo = cleanAndParseFloat(row[colMap.aseo]);
-				const tramitar = cleanAndParseFloat(row[colMap.tramitar]);
-				const intereses = cleanAndParseFloat(row[colMap.intereses]);
-				const factura = colMap.factura >= 0 ? String(row[colMap.factura]).trim() : '';
-				const direccion = colMap.direccion >= 0 ? row[colMap.direccion] : '';
-
-				record = {
-				  ESTACION: estacion,
-				  CUENTA: cuenta,
-				  FACTURA: factura,
-				  CONSUMO: kwh,
-				  CONSUMO_VALOR: energia,
-				  ENERGIA: energia,
-				  A_PUBLICO: aPublico,
-				  ASEO: aseo,
-				  TOTAL_TRAMITAR: tramitar,
-				  INTERESES: intereses,
-				  TOTAL_FACTURA: tramitar + intereses,
-				  DIRECCION: direccion,
-				  _timestamp_carga: timestampCarga
-				};
-			  } else {
-				const m3 = cleanAndParseFloat(row[colMap.m3]);
-				const acueducto = cleanAndParseFloat(row[colMap.acueducto]);
-				const alcantarillado = cleanAndParseFloat(row[colMap.alcantarillado]);
-				const aseo = cleanAndParseFloat(row[colMap.aseo]);
-				const tramitar = cleanAndParseFloat(row[colMap.tramitar]);
-				const intereses = cleanAndParseFloat(row[colMap.intereses]);
-				const factura = colMap.factura >= 0 ? String(row[colMap.factura]).trim() : '';
-				const direccion = colMap.direccion >= 0 ? row[colMap.direccion] : '';
-
-				record = {
-				  ESTACION: estacion,
-				  CUENTA: cuenta,
-				  FACTURA: factura,
-				  CONSUMO: m3,
-				  ACUEDUCTO: acueducto,
-				  ALCANTARILLADO: alcantarillado,
-				  ASEO: aseo,
-				  TOTAL_TRAMITAR: tramitar,
-				  INTERESES: intereses,
-				  TOTAL_FACTURA: tramitar + intereses,
-				  DIRECCION: direccion,
-				  _timestamp_carga: timestampCarga
-				};
-			  }
-
-			  // ✅ Guardar directamente en la unidad y hoja correctas
-			  if (!appData[currentService][unidad][sheetName]) {
-				appData[currentService][unidad][sheetName] = [];
-			  }
-			  appData[currentService][unidad][sheetName].push(record);
-
-			} else {
-			  consecutiveEmptyCuenta++;
-			  if (consecutiveEmptyCuenta >= MAX_EMPTY_CUENTA) break;
 			}
-		  }
-
-		  // Mostrar resumen
-		  ['nusefa', 'asturias'].forEach(u => {
-			const count = appData[currentService]?.[u]?.[sheetName]?.length || 0;
-			if (count > 0) {
-			  console.log(`✅ ${sheetName} → ${currentService.toUpperCase()} / ${u.toUpperCase()}: ${count} registros`);
+			
+			try {
+				const worksheet = workbook.Sheets[sheetName];
+				const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
+				const maxRows = Math.min(range.e.r + 1, 1000);
+				
+				// === 🔧 CORRECCIÓN: currentService declarado AQUÍ (scope correcto) ===
+				const currentService = sheetUpper === 'ENERGIA' ? 'energia' : 'acueducto';
+				// =====================================================================
+				
+				const headers = [];
+				let headerRow = -1;
+				
+				// Buscar encabezados
+				for (let r = 0; r < Math.min(10, maxRows); r++) {
+					const row = [];
+					for (let c = range.s.c; c <= range.e.c; c++) {
+						const cell = worksheet[XLSX.utils.encode_cell({ r, c })];
+						row.push(cell ? String(cell.v || '').trim() : '');
+					}
+					const hasKey = row.some(cell => {
+						const lower = cell.toLowerCase();
+						return lower.includes('cuenta') || lower.includes('estacion') || lower.includes('estación') || lower.includes('factura');
+					});
+					if (hasKey) {
+						headers.push(...row);
+						headerRow = r;
+						break;
+					}
+				}
+				if (headerRow === -1) continue;
+				
+				// Mapeo de columnas
+				const COLUMN_MAPPING = sheetUpper === 'ENERGIA' ? {
+					cuenta: ['cuenta', 'numero cuenta', 'no cuenta', 'cta', 'n° cuenta', 'no. cuenta'],
+					estacion: ['estacion', 'estación', 'predio', 'nombre', 'dependencia'],
+					factura: ['factura', 'n° factura', 'numero factura', 'no factura'],
+					kwh: ['kw/h', 'kwh', 'kw / h', 'kilowatios'],
+					energia: ['energia', 'consumo', 'valor energia'],
+					aPublico: ['a. publico', 'a.publico', 'alumbrado publico', 'alumbrado público', 'a publico', 'publico'],
+					aseo: ['aseo', 'servicio aseo'],
+					tramitar: ['total a tramitar', 'tramitar', 'a tramitar', 'total tramitar'],
+					intereses: ['intereses', 'int', 'saldos', 'mora', 'intereses y/o saldos'],
+					direccion: ['direccion', 'dirección', 'dir']
+				} : {
+					cuenta: ['cuenta', 'numero cuenta', 'no cuenta', 'cta', 'n° cuenta', 'no. cuenta'],
+					estacion: ['estacion', 'estación', 'predio', 'nombre', 'dependencia'],
+					factura: ['factura', 'n° factura', 'numero factura', 'no factura'],
+					m3: ['m3', 'm³', 'm 3'],
+					acueducto: ['acueducto', 'agua'],
+					alcantarillado: ['alcantarillado', 'alcant'],
+					aseo: ['aseo', 'servicio aseo'],
+					tramitar: ['total tramite', 'total a tramitar', 'tramitar', 'a tramitar', 'total tramitar'],
+					intereses: ['intereses', 'int', 'saldos', 'mora', 'intereses y/o saldos'],
+					direccion: ['direccion', 'dirección', 'dir']
+				};
+				
+				const colMap = {};
+				for (const [key, patterns] of Object.entries(COLUMN_MAPPING)) {
+					colMap[key] = -1;
+					for (let i = 0; i < headers.length; i++) {
+						const headerLower = headers[i].toLowerCase().trim();
+						if (patterns.some(pattern => headerLower === pattern.toLowerCase() || headerLower.includes(pattern.toLowerCase()))) {
+							colMap[key] = i;
+							break;
+						}
+					}
+				}
+				if (colMap.cuenta === -1 && colMap.estacion === -1) continue;
+				
+				let consecutiveEmptyCuenta = 0;
+				const MAX_EMPTY_CUENTA = sheetUpper === 'ENERGIA' ? 3 : 1;
+				
+				// Procesar filas (sin redeclarar currentService)
+				for (let r = headerRow + 1; r < maxRows; r++) {
+					const row = [];
+					for (let c = range.s.c; c <= range.e.c; c++) {
+						const cell = worksheet[XLSX.utils.encode_cell({ r, c })];
+						const val = cell ? String(cell.v || '').trim() : '';
+						row.push(val);
+					}
+					const estacion = colMap.estacion >= 0 ? row[colMap.estacion] : '';
+					const cuenta = colMap.cuenta >= 0 ? row[colMap.cuenta] : '';
+					
+					if (isValidCuenta(cuenta)) {
+						consecutiveEmptyCuenta = 0;
+						const upperEstacion = estacion.toUpperCase();
+						if (upperEstacion.includes('TOTAL') || upperEstacion.includes('SUBTOTAL') ||
+							upperEstacion.includes('PROMEDIO') || upperEstacion.includes('SUMATORIA')) {
+							continue;
+						}
+						
+						// ✅ Determinar servicio y unidad por FILA (usando currentService del scope superior)
+						let unidad;
+						if (currentService === 'energia') {
+							if (NUSEFA_ENERGIA_ACCOUNTS.has(cuenta)) unidad = 'nusefa';
+							else if (ASTURIAS_ENERGIA_ACCOUNTS.has(cuenta)) unidad = 'asturias';
+						} else {
+							if (NUSEFA_ACUEDUCTO_ACCOUNTS.has(cuenta)) unidad = 'nusefa';
+							else if (ASTURIAS_ACUEDUCTO_ACCOUNTS.has(cuenta)) unidad = 'asturias';
+						}
+						
+						if (!unidad) {
+							console.warn(`⚠️ Cuenta no mapeada: ${cuenta} en hoja ${sheetName}`);
+							continue;
+						}
+						
+						// ✅ Construir registro
+						let record;
+						if (currentService === 'energia') {
+							const kwh = cleanAndParseFloat(row[colMap.kwh]);
+							const energia = cleanAndParseFloat(row[colMap.energia]);
+							const aPublico = cleanAndParseFloat(row[colMap.aPublico]);
+							const aseo = cleanAndParseFloat(row[colMap.aseo]);
+							const tramitar = cleanAndParseFloat(row[colMap.tramitar]);
+							const intereses = cleanAndParseFloat(row[colMap.intereses]);
+							const factura = colMap.factura >= 0 ? String(row[colMap.factura]).trim() : '';
+							const direccion = colMap.direccion >= 0 ? row[colMap.direccion] : '';
+							record = {
+								ESTACION: estacion,
+								CUENTA: cuenta,
+								FACTURA: factura,
+								CONSUMO: kwh,
+								CONSUMO_VALOR: energia,
+								ENERGIA: energia,
+								A_PUBLICO: aPublico,
+								ASEO: aseo,
+								TOTAL_TRAMITAR: tramitar,
+								INTERESES: intereses,
+								TOTAL_FACTURA: tramitar + intereses,
+								DIRECCION: direccion,
+								_timestamp_carga: timestampCarga
+							};
+						} else {
+							const m3 = cleanAndParseFloat(row[colMap.m3]);
+							const acueducto = cleanAndParseFloat(row[colMap.acueducto]);
+							const alcantarillado = cleanAndParseFloat(row[colMap.alcantarillado]);
+							const aseo = cleanAndParseFloat(row[colMap.aseo]);
+							const tramitar = cleanAndParseFloat(row[colMap.tramitar]);
+							const intereses = cleanAndParseFloat(row[colMap.intereses]);
+							const factura = colMap.factura >= 0 ? String(row[colMap.factura]).trim() : '';
+							const direccion = colMap.direccion >= 0 ? row[colMap.direccion] : '';
+							record = {
+								ESTACION: estacion,
+								CUENTA: cuenta,
+								FACTURA: factura,
+								CONSUMO: m3,
+								ACUEDUCTO: acueducto,
+								ALCANTARILLADO: alcantarillado,
+								ASEO: aseo,
+								TOTAL_TRAMITAR: tramitar,
+								INTERESES: intereses,
+								TOTAL_FACTURA: tramitar + intereses,
+								DIRECCION: direccion,
+								_timestamp_carga: timestampCarga
+							};
+						}
+						
+						// ✅ Guardar directamente en la unidad y hoja correctas
+						if (!appData[currentService][unidad][sheetName]) {
+							appData[currentService][unidad][sheetName] = [];
+						}
+						appData[currentService][unidad][sheetName].push(record);
+						
+					} else {
+						consecutiveEmptyCuenta++;
+						if (consecutiveEmptyCuenta >= MAX_EMPTY_CUENTA) break;
+					}
+				}
+				
+				// ✅ Mostrar resumen (AHORA currentService SÍ está definida)
+				['nusefa', 'asturias'].forEach(u => {
+					const count = appData[currentService]?.[u]?.[sheetName]?.length || 0;
+					if (count > 0) {
+						console.log(`✅ ${sheetName} → ${currentService.toUpperCase()} / ${u.toUpperCase()}: ${count} registros`);
+					}
+				});
+				
+			} catch (err) {
+				console.error(`❌ Error en hoja ${sheetName}:`, err);
 			}
-		  });
-
-		} catch (err) {
-		  console.error(`❌ Error en hoja ${sheetName}:`, err);
 		}
-	  }
 	}
 	
 	async function processGasFile(workbook, timestampCarga) {
@@ -10775,4 +10776,3 @@ input.search-bar {
 	  </main>
 </body>
 </html>
-
