@@ -3710,15 +3710,26 @@ input.search-bar {
 		}
 
 	async function cerrarSesion() {
-	  await window.supabaseClient.auth.signOut();
-	  userRole = null;
-	  userNombre = null;
-	  isAdminMode = false;
-	  document.getElementById('loginEmail').value = '';
-	  document.getElementById('loginPassword').value = '';
-	  document.getElementById('loginError').style.display = 'none';
-	  mostrarLogin();
-	}
+		  await window.supabaseClient.auth.signOut();
+		  userRole = null;
+		  userNombre = null;
+		  isAdminMode = false;
+
+		  // ✅ Si "Recordar mi usuario" está activo, mantenemos el campo lleno; si no, lo limpiamos
+		  const recordarActivo = localStorage.getItem('recordarUsuarioActivo') === 'true';
+		  const campoIdentificador = document.getElementById('loginIdentificador');
+		  if (campoIdentificador) {
+			campoIdentificador.value = recordarActivo ? (localStorage.getItem('recordarUsuarioValor') || '') : '';
+		  }
+
+		  const campoPassword = document.getElementById('loginPassword');
+		  if (campoPassword) campoPassword.value = '';
+
+		  const errorEl = document.getElementById('loginError');
+		  if (errorEl) errorEl.style.display = 'none';
+
+		  mostrarLogin();
+		}
 
 	// ========== GESTIÓN DE USUARIOS (solo admin_principal) ==========
 	async function mostrarGestionUsuarios() {
@@ -11370,12 +11381,6 @@ function toggleNovedadBlock(id) {
 		  }
 		});
 	  });
-
-	  // ✅ NUEVO: Listener para salir del modo administrador
-	  const btnCerrarAdmin = document.getElementById('btnCerrarAdmin');
-	  if (btnCerrarAdmin) {
-		btnCerrarAdmin.addEventListener('click', cerrarModoAdmin);
-	  }
 	  
 	  // Inicializar badge de notificaciones
       actualizarBadgeNotificaciones();
