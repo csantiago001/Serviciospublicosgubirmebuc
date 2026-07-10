@@ -2854,6 +2854,10 @@ input.search-bar {
   color: #64748b;
   cursor: pointer;
 }
+
+#predialContent table tbody td {
+  color: #1e293b !important;
+}
 </style>
 </head>
 <body>
@@ -2991,9 +2995,13 @@ input.search-bar {
 		  <i class="fas fa-balance-scale"></i>
 		  <span>Consolidado</span>
 		</div>
-		<div class="nav-link" data-section="saldos" id="navSaldos" style="display:none;">
+		<div class="nav-link" data-section="saldos">
 		  <i class="fas fa-wallet"></i>
 		  <span>Saldos Presupuestales</span>
+		</div>
+		<div class="nav-link" data-section="predial">
+		  <i class="fas fa-house-chimney"></i>
+		  <span>Impuesto Predial</span>
 		</div>
         <div class="nav-link" data-section="configuracion">
           <i class="fas fa-cog"></i>
@@ -3506,6 +3514,20 @@ input.search-bar {
 				</div>
 			  </div>
 			</div>
+		</section>
+		<!-- IMPUESTO PREDIAL -->
+		<section id="predial" class="page-section">
+		  <h1 style="text-align:center;color:white;font-size:2.3rem;margin-bottom:30px;">
+			<i class="fas fa-house-chimney"></i> Impuesto Predial
+		  </h1>
+		  <div class="service-buttons" id="predialButtons">
+			<button class="service-btn" data-predial="resumen">RESUMEN</button>
+			<button class="service-btn" data-predial="mebuc">MEBUC</button>
+			<button class="service-btn" data-predial="desan">DESAN</button>
+			<button class="service-btn" data-predial="demam">DEMAM</button>
+			<button class="service-btn" data-predial="municipio">POR MUNICIPIO</button>
+		  </div>
+		  <div id="predialContent"></div>
 		</section>
 	<!-- CONFIGURACION -->
 	<section id="configuracion" class="page-section">
@@ -5726,7 +5748,8 @@ input.search-bar {
 	  '5- DEMAM ENERGIA.xlsm',
 	  '6- DEMAM ACUEDUCTO.xlsm',
 	  '7- GAS MEBUC-DESAN-DEMAM.xlsm',
-	  '8- BIESO Y ASTURIAS.xlsm'
+	  '8- BIESO Y ASTURIAS.xlsm',
+	  '11- MATRIZ IMPUESTO PREDIAL.xlsm'
 	];
 
 	// Abrir modal y cargar lista
@@ -6006,6 +6029,11 @@ input.search-bar {
 	  },
 	  gas: { 
 		mebuc: [], desan: [], demam: [], asturias: []
+	  },
+	  
+	  // ========== MÓDULO IMPUESTO PREDIAL ==========
+	  predial: {
+		mebuc: [], vifisMebuc: [], desan: [], vifisDesan: [], demam: []
 	  },
 	  
 	  // ========== MÓDULO SALDOS PRESUPUESTALES ==========
@@ -6764,7 +6792,8 @@ input.search-bar {
 		  '5- DEMAM ENERGIA.xlsm',
 		  '6- DEMAM ACUEDUCTO.xlsm',
 		  '7- GAS MEBUC-DESAN-DEMAM.xlsm',
-		  '8- BIESO Y ASTURIAS.xlsm' // ← 🔑 AGREGADO
+		  '8- BIESO Y ASTURIAS.xlsm',
+		  '11- MATRIZ IMPUESTO PREDIAL.xlsm' // ← 🔑 AGREGADO
 		];
 
 		const promesas = nombresArchivos.map(async (nombre) => {
@@ -6856,8 +6885,11 @@ input.search-bar {
 			const workbook = await readFile(file);
 			const fileName = file.name;
 
+			// ✅ Detectar archivo de Impuesto Predial
+			if (fileName.toLowerCase().includes('predial') || fileName.toLowerCase().includes('matriz')) {
+			  await processImpuestoPredialFile(fileName, workbook, timestampCarga);
 			// ✅ Detectar archivo de ASTURIAS/NUSEFA
-			if (fileName.toLowerCase().includes('asturias') || 
+			} else if (fileName.toLowerCase().includes('asturias') || 
 				fileName.toLowerCase().includes('nusefa') || 
 				fileName.toLowerCase().includes('bieso')) {
 			  await processAsturiasNusefaFile(fileName, workbook, timestampCarga);
@@ -7527,6 +7559,139 @@ input.search-bar {
 					console.error(`❌ Error en hoja ${sheetName}:`, err);
 				}
 			}
+		}
+		
+	// ========== IMPUESTO PREDIAL ==========
+		async function processImpuestoPredialFile(filename, workbook, timestampCarga) {
+		  console.log(`✅ Procesando archivo de Impuesto Predial: ${filename}`);
+
+		  const HOJA_A_UNIDAD = {
+			'MEBUC': 'mebuc',
+			'VIFIS MEBUC': 'vifisMebuc',
+			'DESAN': 'desan',
+			'VIFIS DESAN': 'vifisDesan',
+			'DEMAM': 'demam'
+		  };
+
+		  if (!appData.predial) appData.predial = {};
+
+		  for (const sheetName of workbook.SheetNames) {
+			const sheetUpper = sheetName.toUpperCase().trim();
+			const unidadKey = HOJA_A_UNIDAD[sheetUpper];
+			if (!unidadKey) {
+			  console.log(`⚠️ Hoja ignorada en Impuesto Predial: "${sheetName}"`);
+			  continue;
+			}
+
+			try {
+			  const worksheet = workbook.Sheets[sheetName];
+			  const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
+			  const maxRows = Math.min(range.e.r + 1, 3000);
+
+			  // Buscar la fila de encabezado (DENOMINACION / MUNICIPIO / MATRICULA...)
+			  let headerRow = -1;
+			  let colMap = {};
+			  for (let r = 0; r < Math.min(5, maxRows); r++) {
+				const row = [];
+				for (let c = range.s.c; c <= range.e.c; c++) {
+				  const cell = worksheet[XLSX.utils.encode_cell({ r, c })];
+				  row.push(cell ? String(cell.v ?? '').trim().toUpperCase() : '');
+				}
+				if (row.includes('DENOMINACION') && row.includes('MATRICULA')) {
+				  headerRow = r;
+				  colMap = {
+					denominacion: row.indexOf('DENOMINACION'),
+					municipio: row.indexOf('MUNICIPIO'),
+					matricula: row.indexOf('MATRICULA'),
+					catastral: row.indexOf('CATASTRAL'),
+					factura: row.indexOf('FACTURA'),
+					avaluo: row.indexOf('AVALUO'),
+					totalTramite: row.indexOf('TOTAL TRAMITE')
+				  };
+				  break;
+				}
+			  }
+			  if (headerRow === -1) {
+				console.warn(`⚠️ No se encontró encabezado válido en hoja ${sheetName} de Impuesto Predial`);
+				continue;
+			  }
+
+			  const predios = [];
+			  const matriculasSemestre2 = new Set();
+			  let leyendoSegundaTabla = false;
+			  let filasVaciasSeguidas = 0;
+			  const UMBRAL_FILAS_VACIAS = 5; // tolera huecos de 2-4 filas antes de una segunda tabla real
+
+			  for (let r = headerRow + 1; r < maxRows; r++) {
+				const primeraCelda = worksheet[XLSX.utils.encode_cell({ r, c: 0 })];
+				const primerValor = primeraCelda ? String(primeraCelda.v ?? '').trim() : '';
+
+				// ✅ Detectar el inicio de la tabla de "pago del 2do semestre por aparte"
+				if (primerValor.toUpperCase().includes('PAGO') && primerValor.toUpperCase().includes('SEMESTRE')) {
+				  leyendoSegundaTabla = true;
+				  filasVaciasSeguidas = 0;
+				  r++; // saltar la fila de encabezado repetida de la segunda tabla
+				  continue;
+				}
+
+				// ✅ Fin de los datos reales: columna A vacía varias filas seguidas
+				// (todas las tablas de control/resumen del Excel dejan la columna A en blanco)
+				if (!primerValor) {
+				  filasVaciasSeguidas++;
+				  if (filasVaciasSeguidas >= UMBRAL_FILAS_VACIAS) break;
+				  continue;
+				}
+				filasVaciasSeguidas = 0;
+
+				const matriculaCell = colMap.matricula >= 0 ? worksheet[XLSX.utils.encode_cell({ r, c: colMap.matricula })] : null;
+				const matricula = matriculaCell ? String(matriculaCell.v ?? '').trim() : '';
+				if (!matricula) continue;
+
+				if (leyendoSegundaTabla) {
+				  // Esta fila solo marca que ese predio tuvo su 2do semestre pagado por aparte
+				  matriculasSemestre2.add(matricula);
+				  continue;
+				}
+
+				const getVal = (colIdx) => {
+				  if (colIdx < 0) return null;
+				  const cell = worksheet[XLSX.utils.encode_cell({ r, c: colIdx })];
+				  return cell ? cell.v : null;
+				};
+
+				const denominacion = String(getVal(colMap.denominacion) ?? '').trim();
+				const municipio = String(getVal(colMap.municipio) ?? '').trim();
+				const catastral = String(getVal(colMap.catastral) ?? '').trim();
+				const facturaRaw = getVal(colMap.factura);
+				const factura = (facturaRaw !== null && facturaRaw !== '') ? String(facturaRaw).trim() : '';
+				const avaluo = cleanAndParseFloat(getVal(colMap.avaluo));
+				const totalTramite = cleanAndParseFloat(getVal(colMap.totalTramite));
+
+				predios.push({
+				  denominacion,
+				  municipio,
+				  matricula,
+				  catastral,
+				  factura,
+				  avaluo,
+				  totalTramite,
+				  pagado: factura !== '',
+				  _timestamp_carga: timestampCarga
+				});
+			  }
+
+			  // ✅ Marcar en cada predio si tuvo pago de 2do semestre por aparte
+			  predios.forEach(p => {
+				p.pago2Semestre = matriculasSemestre2.has(p.matricula);
+			  });
+
+			  appData.predial[unidadKey] = predios;
+			  console.log(`✅ ${sheetName} → ${predios.length} predios cargados (${matriculasSemestre2.size} con 2do semestre pagado por aparte)`);
+
+			} catch (err) {
+			  console.error(`❌ Error procesando hoja ${sheetName} de Impuesto Predial:`, err);
+			}
+		  }
 		}
 	
 	async function processGasFile(workbook, timestampCarga) {
@@ -9117,6 +9282,210 @@ function toggleNovedadBlock(id) {
         .sort((a, b) => b.incremento - a.incremento)
         .slice(0, limit);
     }
+	
+	// ========== IMPUESTO PREDIAL: VISTAS ==========
+	document.querySelectorAll('#predialButtons .service-btn').forEach(btn => {
+	  btn.addEventListener('click', function() {
+		const vista = this.getAttribute('data-predial');
+		showPredial(vista, this);
+	  });
+	});
+
+	function showPredial(vista, btnElement) {
+	  document.querySelectorAll('#predialButtons .service-btn').forEach(b => b.classList.remove('active'));
+	  btnElement.classList.add('active');
+	  const content = document.getElementById('predialContent');
+
+	  if (vista === 'resumen') {
+		renderResumenPredial(content);
+	  } else if (vista === 'municipio') {
+		renderPorMunicipioPredial(content);
+	  } else {
+		renderTablaPredial(content, vista);
+	  }
+	}
+
+	function renderTablaPredial(content, unidad) {
+	  const tieneVifis = (unidad === 'mebuc' || unidad === 'desan');
+	  const vifisKey = unidad === 'mebuc' ? 'vifisMebuc' : 'vifisDesan';
+
+	  content.innerHTML = `
+		<div class="section-card" style="padding:18px 22px;">
+		  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+			<div style="display:flex; align-items:center; gap:10px;">
+			  <i class="fas fa-building-columns" style="color:#06402b;"></i>
+			  <h3 id="predialTituloUnidad" style="margin:0; color:#06402b; font-size:1.1rem; font-weight:700;">${unidad.toUpperCase()} — Predios operativos</h3>
+			</div>
+			${tieneVifis ? `
+			  <div style="display:flex; gap:6px;">
+				<button class="vista-toggle-btn active" data-tipo="operativo">Predios operativos</button>
+				<button class="vista-toggle-btn" data-tipo="vifis">Vivienda Fiscal</button>
+			  </div>
+			` : ''}
+		  </div>
+		  <input type="text" id="predialBusqueda" class="search-bar" placeholder="Buscar por predio, matrícula o municipio...">
+		  <div id="predialTablaContainer" style="overflow-x:auto;"></div>
+		</div>
+	  `;
+
+	  let tipoActivo = 'operativo';
+
+	  function pintarTabla() {
+		const key = tipoActivo === 'vifis' ? vifisKey : unidad;
+		const predios = appData.predial?.[key] || [];
+		const busqueda = document.getElementById('predialBusqueda').value.toLowerCase();
+		const filtrados = predios.filter(p =>
+		  !busqueda ||
+		  p.denominacion.toLowerCase().includes(busqueda) ||
+		  p.matricula.toLowerCase().includes(busqueda) ||
+		  p.municipio.toLowerCase().includes(busqueda)
+		);
+
+		const filas = filtrados.map(p => `
+		  <tr>
+			<td style="text-align:left;">${p.denominacion}${p.pago2Semestre ? ' <i class="fas fa-rotate" title="2do semestre pagado por aparte" style="color:#f59e0b;"></i>' : ''}</td>
+			<td>${p.municipio}</td>
+			<td style="font-family:monospace;font-size:0.75rem;">${p.matricula}</td>
+			<td style="text-align:right;">$${p.avaluo.toLocaleString('es-CO')}</td>
+			<td style="text-align:right;font-weight:600;color:#06402b;">$${p.totalTramite.toLocaleString('es-CO')}</td>
+			<td style="text-align:center;">
+			  ${p.pagado
+				? '<span class="badge-estado badge-normal">PAGADO</span>'
+				: '<span class="badge-estado badge-critico">PENDIENTE</span>'}
+			</td>
+		  </tr>
+		`).join('');
+
+		document.getElementById('predialTablaContainer').innerHTML = `
+		  <table style="width:100%;">
+			<thead><tr><th>Predio</th><th>Municipio</th><th>Matrícula</th><th>Avalúo</th><th>Total Tramitado</th><th>Estado</th></tr></thead>
+			<tbody>${filas || '<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:20px;">No hay predios cargados para esta vista</td></tr>'}</tbody>
+		  </table>
+		`;
+	  }
+
+	  document.getElementById('predialBusqueda').addEventListener('input', pintarTabla);
+
+	  if (tieneVifis) {
+		content.querySelectorAll('.vista-toggle-btn').forEach(btn => {
+		  btn.addEventListener('click', () => {
+			content.querySelectorAll('.vista-toggle-btn').forEach(b => b.classList.remove('active'));
+			btn.classList.add('active');
+			tipoActivo = btn.dataset.tipo;
+			document.getElementById('predialTituloUnidad').textContent =
+			  `${unidad.toUpperCase()} — ${tipoActivo === 'vifis' ? 'Vivienda Fiscal' : 'Predios operativos'}`;
+			pintarTabla();
+		  });
+		});
+	  }
+
+	  pintarTabla();
+	}
+
+	function renderResumenPredial(content) {
+	  const unidades = ['mebuc', 'vifisMebuc', 'desan', 'vifisDesan', 'demam'];
+	  const nombres = { mebuc: 'MEBUC', vifisMebuc: 'VIFIS MEBUC', desan: 'DESAN', vifisDesan: 'VIFIS DESAN', demam: 'DEMAM' };
+
+	  let totalPredios = 0, totalPagados = 0, totalTramitado = 0, totalSemestre2 = 0;
+	  const porUnidad = [];
+
+	  unidades.forEach(u => {
+		const predios = appData.predial?.[u] || [];
+		const pagados = predios.filter(p => p.pagado).length;
+		const tramitado = predios.reduce((s, p) => s + p.totalTramite, 0);
+		const semestre2 = predios.filter(p => p.pago2Semestre).length;
+		totalPredios += predios.length;
+		totalPagados += pagados;
+		totalTramitado += tramitado;
+		totalSemestre2 += semestre2;
+		if (predios.length > 0) {
+		  porUnidad.push({ nombre: nombres[u], total: predios.length, pagados, tramitado, semestre2 });
+		}
+	  });
+
+	  const porcentajePagado = totalPredios > 0 ? (totalPagados / totalPredios * 100) : 0;
+
+	  content.innerHTML = `
+		<div class="section-card" style="padding:20px;background:linear-gradient(135deg, #06402b, #0a5c3d);color:white;border-radius:12px;margin-bottom:20px;">
+		  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:15px;">
+			<div style="text-align:center;">
+			  <div style="font-size:0.8rem;opacity:0.85;">Total Predios</div>
+			  <div style="font-size:1.5rem;font-weight:bold;color:#fbbf24;">${totalPredios}</div>
+			</div>
+			<div style="text-align:center;">
+			  <div style="font-size:0.8rem;opacity:0.85;">Pagados</div>
+			  <div style="font-size:1.5rem;font-weight:bold;color:#fbbf24;">${totalPagados} (${porcentajePagado.toFixed(1)}%)</div>
+			</div>
+			<div style="text-align:center;">
+			  <div style="font-size:0.8rem;opacity:0.85;">Pendientes</div>
+			  <div style="font-size:1.5rem;font-weight:bold;color:#fbbf24;">${totalPredios - totalPagados}</div>
+			</div>
+			<div style="text-align:center;">
+			  <div style="font-size:0.8rem;opacity:0.85;">Total Tramitado</div>
+			  <div style="font-size:1.5rem;font-weight:bold;color:#fbbf24;">$${totalTramitado.toLocaleString('es-CO')}</div>
+			</div>
+			<div style="text-align:center;">
+			  <div style="font-size:0.8rem;opacity:0.85;">2do Semestre Aparte</div>
+			  <div style="font-size:1.5rem;font-weight:bold;color:#fbbf24;">${totalSemestre2}</div>
+			</div>
+		  </div>
+		</div>
+		<div class="section-card" style="padding:18px 22px;">
+		  <h3 style="color:#06402b;margin:0 0 14px;font-size:1.05rem;"><i class="fas fa-list"></i> Por unidad</h3>
+		  <table style="width:100%;">
+			<thead><tr><th>Unidad</th><th>Predios</th><th>Pagados</th><th>% Pagado</th><th>Total tramitado</th><th>2do semestre</th></tr></thead>
+			<tbody>
+			  ${porUnidad.map(u => `
+				<tr>
+				  <td>${u.nombre}</td>
+				  <td style="text-align:center;">${u.total}</td>
+				  <td style="text-align:center;color:#22c55e;">${u.pagados}</td>
+				  <td style="text-align:center;">${(u.pagados / u.total * 100).toFixed(1)}%</td>
+				  <td style="text-align:right;font-weight:600;color:#06402b;">$${u.tramitado.toLocaleString('es-CO')}</td>
+				  <td style="text-align:center;">${u.semestre2 > 0 ? `<span style="color:#f59e0b;font-weight:600;">${u.semestre2}</span>` : '-'}</td>
+				</tr>
+			  `).join('')}
+			</tbody>
+		  </table>
+		</div>
+	  `;
+	}
+
+	function renderPorMunicipioPredial(content) {
+	  const unidades = ['mebuc', 'vifisMebuc', 'desan', 'vifisDesan', 'demam'];
+	  const municipios = {};
+
+	  unidades.forEach(u => {
+		(appData.predial?.[u] || []).forEach(p => {
+		  const key = p.municipio || 'SIN MUNICIPIO';
+		  if (!municipios[key]) municipios[key] = { total: 0, pagados: 0, tramitado: 0 };
+		  municipios[key].total++;
+		  if (p.pagado) municipios[key].pagados++;
+		  municipios[key].tramitado += p.totalTramite;
+		});
+	  });
+
+	  const filas = Object.entries(municipios)
+		.sort((a, b) => b[1].tramitado - a[1].tramitado)
+		.map(([nombre, d]) => `
+		  <tr>
+			<td>${nombre}</td>
+			<td style="text-align:center;">${d.total}</td>
+			<td style="text-align:center;">${d.pagados}</td>
+			<td style="text-align:right;font-weight:600;color:#06402b;">$${d.tramitado.toLocaleString('es-CO')}</td>
+		  </tr>
+		`).join('');
+
+	  content.innerHTML = `
+		<div class="section-card" style="padding:18px 22px;">
+		  <h3 style="color:#06402b;margin:0 0 14px;font-size:1.05rem;"><i class="fas fa-map-location-dot"></i> Predios por Municipio/Alcaldía</h3>
+		  <table style="width:100%;">
+			<thead><tr><th>Municipio</th><th>Predios</th><th>Pagados</th><th>Total tramitado</th></tr></thead>
+			<tbody>${filas || '<tr><td colspan="4" style="text-align:center;color:#94a3b8;padding:20px;">No hay datos cargados</td></tr>'}</tbody>
+		  </table>
+		</div>
+	  `;
+	}
 
 	// ========== BÚSQUEDA ==========
 	document.querySelectorAll('#searchButtons .service-btn').forEach(btn => {
