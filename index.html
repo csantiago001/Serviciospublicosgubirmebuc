@@ -4709,6 +4709,112 @@ input.search-bar {
 	  return resultado;
 	}
 	
+	
+	
+	// ✅ Exportar el desglose de proyecciones a Excel
+	async function exportarDesgloseAExcel() {
+	  showLoading();
+	  try {
+		const proyMensual = calcularProyeccionMensualDetallada();
+		const proyAnual = calcularProyeccionAnualDetallada();
+		const ipcUsado = parseFloat(document.getElementById('selectIPC')?.value || 0.15) * 100;
+		const anioSiguiente = new Date().getFullYear() + 1;
+
+		const unidades = ['mebuc', 'desan', 'demam', 'setra', 'asturias', 'nusefa'];
+		const nombresUnidades = {
+		  mebuc: 'MEBUC', desan: 'DESAN', demam: 'DEMAM',
+		  setra: 'SETRA', asturias: 'ASTURIAS', nusefa: 'NUSEFA'
+		};
+		const servicios = ['Energía', 'Alumbrado Público', 'Acueducto', 'Alcantarillado', 'Gas'];
+
+		const workbook = new ExcelJS.Workbook();
+		const sheet = workbook.addWorksheet('Desglose Proyecciones');
+
+		sheet.mergeCells('A1:C1');
+		sheet.getCell('A1').value = 'Desglose de Proyecciones Presupuestales';
+		sheet.getCell('A1').font = { bold: true, size: 14, color: { argb: 'FFFFFFFF' } };
+		sheet.getCell('A1').alignment = { horizontal: 'center', vertical: 'middle' };
+		sheet.getCell('A1').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF06402B' } };
+		sheet.getRow(1).height = 26;
+
+		sheet.mergeCells('A2:C2');
+		sheet.getCell('A2').value = `IPC aplicado: +${ipcUsado.toFixed(2)}%  ·  Proyección para ${anioSiguiente}`;
+		sheet.getCell('A2').font = { italic: true, size: 10, color: { argb: 'FF374151' } };
+		sheet.getCell('A2').alignment = { horizontal: 'center' };
+		sheet.getRow(2).height = 18;
+
+		sheet.addRow([]);
+
+		const headerRow = sheet.addRow(['Unidad / Servicio', 'Mes Próximo', `Presupuesto ${anioSiguiente}`]);
+		headerRow.eachCell(cell => {
+		  cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+		  cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF06402B' } };
+		  cell.alignment = { horizontal: 'center', vertical: 'middle' };
+		});
+
+		let totalMensualGeneral = 0;
+		let totalAnualGeneral = 0;
+
+		unidades.forEach(unidad => {
+		  let subtotalMensual = 0;
+		  let subtotalAnual = 0;
+		  let tieneDatos = false;
+
+		  servicios.forEach(servicio => {
+			const valorMensual = proyMensual[unidad]?.[servicio] || 0;
+			const valorAnual = proyAnual[unidad]?.[servicio] || 0;
+			if (valorMensual > 0 || valorAnual > 0) {
+			  tieneDatos = true;
+			  subtotalMensual += valorMensual;
+			  subtotalAnual += valorAnual;
+
+			  const fila = sheet.addRow([`   ${servicio}`, valorMensual, valorAnual]);
+			  fila.getCell(2).numFmt = '$#,##0';
+			  fila.getCell(3).numFmt = '$#,##0';
+			}
+		  });
+
+		  if (tieneDatos) {
+			const filaSubtotal = sheet.addRow([`Subtotal ${nombresUnidades[unidad]}`, subtotalMensual, subtotalAnual]);
+			filaSubtotal.eachCell(cell => {
+			  cell.font = { bold: true, color: { argb: 'FF065F46' } };
+			  cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDCFCE7' } };
+			});
+			filaSubtotal.getCell(2).numFmt = '$#,##0';
+			filaSubtotal.getCell(3).numFmt = '$#,##0';
+
+			totalMensualGeneral += subtotalMensual;
+			totalAnualGeneral += subtotalAnual;
+
+			sheet.addRow([]);
+		  }
+		});
+
+		const filaTotal = sheet.addRow(['TOTAL GENERAL', totalMensualGeneral, totalAnualGeneral]);
+		filaTotal.eachCell(cell => {
+		  cell.font = { bold: true, size: 12, color: { argb: 'FFFFFFFF' } };
+		  cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFBBF24' } };
+		});
+		filaTotal.getCell(2).numFmt = '$#,##0';
+		filaTotal.getCell(3).numFmt = '$#,##0';
+
+		sheet.getColumn(1).width = 32;
+		sheet.getColumn(2).width = 20;
+		sheet.getColumn(3).width = 22;
+
+		const buffer = await workbook.xlsx.writeBuffer();
+		const fecha = new Date().toISOString().split('T')[0];
+		saveAs(new Blob([buffer]), `Desglose_Proyecciones_GUBIRMEBUC_${fecha}.xlsx`);
+
+		showNotification('✅ Desglose exportado a Excel correctamente', 'success', 3000);
+	  } catch (error) {
+		console.error('❌ Error al exportar desglose:', error);
+		showNotification(`❌ Error al exportar: ${error.message}`, 'error', 4000);
+	  } finally {
+		hideLoading();
+	  }
+	}
+
 	// ✅ Mostrar desglose en modal con diseño profesional mejorado
 	function mostrarDesgloseEnModal() {
 	  const proyMensual = calcularProyeccionMensualDetallada();
@@ -4904,15 +5010,20 @@ input.search-bar {
 			` : ''}
 		  </div>
 		  
-		  <!-- Footer con botón -->
-		  <div class="modal-footer">
-			<button class="btn btn-close-modal" onclick="closeModal()" 
-					style="background:linear-gradient(135deg, #6b7280, #4b5563);color:white;padding:12px 32px;font-size:0.95rem;border:none;border-radius:8px;cursor:pointer;font-weight:600;">
-			  <i class="fas fa-times-circle" style="margin-right:8px;"></i>
-			  Cerrar
-			</button>
+		  <!-- Footer con botones -->
+			<div class="modal-footer" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+			  <button class="btn" onclick="exportarDesgloseAExcel()" 
+					  style="background:linear-gradient(135deg, #10b981, #059669);color:white;padding:12px 32px;font-size:0.95rem;border:none;border-radius:8px;cursor:pointer;font-weight:600;">
+				<i class="fas fa-file-excel" style="margin-right:8px;"></i>
+				Exportar a Excel
+			  </button>
+			  <button class="btn btn-close-modal" onclick="closeModal()" 
+					  style="background:linear-gradient(135deg, #6b7280, #4b5563);color:white;padding:12px 32px;font-size:0.95rem;border:none;border-radius:8px;cursor:pointer;font-weight:600;">
+				<i class="fas fa-times-circle" style="margin-right:8px;"></i>
+				Cerrar
+			  </button>
+			</div>
 		  </div>
-		</div>
 	  `;
 	  
 	  // Usar el modal global ya existente
