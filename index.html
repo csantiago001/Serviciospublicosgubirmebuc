@@ -409,6 +409,48 @@ body::before {
   padding-top: 4.25rem;
 }
 
+/* ===== VISTA PREVIA FLOTANTE DE FONDO ACTUALIZADO ===== */
+.preview-fondo-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.78);
+  backdrop-filter: blur(6px);
+  z-index: 10001;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  animation: fadeIn 0.4s ease;
+}
+.preview-fondo-overlay.active { display: flex; }
+.preview-fondo-card {
+  max-width: 90%;
+  max-height: 85vh;
+  text-align: center;
+  animation: modalSlide 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  cursor: default;
+}
+.preview-fondo-titulo {
+  color: white;
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 16px;
+}
+.preview-fondo-img {
+  max-width: 100%;
+  max-height: 65vh;
+  border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+.preview-fondo-hint {
+  color: rgba(255,255,255,0.7);
+  font-size: 0.85rem;
+  margin-top: 16px;
+}
+
 /* ===== BOTONES DE SERVICIO ===== */
 .service-buttons {
   display: flex;
@@ -12624,21 +12666,42 @@ function toggleNovedadBlock(id) {
 	}
 	
 	// ========== AUTO-ACTUALIZACIÓN DE LA IMAGEN DE FONDO (sin borrar caché) ==========
+	let temporizadorPreviewFondo = null;
+
+	function mostrarPreviewFondo(urlImagen) {
+	  const overlay = document.getElementById('previewFondoOverlay');
+	  const img = document.getElementById('previewFondoImg');
+	  if (!overlay || !img) return;
+
+	  img.src = urlImagen;
+	  overlay.classList.add('active');
+
+	  if (temporizadorPreviewFondo) clearTimeout(temporizadorPreviewFondo);
+	  temporizadorPreviewFondo = setTimeout(cerrarPreviewFondo, 30000);
+	}
+
+	function cerrarPreviewFondo() {
+	  const overlay = document.getElementById('previewFondoOverlay');
+	  if (overlay) overlay.classList.remove('active');
+	  if (temporizadorPreviewFondo) { clearTimeout(temporizadorPreviewFondo); temporizadorPreviewFondo = null; }
+	}
+
 	async function verificarActualizacionFondo() {
 	  try {
 		const resp = await fetch('fondo.jpg', { method: 'HEAD', cache: 'no-store' });
-		if (!resp.ok) return;
+		if (!resp.ok) { console.warn('⚠️ No se pudo leer fondo.jpg, status:', resp.status); return; }
 
 		const version = resp.headers.get('etag') || resp.headers.get('last-modified');
-		if (!version) return; // el servidor no expone esos encabezados; no se puede detectar el cambio
+		if (!version) { console.warn('⚠️ El servidor no expone ETag/Last-Modified para fondo.jpg'); return; }
 
 		const versionGuardada = localStorage.getItem('fondo_version');
 		const fondoConVersion = `fondo.jpg?v=${encodeURIComponent(version)}`;
 
+		// Siempre aplica la versión más reciente como fondo real de la página
 		document.body.style.backgroundImage = `url('${fondoConVersion}')`;
 
 		if (versionGuardada && versionGuardada !== version) {
-		  showNotification('🖼️ Se actualizó la imagen de fondo del sistema', 'success', 4000);
+		  mostrarPreviewFondo(fondoConVersion);
 		}
 		localStorage.setItem('fondo_version', version);
 	  } catch (err) {
@@ -12705,6 +12768,7 @@ function toggleNovedadBlock(id) {
 	document.addEventListener('DOMContentLoaded', () => {
 	  registrarServiceWorker();
 	  verificarActualizacionFondo();
+	  document.getElementById('previewFondoOverlay')?.addEventListener('click', cerrarPreviewFondo);
 	});
 	
 	function initScrollTopButton() {
@@ -12965,6 +13029,15 @@ function toggleNovedadBlock(id) {
 		  <li>Reportes de novedades y comparaciones analíticas</li>
 		</ul>
 	  </main>
+	  
+	<!-- Vista previa flotante de la imagen de fondo (solo cuando se detecta un cambio) -->
+	<div id="previewFondoOverlay" class="preview-fondo-overlay">
+	  <div class="preview-fondo-card">
+		<p class="preview-fondo-titulo"><i class="fas fa-image"></i> Nueva imagen de fondo del sistema</p>
+		<img id="previewFondoImg" src="" alt="Nuevo fondo del sistema" class="preview-fondo-img">
+		<p class="preview-fondo-hint">Toca en cualquier parte de la pantalla para cerrar</p>
+	  </div>
+	</div>
 	  
 	<!-- Modal de instalación de la app (Android + iOS) -->
 	<div id="modalInstalarApp" class="modal">
