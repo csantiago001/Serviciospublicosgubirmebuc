@@ -3,7 +3,9 @@ const ARCHIVOS_CACHE = [
   './index.html',
   './manifest.json',
   './logo.jpeg',
-  './fondo.jpg'
+  './fondo.jpg',
+  './icons/icon-192.png',
+  './icons/icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {
