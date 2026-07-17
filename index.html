@@ -3840,7 +3840,13 @@ input.search-bar {
 	  if (typeof window.supabase === 'undefined') {
 		console.error('❌ Supabase JS no se cargó correctamente. Verifica el CDN.');
 	  } else {
-		window.supabaseClient = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+		window.supabaseClient = window.supabase.createClient(supabaseUrl, supabaseAnonKey, {
+		  auth: {
+			storage: window.sessionStorage,
+			persistSession: true,
+			autoRefreshToken: true
+		  }
+		});
 		console.log('✅ Cliente de Supabase inicializado correctamente.');
 	  }
 	</script>
@@ -3995,6 +4001,7 @@ input.search-bar {
 		}
 
 	async function cerrarSesion() {
+		  detenerControlInactividad();
 		  await window.supabaseClient.auth.signOut();
 		  userRole = null;
 		  userNombre = null;
@@ -4015,6 +4022,34 @@ input.search-bar {
 
 		  mostrarLogin();
 		}
+		
+	// ========== CIERRE DE SESIÓN POR INACTIVIDAD (10 minutos) ==========
+	const TIEMPO_INACTIVIDAD_MS = 10 * 60 * 1000;
+	let temporizadorInactividad = null;
+	let controlInactividadActivo = false;
+
+	function reiniciarTemporizadorInactividad() {
+	  if (temporizadorInactividad) clearTimeout(temporizadorInactividad);
+	  temporizadorInactividad = setTimeout(async () => {
+		showNotification('🔒 Sesión cerrada por inactividad', 'info', 3500);
+		await cerrarSesion();
+	  }, TIEMPO_INACTIVIDAD_MS);
+	}
+
+	function iniciarControlInactividad() {
+	  if (!controlInactividadActivo) {
+		controlInactividadActivo = true;
+		['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(evento => {
+		  document.addEventListener(evento, reiniciarTemporizadorInactividad, { passive: true });
+		});
+	  }
+	  reiniciarTemporizadorInactividad();
+	}
+
+	function detenerControlInactividad() {
+	  if (temporizadorInactividad) clearTimeout(temporizadorInactividad);
+	  temporizadorInactividad = null;
+	}
 
 	// ========== GESTIÓN DE USUARIOS (solo admin_principal) ==========
 	async function mostrarGestionUsuarios() {
@@ -12136,23 +12171,23 @@ function toggleNovedadBlock(id) {
 	// ========== CONFIGURACIÓN: ACCESIBILIDAD ==========
 	function aplicarAccesibilidad() {
 	  const altoContraste = localStorage.getItem('accesibilidad_alto_contraste') === 'true';
-	
+
 	  // Si el usuario nunca eligió un tamaño manualmente, usar "muy pequeño" cuando
 	  // se abre como app instalada (más compacto, se siente nativo), o "normal" en el navegador.
 	  let tamano = localStorage.getItem('accesibilidad_tamano_texto');
 	  if (!tamano) {
-	    tamano = (typeof appYaInstalada === 'function' && appYaInstalada()) ? 'xs' : 'm';
+		tamano = (typeof appYaInstalada === 'function' && appYaInstalada()) ? 'xs' : 'm';
 	  }
-	
+
 	  // Aplicar alto contraste
 	  document.body.classList.toggle('accesibilidad-alto-contraste', altoContraste);
-	
+
 	  // Aplicar tamaño de letra global (escala el <html>, y como todo el sistema usa rem, se reescala todo)
 	  document.documentElement.setAttribute('data-font-size', tamano);
-	
+
 	  // Reflejar botón activo en el selector de tamaño de letra
 	  document.querySelectorAll('.tamano-texto-btn').forEach(btn => {
-	    btn.classList.toggle('active', btn.dataset.tamano === tamano);
+		btn.classList.toggle('active', btn.dataset.tamano === tamano);
 	  });
 	}
 
@@ -12588,6 +12623,29 @@ function toggleNovedadBlock(id) {
 	  }
 	}
 	
+	// ========== AUTO-ACTUALIZACIÓN DE LA IMAGEN DE FONDO (sin borrar caché) ==========
+	async function verificarActualizacionFondo() {
+	  try {
+		const resp = await fetch('fondo.jpg', { method: 'HEAD', cache: 'no-store' });
+		if (!resp.ok) return;
+
+		const version = resp.headers.get('etag') || resp.headers.get('last-modified');
+		if (!version) return; // el servidor no expone esos encabezados; no se puede detectar el cambio
+
+		const versionGuardada = localStorage.getItem('fondo_version');
+		const fondoConVersion = `fondo.jpg?v=${encodeURIComponent(version)}`;
+
+		document.body.style.backgroundImage = `url('${fondoConVersion}')`;
+
+		if (versionGuardada && versionGuardada !== version) {
+		  showNotification('🖼️ Se actualizó la imagen de fondo del sistema', 'success', 4000);
+		}
+		localStorage.setItem('fondo_version', version);
+	  } catch (err) {
+		console.warn('No se pudo verificar la versión del fondo:', err);
+	  }
+	}
+	
 	// ========== PROMPT DE INSTALACIÓN AUTOMÁTICO (Android + iOS) ==========
 	let deferredInstallPrompt = null;
 
@@ -12644,7 +12702,10 @@ function toggleNovedadBlock(id) {
 	// El Service Worker debe registrarse apenas carga la página, SIN esperar el login,
 	// para que Chrome reconozca el sitio como instalable (PWA completa) y no solo
 	// ofrezca "Crear acceso directo".
-	document.addEventListener('DOMContentLoaded', registrarServiceWorker);
+	document.addEventListener('DOMContentLoaded', () => {
+	  registrarServiceWorker();
+	  verificarActualizacionFondo();
+	});
 	
 	function initScrollTopButton() {
 	  const btn = document.getElementById('scrollTopBtn');
@@ -12777,6 +12838,7 @@ function toggleNovedadBlock(id) {
 	// ========== INICIALIZACIÓN (solo se ejecuta tras iniciar sesión) ==========
 	function initApp() {
 	  initMobileMenu();
+	  iniciarControlInactividad();
 	  registrarServiceWorker();
 	  initScrollTopButton();
 	  document.querySelectorAll('.service-btn').forEach(btn => {
