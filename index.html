@@ -416,7 +416,7 @@ body::before {
   inset: 0;
   background: rgba(0,0,0,0.78);
   backdrop-filter: blur(6px);
-  z-index: 10001;
+  z-index: 20500; /* por encima del overlay de "Procesando Información" (20000) */
   align-items: center;
   justify-content: center;
   cursor: pointer;
@@ -424,8 +424,8 @@ body::before {
 }
 .preview-fondo-overlay.active { display: flex; }
 .preview-fondo-card {
-  max-width: 90%;
-  max-height: 85vh;
+  max-width: 96%;
+  max-height: 92vh;
   text-align: center;
   animation: modalSlide 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   cursor: default;
@@ -437,8 +437,8 @@ body::before {
   margin-bottom: 16px;
 }
 .preview-fondo-img {
-  max-width: 100%;
-  max-height: 65vh;
+  max-width: 96vw;
+  max-height: 82vh;
   border-radius: 16px;
   box-shadow: 0 20px 50px rgba(0,0,0,0.5);
   object-fit: contain;
