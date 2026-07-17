@@ -12136,17 +12136,23 @@ function toggleNovedadBlock(id) {
 	// ========== CONFIGURACIÓN: ACCESIBILIDAD ==========
 	function aplicarAccesibilidad() {
 	  const altoContraste = localStorage.getItem('accesibilidad_alto_contraste') === 'true';
-	  const tamano = localStorage.getItem('accesibilidad_tamano_texto') || 'm';
-
+	
+	  // Si el usuario nunca eligió un tamaño manualmente, usar "muy pequeño" cuando
+	  // se abre como app instalada (más compacto, se siente nativo), o "normal" en el navegador.
+	  let tamano = localStorage.getItem('accesibilidad_tamano_texto');
+	  if (!tamano) {
+	    tamano = (typeof appYaInstalada === 'function' && appYaInstalada()) ? 'xs' : 'm';
+	  }
+	
 	  // Aplicar alto contraste
 	  document.body.classList.toggle('accesibilidad-alto-contraste', altoContraste);
-
+	
 	  // Aplicar tamaño de letra global (escala el <html>, y como todo el sistema usa rem, se reescala todo)
 	  document.documentElement.setAttribute('data-font-size', tamano);
-
+	
 	  // Reflejar botón activo en el selector de tamaño de letra
 	  document.querySelectorAll('.tamano-texto-btn').forEach(btn => {
-		btn.classList.toggle('active', btn.dataset.tamano === tamano);
+	    btn.classList.toggle('active', btn.dataset.tamano === tamano);
 	  });
 	}
 
