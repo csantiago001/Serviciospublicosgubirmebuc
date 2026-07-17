@@ -1,32 +1,25 @@
 {
-  "name": "Sistema de Gestión de Servicios Públicos GUBIR MEBUC",
+  "name": "GUBIR MEBUC",
   "short_name": "GUBIR MEBUC",
-  "description": "Sistema de gestión presupuestal de servicios públicos - Policía Metropolitana de Bucaramanga",
+  "description": "Sistema de Gestión de Servicios Públicos - Policía Metropolitana de Bucaramanga",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "orientation": "any",
   "background_color": "#06402b",
   "theme_color": "#06402b",
-  "lang": "es",
+  "orientation": "any",
   "icons": [
     {
-      "src": "icons/icon-192.png",
+      "src": "logo.jpeg",
       "sizes": "192x192",
-      "type": "image/png",
+      "type": "image/jpeg",
       "purpose": "any"
     },
     {
-      "src": "icons/icon-512.png",
+      "src": "logo.jpeg",
       "sizes": "512x512",
-      "type": "image/png",
+      "type": "image/jpeg",
       "purpose": "any"
-    },
-    {
-      "src": "icons/icon-maskable-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
     }
   ]
 }
