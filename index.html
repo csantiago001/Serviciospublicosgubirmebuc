@@ -2888,14 +2888,19 @@ input.search-bar {
   position: fixed;
   inset: 0;
   z-index: 999999;
-  background: linear-gradient(135deg, #06402b 0%, #0a5c3d 100%);
+  background:
+    linear-gradient(135deg, rgba(6,64,43,0.75) 0%, rgba(10,92,61,0.75) 100%),
+    url('fondo.jpg') center center / cover no-repeat fixed;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
 }
 .login-card {
-  background: rgba(255,255,255,0.98);
+  background: rgba(255,255,255,0.16);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.3);
   border-radius: 20px;
   padding: 40px 36px;
   width: 100%;
@@ -2924,13 +2929,14 @@ input.search-bar {
   object-fit: cover;
 }
 .login-card h2 {
-  color: #06402b;
+  color: #ffffff;
   margin-bottom: 6px;
   font-size: 1.4rem;
   font-weight: 700;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 .login-card p.subtitle {
-  color: #64748b;
+  color: rgba(255,255,255,0.85);
   font-size: 0.85rem;
   margin-bottom: 24px;
 }
@@ -4066,7 +4072,7 @@ input.search-bar {
 		}
 		
 	// ========== CIERRE DE SESIÓN POR INACTIVIDAD (10 minutos) ==========
-	const TIEMPO_INACTIVIDAD_MS = 10 * 60 * 1000;
+	const TIEMPO_INACTIVIDAD_MS = 15 * 1000;
 	let temporizadorInactividad = null;
 	let controlInactividadActivo = false;
 
@@ -12659,9 +12665,24 @@ function toggleNovedadBlock(id) {
 	
 	function registrarServiceWorker() {
 	  if ('serviceWorker' in navigator) {
-		navigator.serviceWorker.register('service-worker.js')
-		  .then(() => console.log('✅ Service Worker registrado'))
-		  .catch((err) => console.warn('⚠️ No se pudo registrar el Service Worker:', err));
+		navigator.serviceWorker.register('service-worker.js').then((registro) => {
+		  console.log('✅ Service Worker registrado');
+
+		  // Forzar revisión inmediata de una versión nueva cada vez que se abre la app
+		  registro.update();
+
+		  // Si se detecta una versión nueva instalándose, esperar a que termine y recargar
+		  registro.addEventListener('updatefound', () => {
+			const nuevoWorker = registro.installing;
+			if (!nuevoWorker) return;
+			nuevoWorker.addEventListener('statechange', () => {
+			  if (nuevoWorker.state === 'installed' && navigator.serviceWorker.controller) {
+				console.log('🔄 Nueva versión detectada, recargando...');
+				window.location.reload();
+			  }
+			});
+		  });
+		}).catch((err) => console.warn('⚠️ No se pudo registrar el Service Worker:', err));
 	  }
 	}
 	
