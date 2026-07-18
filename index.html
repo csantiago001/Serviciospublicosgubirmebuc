@@ -12760,16 +12760,21 @@ function toggleNovedadBlock(id) {
 		const versionGuardada = localStorage.getItem('fondo_version');
 		const fondoConVersion = `fondo.jpg?v=${encodeURIComponent(version)}`;
 
+		const esMovil = window.matchMedia('(max-width: 768px)').matches;
+
 		// Actualiza el fondo del panel principal
 		document.body.style.backgroundImage = `url('${fondoConVersion}')`;
+		document.body.style.backgroundSize = esMovil ? 'contain' : 'cover';
+		if (esMovil) document.body.style.backgroundColor = '#0a3441';
 
 		// Actualiza también el fondo de la pantalla de login
 		const loginOverlay = document.getElementById('loginOverlay');
 		if (loginOverlay) {
 		  loginOverlay.style.backgroundImage = `url('${fondoConVersion}')`;
-		  loginOverlay.style.backgroundSize = 'cover';
+		  loginOverlay.style.backgroundSize = esMovil ? 'contain' : 'cover';
 		  loginOverlay.style.backgroundPosition = 'center center';
 		  loginOverlay.style.backgroundRepeat = 'no-repeat';
+		  if (esMovil) loginOverlay.style.backgroundColor = '#0a3441';
 		}
 
 		if (versionGuardada && versionGuardada !== version) {
