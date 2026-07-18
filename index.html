@@ -2895,9 +2895,9 @@ input.search-bar {
   padding: 20px;
 }
 .login-card {
-  background: rgba(255,255,255,0.00);
-  backdrop-filter: blur(7px);
-  -webkit-backdrop-filter: blur(7px);
+  background: rgba(255,255,255,0.16);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
   border: 1px solid rgba(255,255,255,0.3);
   border-radius: 20px;
   padding: 40px 36px;
@@ -2908,6 +2908,18 @@ input.search-bar {
   box-sizing: border-box;
   max-height: 92vh;
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.4) transparent;
+}
+.login-card::-webkit-scrollbar {
+  width: 5px;
+}
+.login-card::-webkit-scrollbar-track {
+  background: transparent;
+}
+.login-card::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.4);
+  border-radius: 10px;
 }
 .login-card .login-icon {
   width: 120px;
@@ -8885,79 +8897,44 @@ input.search-bar {
 			return;
 		  }
 
-		  // Construir modal con todos los servicios
+		  // Construir modal con pestañas (un solo scroll, sin contenedores anidados)
 		  let modalHtml = `
-			<div style="padding:8px;">
-			  <div style="
-				background:#06402b;
-				padding:20px;
-				border-radius:8px 8px 0 0;
-				text-align:center;
-			  ">
-				<h3 style="color:#fff;margin:0 0 6px 0;font-size:1.2rem;font-weight:700;">
-				  Predios Pendientes
-				</h3>
-				<p style="color:rgba(255,255,255,0.9);margin:0;font-size:0.9rem;font-weight:500;">
-				  ${unit.toUpperCase()}
-				</p>
+			<div style="padding:0;">
+			  <div style="background:#06402b;padding:20px;border-radius:8px 8px 0 0;text-align:center;">
+				<h3 style="color:#fff;margin:0 0 6px 0;font-size:1.2rem;font-weight:700;">Predios Pendientes</h3>
+				<p style="color:rgba(255,255,255,0.9);margin:0;font-size:0.9rem;font-weight:500;">${unit.toUpperCase()}</p>
 			  </div>
 
-			  <div style="max-height:500px;overflow-y:auto;background:#f9fafb;">
+			  <div style="display:flex;gap:8px;padding:14px 16px 0;flex-wrap:wrap;background:#f9fafb;">
 		  `;
 
 		  todosLosPendientes.forEach((servicioData, idx) => {
-			const totalPendientes = servicioData.pendientes.length;
-			
+			const activo = idx === 0;
 			modalHtml += `
-			  <div style="background:#fff;margin:16px;border-radius:6px;border:1px solid #e5e7eb;overflow:hidden;">
-				<div style="
-				  background:#f9fafb;
-				  padding:12px 16px;
-				  border-bottom:2px solid #06402b;
-				  display:flex;
-				  justify-content:space-between;
-				  align-items:center;
-				">
-				  <div style="display:flex;align-items:center;gap:8px;">
-					<i class="fas ${servicioData.icono}" style="font-size:0.9rem;color:#06402b;"></i>
-					<span style="font-weight:700;color:#1f2937;font-size:0.95rem;">
-					  ${servicioData.nombre}
-					</span>
-				  </div>
-				  <span style="
-					background:#06402b;
-					color:#fff;
-					padding:4px 12px;
-					border-radius:12px;
-					font-weight:600;
-					font-size:0.75rem;
-				  ">
-					${totalPendientes} ${totalPendientes === 1 ? 'pendiente' : 'pendientes'}
-				  </span>
-				</div>
+				<button
+				  class="tab-predio-btn"
+				  onclick="cambiarTabPredios(${idx})"
+				  style="display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:20px;border:1.5px solid #06402b;background:${activo ? '#06402b' : '#fff'};color:${activo ? '#fff' : '#06402b'};font-weight:600;font-size:0.8rem;cursor:pointer;transition:all 0.2s;">
+				  <i class="fas ${servicioData.icono}"></i> ${servicioData.nombre}
+				  <span style="background:${activo ? 'rgba(255,255,255,0.25)' : '#06402b'};color:#fff;padding:2px 8px;border-radius:10px;font-size:0.7rem;">${servicioData.pendientes.length}</span>
+				</button>
+			`;
+		  });
 
-				<div style="max-height:250px;overflow-y:auto;">
+		  modalHtml += `
+			  </div>
+
+			  <div style="padding:16px;background:#f9fafb;">
+		  `;
+
+		  todosLosPendientes.forEach((servicioData, idx) => {
+			modalHtml += `
+				<div id="tab-predio-${idx}" class="tab-predio-panel" style="display:${idx === 0 ? 'block' : 'none'};background:#fff;border-radius:6px;border:1px solid #e5e7eb;overflow:hidden;">
 				  <table style="width:100%;border-collapse:collapse;">
-					<thead style="position:sticky;top:0;z-index:10;">
+					<thead>
 					  <tr style="background:#1f2937;">
-						<th style="
-						  color:#fff;
-						  padding:10px 12px;
-						  text-align:center;
-						  font-weight:600;
-						  font-size:0.75rem;
-						  text-transform:uppercase;
-						  border-bottom:2px solid #06402b;
-						">Cuenta</th>
-						<th style="
-						  color:#fff;
-						  padding:10px 12px;
-						  text-align:left;
-						  font-weight:600;
-						  font-size:0.75rem;
-						  text-transform:uppercase;
-						  border-bottom:2px solid #06402b;
-						">Predio</th>
+						<th style="color:#fff;padding:10px 12px;text-align:center;font-weight:600;font-size:0.75rem;text-transform:uppercase;border-bottom:2px solid #06402b;">Cuenta</th>
+						<th style="color:#fff;padding:10px 12px;text-align:left;font-weight:600;font-size:0.75rem;text-transform:uppercase;border-bottom:2px solid #06402b;">Predio</th>
 					  </tr>
 					</thead>
 					<tbody>
@@ -8966,24 +8943,10 @@ input.search-bar {
 			servicioData.pendientes.forEach((p, index) => {
 			  const bgColor = index % 2 === 0 ? '#f9fafb' : '#fff';
 			  modalHtml += `
-				<tr style="background:${bgColor};transition:background 0.2s;"
-				onmouseenter="this.style.background='#eff6ff';"
-				onmouseleave="this.style.background='${bgColor}';">
-				  <td style="
-					padding:10px 12px;
-					border-bottom:1px solid #e5e7eb;
-					text-align:center;
-					font-weight:600;
-					color:#1f2937;
-					font-size:0.85rem;
-				  ">${p.cuenta}</td>
-				  <td style="
-					padding:10px 12px;
-					border-bottom:1px solid #e5e7eb;
-					color:#475569;
-					font-size:0.85rem;
-				  ">${p.predio}</td>
-				</tr>
+					  <tr style="background:${bgColor};" onmouseenter="this.style.background='#eff6ff';" onmouseleave="this.style.background='${bgColor}';">
+						<td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;text-align:center;font-weight:600;color:#1f2937;font-size:0.85rem;">${p.cuenta}</td>
+						<td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;color:#475569;font-size:0.85rem;">${p.predio}</td>
+					  </tr>
 			  `;
 			});
 
@@ -8991,7 +8954,6 @@ input.search-bar {
 					</tbody>
 				  </table>
 				</div>
-			  </div>
 			`;
 		  });
 
@@ -8999,14 +8961,8 @@ input.search-bar {
 
 		  modalHtml += `
 			  </div>
-			  
-			  <div style="
-				background:#f9fafb;
-				padding:14px;
-				border-radius:0 0 8px 8px;
-				text-align:center;
-				border-top:2px solid #e5e7eb;
-			  ">
+
+			  <div style="background:#f9fafb;padding:14px;border-radius:0 0 8px 8px;text-align:center;border-top:2px solid #e5e7eb;">
 				<p style="color:#64748b;font-size:0.8rem;margin:0;">
 				  <i class="fas fa-info-circle" style="margin-right:6px;color:#06402b;"></i>
 				  Total: <strong style="color:#06402b;">${totalGeneral}</strong> ${totalGeneral === 1 ? 'predio pendiente' : 'predios pendientes'}
@@ -9016,6 +8972,19 @@ input.search-bar {
 		  `;
 
 		  showSimpleModal(modalHtml);
+		}
+
+		function cambiarTabPredios(index) {
+		  document.querySelectorAll('.tab-predio-panel').forEach((panel, i) => {
+			panel.style.display = i === index ? 'block' : 'none';
+		  });
+		  document.querySelectorAll('.tab-predio-btn').forEach((btn, i) => {
+			const activo = i === index;
+			btn.style.background = activo ? '#06402b' : '#fff';
+			btn.style.color = activo ? '#fff' : '#06402b';
+			const badge = btn.querySelector('span');
+			if (badge) badge.style.background = activo ? 'rgba(255,255,255,0.25)' : '#06402b';
+		  });
 		}
 
 	function showSimpleModal(content) {
