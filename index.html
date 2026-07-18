@@ -2888,9 +2888,7 @@ input.search-bar {
   position: fixed;
   inset: 0;
   z-index: 999999;
-  background:
-    linear-gradient(135deg, rgba(6,64,43,0.75) 0%, rgba(10,92,61,0.75) 100%),
-    url('fondo.jpg') center center / cover no-repeat fixed;
+  background: url('fondo.jpg') center center / cover no-repeat fixed;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2965,6 +2963,24 @@ input.search-bar {
 .login-input-group input:focus {
   border-color: #06402b;
 }
+.login-input-group .toggle-password {
+  position: absolute;
+  right: 14px;
+  left: auto;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #94a3b8;
+  font-size: 0.95rem;
+  transition: color 0.2s;
+}
+.login-input-group .toggle-password:hover {
+  color: #06402b;
+}
+.login-input-group input[type="password"],
+.login-input-group input.password-visible {
+  padding-right: 40px;
+}
 #loginError {
   display: none;
   background: #fef2f2;
@@ -3006,8 +3022,9 @@ input.search-bar {
 }
 .login-remember-row label {
   font-size: 0.82rem;
-  color: #64748b;
+  color: rgba(255,255,255,0.9);
   cursor: pointer;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.25);
 }
 
 #predialContent table tbody td {
@@ -3061,18 +3078,19 @@ input.search-bar {
 	 <div class="login-input-group">
 	   <i class="fas fa-lock"></i>
 	   <input type="password" id="loginPassword" placeholder="Contraseña" autocomplete="current-password">
+	   <i class="fas fa-eye toggle-password" id="toggleLoginPassword" onclick="alternarVisibilidadPassword()"></i>
 	 </div>
 	 <div class="login-remember-row">
 	   <input type="checkbox" id="loginRecordarme">
 	   <label for="loginRecordarme">Recordar mi usuario</label>
 	 </div>
 	 <button id="btnLoginSubmit"><i class="fas fa-arrow-right-to-bracket"></i> Iniciar sesión</button>
-	 <p style="margin-top:16px;font-size:0.78rem;color:#94a3b8;text-align:center;line-height:1.4;">
+	 <p style="margin-top:16px;font-size:0.78rem;color:rgba(255,255,255,0.85);text-align:center;line-height:1.4;text-shadow:0 1px 4px rgba(0,0,0,0.3);">
 	  Solicite su usuario al administrador<br>
-	  <strong style="color:#475569;">IT. Ayala Díaz</strong>
-	  <span style="color:#CBD5E1; margin:0 8px;">•</span>
-	  <span style="color:#64748B;">312 429 6039</span><br>
-	  <span style="font-size:0.65rem; color:#94A3B8;">DESARROLLADO POR SI. SANTIAGO ESCORCIA CARLOS</span>
+	  <strong style="color:#ffffff;">IT. Ayala Díaz</strong>
+	  <span style="color:rgba(255,255,255,0.6); margin:0 8px;">•</span>
+	  <span style="color:rgba(255,255,255,0.85);">312 429 6039</span><br>
+	  <span style="font-size:0.65rem; color:rgba(255,255,255,0.7);">DESARROLLADO POR SI. SANTIAGO ESCORCIA CARLOS</span>
 	</p>
    </div>
  </div>
@@ -3990,6 +4008,18 @@ input.search-bar {
 	  } else {
 		mostrarLogin();
 	  }
+	}
+	
+	function alternarVisibilidadPassword() {
+	  const input = document.getElementById('loginPassword');
+	  const icono = document.getElementById('toggleLoginPassword');
+	  if (!input || !icono) return;
+
+	  const mostrar = input.type === 'password';
+	  input.type = mostrar ? 'text' : 'password';
+	  input.classList.toggle('password-visible', mostrar);
+	  icono.classList.toggle('fa-eye', !mostrar);
+	  icono.classList.toggle('fa-eye-slash', mostrar);
 	}
 
 	async function iniciarSesion() {
@@ -12718,8 +12748,17 @@ function toggleNovedadBlock(id) {
 		const versionGuardada = localStorage.getItem('fondo_version');
 		const fondoConVersion = `fondo.jpg?v=${encodeURIComponent(version)}`;
 
-		// Siempre aplica la versión más reciente como fondo real de la página
+		// Actualiza el fondo del panel principal
 		document.body.style.backgroundImage = `url('${fondoConVersion}')`;
+
+		// Actualiza también el fondo de la pantalla de login
+		const loginOverlay = document.getElementById('loginOverlay');
+		if (loginOverlay) {
+		  loginOverlay.style.backgroundImage = `url('${fondoConVersion}')`;
+		  loginOverlay.style.backgroundSize = 'cover';
+		  loginOverlay.style.backgroundPosition = 'center center';
+		  loginOverlay.style.backgroundRepeat = 'no-repeat';
+		}
 
 		if (versionGuardada && versionGuardada !== version) {
 		  mostrarPreviewFondo(fondoConVersion);
