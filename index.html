@@ -3062,6 +3062,18 @@ input.search-bar {
   background: #0a5c3d;
   transform: translateY(-4px) scale(1.08);
 }
+
+/* Solo en pantallas angostas (celulares) se ve la imagen completa sin recortar */
+@media (max-width: 768px) {
+  body {
+    background-color: #0a3441;
+    background-size: contain !important;
+  }
+  #loginOverlay {
+    background-color: #0a3441;
+    background-size: contain !important;
+  }
+}
 </style>
 </head>
 <body>
