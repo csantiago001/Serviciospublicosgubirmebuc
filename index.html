@@ -3975,6 +3975,12 @@ input.search-bar {
 // ========== AUTENTICACIÓN Y ROLES ==========
 	const EDGE_FUNCTION_CREATE_USER = 'https://jjbjgrnhnlmmlilbrqbx.supabase.co/functions/v1/create-user';
 	const EDGE_FUNCTION_RESET_PASSWORD = 'https://jjbjgrnhnlmmlilbrqbx.supabase.co/functions/v1/admin-reset-password';
+	const EDGE_FUNCTION_DELETE_USER = 'https://jjbjgrnhnlmmlilbrqbx.supabase.co/functions/v1/admin-delete-user';
+
+	// ✅ Normaliza usuario/correo: sin mayúsculas, sin tildes, sin espacios extra
+	function normalizarIdentificador(texto) {
+	  return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+	}
 
 	async function aplicarRolEnInterfaz() {
 	  const navSaldos = document.getElementById('navSaldos');
@@ -4047,7 +4053,8 @@ input.search-bar {
 	}
 
 	async function iniciarSesion() {
-		  const identificador = document.getElementById('loginIdentificador').value.trim();
+		  const identificadorOriginal = document.getElementById('loginIdentificador').value.trim();
+		  const identificador = normalizarIdentificador(identificadorOriginal);
 		  const password = document.getElementById('loginPassword').value;
 		  const recordarme = document.getElementById('loginRecordarme').checked;
 		  const btn = document.getElementById('btnLoginSubmit');
@@ -4061,7 +4068,7 @@ input.search-bar {
 		  btn.disabled = true;
 		  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Ingresando...';
 
-		  // ✅ Detectar si escribió un correo o un nombre de usuario
+		  // ✅ Detectar si escribió un correo o un nombre de usuario (ya normalizado)
 		  let emailParaLogin = identificador;
 		  if (!identificador.includes('@')) {
 			const { data: correoEncontrado, error: rpcError } = await window.supabaseClient
@@ -4086,10 +4093,10 @@ input.search-bar {
 			return;
 		  }
 
-		  // ✅ Guardar o borrar el "recordarme"
+		  // ✅ Guardar o borrar el "recordarme" (se guarda tal como lo escribió)
 		  if (recordarme) {
 			localStorage.setItem('recordarUsuarioActivo', 'true');
-			localStorage.setItem('recordarUsuarioValor', identificador);
+			localStorage.setItem('recordarUsuarioValor', identificadorOriginal);
 		  } else {
 			localStorage.removeItem('recordarUsuarioActivo');
 			localStorage.removeItem('recordarUsuarioValor');
@@ -4160,9 +4167,13 @@ input.search-bar {
 		return;
 	  }
 
+	  // ✅ ID del admin actual para no permitir auto-eliminarse
+	  const { data: { session } } = await window.supabaseClient.auth.getSession();
+	  const miId = session?.user?.id || '';
+
 	  const { data: usuarios, error } = await window.supabaseClient
 		.from('usuarios_roles')
-		.select('id, email, nombre, rol')
+		.select('id, email, nombre, rol, usuario')
 		.order('email');
 
 	  if (error) {
@@ -4185,6 +4196,13 @@ input.search-bar {
 			<button class="btn-accion" style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#06402b;" onclick="resetearPasswordUsuario('${u.id}', '${u.email}')" title="Restablecer contraseña">
 			  <i class="fas fa-key"></i>
 			</button>
+		  </td>
+		  <td style="padding:8px;text-align:center;">
+			${u.id === miId
+			  ? '<span style="font-size:0.75rem;color:#94a3b8;" title="No puedes eliminar tu propia cuenta">Tú</span>'
+			  : `<button class="btn-accion" style="background:linear-gradient(135deg,#f87171,#ef4444);color:#fff;" onclick="eliminarUsuarioSistema('${u.id}', '${u.email}')" title="Eliminar usuario">
+				  <i class="fas fa-trash"></i>
+				</button>`}
 		  </td>
 		</tr>
 	  `).join('');
@@ -4213,7 +4231,7 @@ input.search-bar {
 		  <h3 style="font-size:1rem;color:#06402b;margin-bottom:10px;"><i class="fas fa-list"></i> Usuarios existentes</h3>
 		  <div style="max-height:300px;overflow-y:auto;">
 			<table style="width:100%;">
-			  <thead><tr><th>Nombre</th><th>Usuario</th><th>Correo</th><th>Rol</th><th>Contraseña</th></tr></thead>
+			  <thead><tr><th>Nombre</th><th>Usuario</th><th>Correo</th><th>Rol</th><th>Contraseña</th><th>Eliminar</th></tr></thead>
 			  <tbody>${filasHTML}</tbody>
 			</table>
 		  </div>
@@ -4386,6 +4404,37 @@ input.search-bar {
 		return;
 	  }
 	  showNotification('✅ Rol actualizado', 'success', 2000);
+	};
+	
+	// ========== ADMIN: ELIMINAR USUARIO DEL SISTEMA ==========
+	window.eliminarUsuarioSistema = async function(userId, email) {
+	  const confirmacion = confirm(`⚠️ ¿Seguro que deseas ELIMINAR al usuario ${email}?\n\nEsta acción borra su cuenta y su acceso al sistema de forma permanente y NO se puede deshacer.`);
+	  if (!confirmacion) return;
+
+	  showLoading();
+	  try {
+		const { data: { session } } = await window.supabaseClient.auth.getSession();
+
+		const response = await fetch(EDGE_FUNCTION_DELETE_USER, {
+		  method: 'POST',
+		  headers: {
+			'Content-Type': 'application/json',
+			'Authorization': `Bearer ${session.access_token}`
+		  },
+		  body: JSON.stringify({ userId })
+		});
+
+		const result = await response.json();
+		if (!response.ok) throw new Error(result.error || 'Error desconocido');
+
+		showNotification(`✅ Usuario ${email} eliminado del sistema`, 'success', 3500);
+		mostrarGestionUsuarios(); // refrescar la lista
+	  } catch (error) {
+		console.error('❌ Error al eliminar usuario:', error);
+		showNotification(`❌ Error: ${error.message}`, 'error', 5000);
+	  } finally {
+		hideLoading();
+	  }
 	};
 
   // Función para actualizar nombres de columnas según el año
