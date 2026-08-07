@@ -70,7 +70,7 @@ body::before {
   left: 0;
   right: 0;
   height: 100%;
-  background: url('fondo.jpg') center center / cover no-repeat fixed;
+  background: var(--fondo-img, url('fondo.jpg')) center center / cover no-repeat;
   z-index: -1; /* ⚠️ Cambiado a -1 para asegurar que esté detrás de todo */
   pointer-events: none;
   min-width: 100%;
@@ -3304,6 +3304,9 @@ input.search-bar {
 				  <button id="btnGestionUsuarios" class="profile-menu-item" style="display:none;">
 					<i class="fas fa-users-gear"></i> <span>Gestión de usuarios</span>
 				  </button>
+				  <button id="btnConfigFondos" class="profile-menu-item" style="display:none;">
+					<i class="fas fa-image"></i> <span>Fondos de pantalla</span>
+				  </button>
 				  <button id="btnCerrarSesion" class="profile-menu-item profile-menu-item-danger">
 					<i class="fas fa-right-from-bracket"></i> <span>Cerrar sesión</span>
 				  </button>
@@ -4000,10 +4003,15 @@ input.search-bar {
 
 	  if (btnGestion) btnGestion.style.display = isAdminMode ? 'flex' : 'none';
 
+	  const btnConfigFondos = document.getElementById('btnConfigFondos');
+	  if (btnConfigFondos) btnConfigFondos.style.display = isAdminMode ? 'flex' : 'none';
+
 	  const adminForm = document.getElementById('adminFormSection');
 	  const btnBorrarTodos = document.getElementById('btnBorrarTodosSaldos');
 	  if (adminForm) adminForm.style.display = isAdminMode ? 'block' : 'none';
 	  if (btnBorrarTodos) btnBorrarTodos.style.display = isAdminMode ? 'inline-block' : 'none';
+
+	  cargarConfigFondos();
 	}
 
 	async function cargarRolUsuario(userId) {
@@ -12999,7 +13007,7 @@ function toggleNovedadBlock(id) {
 	// ofrezca "Crear acceso directo".
 	document.addEventListener('DOMContentLoaded', () => {
 	  registrarServiceWorker();
-	  verificarActualizacionFondo();
+	  cargarConfigFondos();
 	  document.getElementById('previewFondoOverlay')?.addEventListener('click', cerrarPreviewFondo);
 	});
 	
@@ -13130,6 +13138,234 @@ function toggleNovedadBlock(id) {
 		}
 	  }
 	}
+	
+	// ========================================================
+	// ========== FONDOS AUTOMÁTICOS POR FECHA ESPECIAL ========
+	// ========================================================
+	let configFondos = {};
+	let fondosAutoActivo = true;
+
+	const FONDOS_FECHAS = [
+	  { clave: 'ano_nuevo',    nombre: 'Año Nuevo', hint: '1 ene' },
+	  { clave: 'dia_mujer',    nombre: 'Día de la Mujer', hint: '8 mar' },
+	  { clave: 'semana_santa', nombre: 'Semana Santa', hint: 'variable' },
+	  { clave: 'dia_idioma',   nombre: 'Día del Idioma', hint: '23 abr' },
+	  { clave: 'dia_trabajo',  nombre: 'Día del Trabajo', hint: '1 may' },
+	  { clave: 'dia_madre',    nombre: 'Día de la Madre', hint: '2º dom may' },
+	  { clave: 'dia_maestro',  nombre: 'Día del Maestro', hint: '15 may' },
+	  { clave: 'dia_padre',    nombre: 'Día del Padre', hint: '3er dom jun' },
+	  { clave: 'boyaca',       nombre: 'Batalla de Boyacá', hint: '7 ago' },
+	  { clave: 'amor_amistad', nombre: 'Amor y Amistad', hint: '3er sáb sep' },
+	  { clave: 'halloween',    nombre: 'Halloween', hint: '31 oct' },
+	  { clave: 'policia',      nombre: 'Aniversario Policía Nacional', hint: '5 nov' },
+	  { clave: 'velitas',      nombre: 'Día de las Velitas', hint: '7 dic' },
+	  { clave: 'navidad',      nombre: 'Navidad', hint: '25 dic' },
+	  { clave: 'fin_ano',      nombre: 'Fin de Año', hint: '31 dic' },
+	];
+
+	// Pascua (Domingo de Resurrección) - algoritmo de Butcher
+	function calcularPascua(anio) {
+	  const a = anio % 19, b = Math.floor(anio / 100), c = anio % 100;
+	  const d = Math.floor(b / 4), e = b % 4;
+	  const f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3);
+	  const h = (19 * a + b - d - g + 15) % 30;
+	  const i = Math.floor(c / 4), k = c % 4;
+	  const l = (32 + 2 * e + 2 * i - h - k) % 7;
+	  const m = Math.floor((a + 11 * h + 22 * l) / 451);
+	  const mes = Math.floor((h + l - 7 * m + 114) / 31);
+	  const dia = ((h + l - 7 * m + 114) % 31) + 1;
+	  return new Date(anio, mes - 1, dia);
+	}
+
+	// n-ésimo día de la semana de un mes (diaSemana: 0=dom..6=sáb)
+	function nesimoDiaSemana(anio, mes, diaSemana, n) {
+	  const primero = new Date(anio, mes, 1);
+	  const offset = (diaSemana - primero.getDay() + 7) % 7;
+	  return new Date(anio, mes, 1 + offset + (n - 1) * 7);
+	}
+
+	function fechasEspecialesDelAnio(anio) {
+	  const pascua = calcularPascua(anio);
+	  return [
+		{ clave: 'ano_nuevo',    fecha: new Date(anio, 0, 1) },
+		{ clave: 'dia_mujer',    fecha: new Date(anio, 2, 8) },
+		{ clave: 'semana_santa', fecha: pascua },
+		{ clave: 'dia_idioma',   fecha: new Date(anio, 3, 23) },
+		{ clave: 'dia_trabajo',  fecha: new Date(anio, 4, 1) },
+		{ clave: 'dia_madre',    fecha: nesimoDiaSemana(anio, 4, 0, 2) },
+		{ clave: 'dia_maestro',  fecha: new Date(anio, 4, 15) },
+		{ clave: 'dia_padre',    fecha: nesimoDiaSemana(anio, 5, 0, 3) },
+		{ clave: 'boyaca',       fecha: new Date(anio, 7, 7) },
+		{ clave: 'amor_amistad', fecha: nesimoDiaSemana(anio, 8, 6, 3) },
+		{ clave: 'halloween',    fecha: new Date(anio, 9, 31) },
+		{ clave: 'policia',      fecha: new Date(anio, 10, 5) },
+		{ clave: 'velitas',      fecha: new Date(anio, 11, 7) },
+		{ clave: 'navidad',      fecha: new Date(anio, 11, 25) },
+		{ clave: 'fin_ano',      fecha: new Date(anio, 11, 31) },
+	  ];
+	}
+
+	// Clave de la fecha especial activa hoy (o null). Ventana: -15 / +2 días. En traslape gana la más cercana.
+	function claveFondoParaHoy(hoy = new Date()) {
+	  const y = hoy.getFullYear();
+	  let candidatos = [];
+	  [y - 1, y, y + 1].forEach(anio => { candidatos = candidatos.concat(fechasEspecialesDelAnio(anio)); });
+	  const MS = 86400000;
+	  const hoy0 = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate()).getTime();
+	  let activa = null, mejorDist = Infinity;
+	  for (const c of candidatos) {
+		const f0 = new Date(c.fecha.getFullYear(), c.fecha.getMonth(), c.fecha.getDate()).getTime();
+		if (hoy0 >= f0 - 15 * MS && hoy0 <= f0 + 2 * MS) {
+		  const dist = Math.abs(hoy0 - f0);
+		  if (dist < mejorDist) { mejorDist = dist; activa = c.clave; }
+		}
+	  }
+	  return activa;
+	}
+
+	function aplicarFondo(url) {
+	  const valor = url ? "url('" + url + "')" : "url('fondo.jpg')";
+	  // Fondo de la app (variable CSS, se adapta con cover)
+	  document.documentElement.style.setProperty('--fondo-img', valor);
+	  // Fondo de la pantalla de login
+	  const login = document.getElementById('loginOverlay');
+	  if (login) {
+		login.style.backgroundImage = valor;
+		login.style.backgroundSize = 'cover';
+		login.style.backgroundPosition = 'center center';
+		login.style.backgroundRepeat = 'no-repeat';
+		login.style.backgroundAttachment = 'scroll';
+	  }
+	}
+
+	function resolverYAplicarFondo() {
+	  let url = configFondos['universal'] || null;
+	  if (fondosAutoActivo) {
+		const clave = claveFondoParaHoy();
+		if (clave && configFondos[clave]) url = configFondos[clave];
+	  }
+	  aplicarFondo(url);
+	}
+
+	async function cargarConfigFondos() {
+	  try {
+		const { data, error } = await window.supabaseClient
+		  .from('config_fondos').select('clave, imagen_url');
+		configFondos = {};
+		if (!error && data) data.forEach(r => { configFondos[r.clave] = r.imagen_url; });
+		fondosAutoActivo = (configFondos['auto_activo'] !== '0');
+	  } catch (e) {
+		console.warn('No se pudo cargar config de fondos:', e);
+	  }
+	  resolverYAplicarFondo();
+	  if (!window._fondoIntervalSet) { window._fondoIntervalSet = true; setInterval(resolverYAplicarFondo, 3600000); }
+	}
+
+	// ========== PANEL ADMIN: FONDOS DE PANTALLA ==========
+	async function mostrarConfigFondos() {
+	  if (!isAdminMode) { showNotification('🔒 No tienes permisos para esta acción', 'error'); return; }
+	  await cargarConfigFondos();
+	  const claveActiva = fondosAutoActivo ? claveFondoParaHoy() : null;
+
+	  const tarjeta = (clave, nombre, hint) => {
+		const url = configFondos[clave];
+		const esActiva = clave === claveActiva || (clave === 'universal' && !claveActiva);
+		const thumb = url
+		  ? "<img src='" + url + "' style='width:100%;height:90px;object-fit:cover;border-radius:8px;'>"
+		  : "<div style='width:100%;height:90px;border-radius:8px;background:#e5e7eb;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:0.8rem;'>Sin imagen</div>";
+		return `
+		  <div style="border:2px solid ${esActiva ? '#0a5c3d' : '#e5e7eb'};border-radius:12px;padding:10px;background:#fff;position:relative;">
+			${esActiva ? '<span style="position:absolute;top:6px;right:6px;background:#0a5c3d;color:#fff;font-size:0.65rem;padding:2px 8px;border-radius:10px;">EN USO</span>' : ''}
+			<div style="font-weight:700;color:#06402b;font-size:0.85rem;">${nombre}</div>
+			<div style="color:#94a3b8;font-size:0.72rem;margin-bottom:8px;">${hint || ''}</div>
+			${thumb}
+			<button class="btn btn-primary" style="width:100%;margin-top:8px;font-size:0.78rem;padding:6px;" onclick="document.getElementById('fondoInput_${clave}').click()"><i class="fas fa-upload"></i> ${url ? 'Cambiar' : 'Subir'}</button>
+			${url ? `<button class="btn" style="width:100%;margin-top:6px;font-size:0.72rem;padding:5px;background:#fee2e2;color:#b91c1c;" onclick="quitarFondo('${clave}')"><i class="fas fa-trash"></i> Quitar</button>` : ''}
+			<input type="file" id="fondoInput_${clave}" accept="image/*" style="display:none;" onchange="if(this.files[0]) subirFondo('${clave}', this.files[0])">
+		  </div>`;
+	  };
+
+	  const tarjetasFechas = FONDOS_FECHAS.map(f => tarjeta(f.clave, f.nombre, f.hint)).join('');
+	  const contenido = `
+		<div style="max-width:840px;width:100%;">
+		  <h2 style="color:#06402b;margin-bottom:8px;"><i class="fas fa-image"></i> Fondos de pantalla</h2>
+		  <p style="color:#64748b;font-size:0.85rem;margin-bottom:16px;">Cada fondo especial se activa solo 15 días antes de la fecha y se quita 2 días después. El resto del año se ve la imagen universal. En traslape gana la fecha más cercana.</p>
+		  <label style="display:flex;align-items:center;gap:10px;background:#f0fdf4;border:1px solid #bbf7d0;padding:12px;border-radius:10px;margin-bottom:18px;cursor:pointer;">
+			<input type="checkbox" id="chkFondosAuto" ${fondosAutoActivo ? 'checked' : ''} onchange="toggleFondosAuto(this.checked)" style="width:18px;height:18px;">
+			<span style="font-weight:600;color:#06402b;">Fondos automáticos por fecha activados</span>
+		  </label>
+		  <h3 style="font-size:0.95rem;color:#06402b;margin-bottom:10px;"><i class="fas fa-globe"></i> Imagen universal (resto del año)</h3>
+		  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:22px;">
+			${tarjeta('universal', 'Imagen universal', 'Se ve el resto del año')}
+		  </div>
+		  <h3 style="font-size:0.95rem;color:#06402b;margin-bottom:10px;"><i class="fas fa-calendar-check"></i> Fechas especiales</h3>
+		  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;">
+			${tarjetasFechas}
+		  </div>
+		</div>`;
+	  document.getElementById('modalContent').innerHTML = contenido;
+	  document.getElementById('modal').classList.add('active');
+	}
+
+	window.subirFondo = async function(clave, file) {
+	  if (!file.type.startsWith('image/')) { showNotification('⚠️ Selecciona una imagen', 'error'); return; }
+	  if (file.size > 4 * 1024 * 1024) { showNotification('⚠️ La imagen no debe superar 4 MB', 'error'); return; }
+	  showLoading();
+	  try {
+		const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+		const filePath = clave + '_' + Date.now() + '.' + ext;
+		try {
+		  const { data: viejas } = await window.supabaseClient.storage.from('fondos').list('', { search: clave + '_' });
+		  if (viejas && viejas.length) {
+			await window.supabaseClient.storage.from('fondos').remove(viejas.map(v => v.name));
+		  }
+		} catch (e) { console.warn('No se pudieron borrar fondos viejos:', e); }
+
+		const { error: upErr } = await window.supabaseClient.storage.from('fondos').upload(filePath, file, { cacheControl: '3600' });
+		if (upErr) throw upErr;
+		const { data: urlData } = window.supabaseClient.storage.from('fondos').getPublicUrl(filePath);
+		const publicUrl = urlData.publicUrl;
+
+		const { error: dbErr } = await window.supabaseClient
+		  .from('config_fondos')
+		  .upsert({ clave: clave, imagen_url: publicUrl, updated_at: new Date().toISOString() }, { onConflict: 'clave' });
+		if (dbErr) throw dbErr;
+
+		configFondos[clave] = publicUrl;
+		resolverYAplicarFondo();
+		showNotification('✅ Fondo actualizado', 'success', 2500);
+		mostrarConfigFondos();
+	  } catch (error) {
+		console.error('❌ Error al subir fondo:', error);
+		showNotification('❌ Error: ' + error.message, 'error', 5000);
+	  } finally { hideLoading(); }
+	};
+
+	window.quitarFondo = async function(clave) {
+	  if (!confirm('¿Quitar esta imagen de fondo?')) return;
+	  showLoading();
+	  try {
+		const { error } = await window.supabaseClient.from('config_fondos').delete().eq('clave', clave);
+		if (error) throw error;
+		delete configFondos[clave];
+		resolverYAplicarFondo();
+		showNotification('✅ Imagen quitada', 'success', 2000);
+		mostrarConfigFondos();
+	  } catch (error) {
+		console.error('❌ Error al quitar fondo:', error);
+		showNotification('❌ Error: ' + error.message, 'error', 5000);
+	  } finally { hideLoading(); }
+	};
+
+	window.toggleFondosAuto = async function(activo) {
+	  fondosAutoActivo = activo;
+	  try {
+		await window.supabaseClient.from('config_fondos')
+		  .upsert({ clave: 'auto_activo', imagen_url: activo ? '1' : '0', updated_at: new Date().toISOString() }, { onConflict: 'clave' });
+	  } catch (e) { console.warn(e); }
+	  resolverYAplicarFondo();
+	  mostrarConfigFondos();
+	};
 
 	// ========== INICIALIZACIÓN (solo se ejecuta tras iniciar sesión) ==========
 	function initApp() {
@@ -13241,6 +13477,7 @@ function toggleNovedadBlock(id) {
 	  document.getElementById('btnGestionUsuarios').addEventListener('click', mostrarGestionUsuarios);
 	  document.getElementById('btnCambiarPassword').addEventListener('click', mostrarCambiarPassword);
 	  document.getElementById('btnMiPerfil').addEventListener('click', mostrarMiPerfil);
+	  document.getElementById('btnConfigFondos').addEventListener('click', mostrarConfigFondos);
 
 	  verificarSesionInicial();
 	});
