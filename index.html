@@ -13369,30 +13369,43 @@ function toggleNovedadBlock(id) {
 
 	// ========== INICIALIZACIÓN (solo se ejecuta tras iniciar sesión) ==========
 	function initApp() {
-	  initMobileMenu();
+	  // ✅ Evita que los listeners de UI (menú hamburguesa, menú de perfil, etc.)
+	  // se enlacen varias veces cuando initApp() se llama más de una vez
+	  // en la misma pestaña (ej: cierre por inactividad + volver a loguear sin refrescar).
+	  const primeraVez = !window._appInicializada;
+	  window._appInicializada = true;
+
+	  if (primeraVez) {
+		initMobileMenu();
+	  }
 	  iniciarControlInactividad();
 	  registrarServiceWorker();
 	  initScrollTopButton();
-	  document.querySelectorAll('.service-btn').forEach(btn => {
-		btn.addEventListener('click', function() {
-		  const section = this.closest('.page-section').id;
-		  let service = this.dataset.service || this.dataset.search || this.dataset.stats || this.dataset.graf;
-		  applyServiceTheme(service);
+
+	  if (primeraVez) {
+		document.querySelectorAll('.service-btn').forEach(btn => {
+		  btn.addEventListener('click', function() {
+			const section = this.closest('.page-section').id;
+			let service = this.dataset.service || this.dataset.search || this.dataset.stats || this.dataset.graf;
+			applyServiceTheme(service);
+		  });
 		});
-	  });
+	  }
+
 	  initKeyboardShortcuts();
 	  initSaldos();
 	  cargarDesdeSupabaseAutomatico();
 
-	  // Vincular nuevos botones del topbar
-	  document.getElementById('btnCargarLocalTop')?.addEventListener('click', () => {
-		document.getElementById('fileInputTop').click();
-	  });
-	  document.getElementById('btnCargarNubeTop')?.addEventListener('click', () => {
-		cargarDesdeSupabase();
-	  });
-	  
-	  // ✅ Menú de perfil: abrir/cerrar y cerrar al hacer clic fuera o al elegir una opción
+	  if (primeraVez) {
+		// Vincular nuevos botones del topbar
+		document.getElementById('btnCargarLocalTop')?.addEventListener('click', () => {
+		  document.getElementById('fileInputTop').click();
+		});
+		document.getElementById('btnCargarNubeTop')?.addEventListener('click', () => {
+		  cargarDesdeSupabase();
+		});
+
+		// ✅ Menú de perfil: abrir/cerrar y cerrar al hacer clic fuera o al elegir una opción
 		const profileMenuBtn = document.getElementById('profileMenuBtn');
 		const profileMenuDropdown = document.getElementById('profileMenuDropdown');
 		if (profileMenuBtn && profileMenuDropdown) {
@@ -13415,46 +13428,47 @@ function toggleNovedadBlock(id) {
 		  });
 		}
 
-	  // Vincular botón de desbloqueo de administrador en el modal
-	  const btnUnlock = document.getElementById('btnUnlockAdminModal');
-	  if (btnUnlock) {
-		btnUnlock.addEventListener('click', unlockAdminMode);
-	  }
-
-	  // Botón flotante de ayuda global
-	  document.getElementById('floatingHelpBtn')?.addEventListener('click', showHelpModal);
-
-	  // Animación inicial del botón de ayuda
-	  setTimeout(() => {
-		const helpBtn = document.getElementById('floatingHelpBtn');
-		if (helpBtn) {
-		  helpBtn.classList.add('pulse');
-		  setTimeout(() => helpBtn.classList.remove('pulse'), 5000);
+		// Vincular botón de desbloqueo de administrador en el modal
+		const btnUnlock = document.getElementById('btnUnlockAdminModal');
+		if (btnUnlock) {
+		  btnUnlock.addEventListener('click', unlockAdminMode);
 		}
-	  }, 1000);
 
-	  // ✅ TEMAS: Aplicar tema guardado al iniciar
-	  const savedTheme = localStorage.getItem('theme') || 'light';
-	  document.documentElement.setAttribute('data-theme', savedTheme);
-	  const icon = document.getElementById('themeToggleIcon');
-	  if (icon) {
-		icon.className = savedTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
-	  }
-	  const toggleBtn = document.getElementById('themeToggleBtn');
-	  if (toggleBtn) {
-		toggleBtn.addEventListener('click', toggleTheme);
-	  }
+		// Botón flotante de ayuda global
+		document.getElementById('floatingHelpBtn')?.addEventListener('click', showHelpModal);
 
-	  // ✅ Inicialización del módulo CONSOLIDADO al entrar
-	  document.querySelectorAll('.nav-link').forEach(link => {
-		link.addEventListener('click', function() {
-		  const section = this.getAttribute('data-section');
-		  if (section === 'consolidado') {
-			setTimeout(initConsolidado, 150);
+		// Animación inicial del botón de ayuda
+		setTimeout(() => {
+		  const helpBtn = document.getElementById('floatingHelpBtn');
+		  if (helpBtn) {
+			helpBtn.classList.add('pulse');
+			setTimeout(() => helpBtn.classList.remove('pulse'), 5000);
 		  }
+		}, 1000);
+
+		// ✅ TEMAS: Aplicar tema guardado al iniciar
+		const savedTheme = localStorage.getItem('theme') || 'light';
+		document.documentElement.setAttribute('data-theme', savedTheme);
+		const icon = document.getElementById('themeToggleIcon');
+		if (icon) {
+		  icon.className = savedTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+		}
+		const toggleBtn = document.getElementById('themeToggleBtn');
+		if (toggleBtn) {
+		  toggleBtn.addEventListener('click', toggleTheme);
+		}
+
+		// ✅ Inicialización del módulo CONSOLIDADO al entrar
+		document.querySelectorAll('.nav-link').forEach(link => {
+		  link.addEventListener('click', function() {
+			const section = this.getAttribute('data-section');
+			if (section === 'consolidado') {
+			  setTimeout(initConsolidado, 150);
+			}
+		  });
 		});
-	  });
-	  
+	  }
+
 	  // Inicializar badge de notificaciones
       actualizarBadgeNotificaciones();
 	}
