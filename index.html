@@ -7970,7 +7970,8 @@ input.search-bar {
 		aseo: ['aseo', 'servicio aseo'],
 		tramitar: ['total a tramitar', 'tramitar', 'a tramitar', 'total tramitar'],
 		intereses: ['intereses', 'int', 'saldos', 'mora', 'intereses y/o saldos'],
-		factura: ['factura', 'n° factura', 'numero factura', 'no factura']
+		factura: ['factura', 'n° factura', 'numero factura', 'no factura'],
+		radicado: ['comunicado', 'radicado', 'comunicado o radicado', 'rad', 'com']
 	  } : {
 		cuenta: ['cuenta', 'numero cuenta', 'no cuenta', 'cta', 'n° cuenta', 'no. cuenta'],
 		estacion: ['estacion', 'estación', 'predio', 'nombre', 'dependencia'],
@@ -7980,7 +7981,8 @@ input.search-bar {
 		aseo: ['aseo', 'servicio aseo'],
 		tramitar: ['total a tramitar', 'tramitar', 'a tramitar', 'total tramitar'],
 		intereses: ['intereses', 'int', 'saldos', 'mora', 'intereses y/o saldos'],
-		factura: ['factura', 'n° factura', 'numero factura', 'no factura']
+		factura: ['factura', 'n° factura', 'numero factura', 'no factura'],
+		radicado: ['comunicado', 'radicado', 'comunicado o radicado', 'rad', 'com']
 	  };
 
 	  const sheetPromises = workbook.SheetNames.map(async (sheetName) => {
@@ -8056,10 +8058,12 @@ input.search-bar {
 				const tramitar = cleanAndParseFloat(row[colMap.tramitar]);
 				const intereses = cleanAndParseFloat(row[colMap.intereses]);
 				const factura = colMap.factura >= 0 ? String(row[colMap.factura]).trim() : '';
+				const radicado = colMap.radicado >= 0 ? String(row[colMap.radicado]).trim() : '';
 				record = {
 				  ESTACION: estacion,
 				  CUENTA: cuenta,
 				  FACTURA: factura,
+				  RADICADO: radicado,
 				  CONSUMO: kwh,
 				  CONSUMO_VALOR: consumo,
 				  ENERGIA: consumo,
@@ -8078,10 +8082,12 @@ input.search-bar {
 				const tramitar = cleanAndParseFloat(row[colMap.tramitar]);
 				const intereses = cleanAndParseFloat(row[colMap.intereses]);
 				const factura = colMap.factura >= 0 ? String(row[colMap.factura]).trim() : '';
+				const radicado = colMap.radicado >= 0 ? String(row[colMap.radicado]).trim() : '';
 				record = {
 				  ESTACION: estacion,
 				  CUENTA: cuenta,
 				  FACTURA: factura,
+				  RADICADO: radicado,
 				  CONSUMO: m3,
 				  ACUEDUCTO: acueducto,
 				  ALCANTARILLADO: alcantarillado,
@@ -8168,9 +8174,10 @@ input.search-bar {
 					energia: ['energia', 'consumo', 'valor energia'],
 					aPublico: ['a. publico', 'a.publico', 'alumbrado publico', 'alumbrado público', 'a publico', 'publico'],
 					aseo: ['aseo', 'servicio aseo'],
-					tramitar: ['total a tramitar', 'tramitar', 'a tramitar', 'total tramitar'],
+				    tramitar: ['total a tramitar', 'tramitar', 'a tramitar', 'total tramitar'],
 					intereses: ['intereses', 'int', 'saldos', 'mora', 'intereses y/o saldos'],
-					direccion: ['direccion', 'dirección', 'dir']
+					direccion: ['direccion', 'dirección', 'dir'],
+					radicado: ['comunicado', 'radicado', 'comunicado o radicado', 'rad', 'com']
 				} : {
 					cuenta: ['cuenta', 'numero cuenta', 'no cuenta', 'cta', 'n° cuenta', 'no. cuenta'],
 					estacion: ['estacion', 'estación', 'predio', 'nombre', 'dependencia'],
@@ -8181,7 +8188,8 @@ input.search-bar {
 					aseo: ['aseo', 'servicio aseo'],
 					tramitar: ['total tramite', 'total a tramitar', 'tramitar', 'a tramitar', 'total tramitar'],
 					intereses: ['intereses', 'int', 'saldos', 'mora', 'intereses y/o saldos'],
-					direccion: ['direccion', 'dirección', 'dir']
+					direccion: ['direccion', 'dirección', 'dir'],
+					radicado: ['comunicado', 'radicado', 'comunicado o radicado', 'rad', 'com']
 				};
 
 				try {
@@ -8273,10 +8281,12 @@ input.search-bar {
 
 							const factura = colMap.factura >= 0 ? String(row[colMap.factura]).trim() : '';
 							const direccion = colMap.direccion >= 0 ? row[colMap.direccion] : '';
+							const radicado = colMap.radicado >= 0 ? String(row[colMap.radicado]).trim() : '';
 							record = {
 								ESTACION: estacion,
 								CUENTA: cuenta,
 								FACTURA: factura,
+								RADICADO: radicado,
 								CONSUMO: kwh,
 								CONSUMO_VALOR: energiaVal,
 								ENERGIA: energiaVal,
@@ -8298,10 +8308,12 @@ input.search-bar {
 
 							const factura = colMap.factura >= 0 ? String(row[colMap.factura]).trim() : '';
 							const direccion = colMap.direccion >= 0 ? row[colMap.direccion] : '';
+							const radicado = colMap.radicado >= 0 ? String(row[colMap.radicado]).trim() : '';
 							record = {
 								ESTACION: estacion,
 								CUENTA: cuenta,
 								FACTURA: factura,
+								RADICADO: radicado,
 								CONSUMO: m3,
 								ACUEDUCTO: acueductoVal,
 								ALCANTARILLADO: alcantarillado,
@@ -8481,12 +8493,13 @@ input.search-bar {
 	}
 	
 	async function processGasFile(workbook, timestampCarga) {
-	  const COLUMN_MAPPING = {
+	  	const COLUMN_MAPPING = {
 		cuenta: ['cuenta', 'numero cuenta', 'no cuenta', 'cta', 'n° cuenta'],
 		estacion: ['estacion', 'estación', 'predio', 'nombre', 'dependencia'],
 		m3: ['m3', 'm³', 'm 3'],
 		tramitar: ['total a tramitar', 'tramitar', 'a tramitar', 'total tramitar'],
-		intereses: ['intereses', 'int', 'saldos', 'mora', 'intereses y/o saldos']
+		intereses: ['intereses', 'int', 'saldos', 'mora', 'intereses y/o saldos'],
+		radicado: ['comunicado', 'radicado', 'comunicado o radicado', 'rad', 'com']
 	  };
 
 	  // 🔥 Cuentas que pertenecen a ASTURIAS
@@ -8615,9 +8628,11 @@ input.search-bar {
               const m3 = cleanAndParseFloat(row[columnIndexes.m3]);
               const tramitar = cleanAndParseFloat(row[columnIndexes.tramitar]);
               const intereses = cleanAndParseFloat(row[columnIndexes.intereses]);
+              const radicado = columnIndexes.radicado >= 0 ? String(row[columnIndexes.radicado] || '').trim() : '';
               currentTable.push({
                 ESTACION: estacion,
                 CUENTA: cuenta,
+                RADICADO: radicado,
                 CONSUMO: m3,
                 TOTAL_TRAMITAR: tramitar,
                 INTERESES: intereses,
@@ -9129,6 +9144,7 @@ input.search-bar {
 					  <tr style="background:#1f2937;">
 						<th style="color:#fff;padding:10px 12px;text-align:center;font-weight:600;font-size:0.75rem;text-transform:uppercase;border-bottom:2px solid #06402b;">Cuenta</th>
 						<th style="color:#fff;padding:10px 12px;text-align:left;font-weight:600;font-size:0.75rem;text-transform:uppercase;border-bottom:2px solid #06402b;">Predio</th>
+						<th style="color:#fff;padding:10px 12px;text-align:left;font-weight:600;font-size:0.75rem;text-transform:uppercase;border-bottom:2px solid #06402b;">Comunicado/Radicado</th>
 					  </tr>
 					</thead>
 					<tbody>
@@ -9140,6 +9156,7 @@ input.search-bar {
 					  <tr style="background:${bgColor};" onmouseenter="this.style.background='#eff6ff';" onmouseleave="this.style.background='${bgColor}';">
 						<td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;text-align:center;font-weight:600;color:#1f2937;font-size:0.85rem;">${p.cuenta}</td>
 						<td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;color:#475569;font-size:0.85rem;">${p.predio}</td>
+						<td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;color:#475569;font-size:0.85rem;">${p.radicado || '—'}</td>
 					  </tr>
 			  `;
 			});
@@ -9297,12 +9314,13 @@ input.search-bar {
 			}
 
 			if (!isTramitado) {
-			  pendingList.push({
+			  	pendingList.push({
 				unidad: unit.toUpperCase(),
 				servicio: names[service],
 				servicioKey: service,
 				predio: row.ESTACION || 'Sin nombre',
 				cuenta: cuenta,
+				radicado: row.RADICADO || '',
 				tramitar: totalTramitarRaw
 			  });
 			}
