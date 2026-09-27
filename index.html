@@ -3674,9 +3674,17 @@ input.search-bar {
 				</span>
 			  </h3>
 			  <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;">
-				<div style="display:flex;gap:6px;">
+								<div style="display:flex;gap:6px;align-items:center;position:relative;">
 				  <button class="vista-toggle-btn active" data-vista="resumen">Resumen</button>
 				  <button class="vista-toggle-btn" data-vista="detalle">Detalle (12 meses)</button>
+				  <button id="btnColumnasSaldos" type="button" title="Mostrar / ocultar columnas"
+						  style="display:none;align-items:center;gap:6px;padding:6px 14px;font-size:0.82rem;font-weight:600;border-radius:8px;border:1px solid #06402b;background:#fff;color:#06402b;cursor:pointer;">
+					<i class="fas fa-table-columns"></i> Columnas
+					<span id="badgeColumnasOcultas" style="display:none;background:#ef4444;color:#fff;font-size:0.68rem;padding:1px 7px;border-radius:10px;"></span>
+				  </button>
+				  <div id="panelColumnasSaldos"
+					   style="display:none;position:absolute;top:calc(100% + 8px);right:0;z-index:60;background:#fff;border:1px solid #e5e7eb;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,0.18);padding:12px;width:250px;max-height:380px;overflow-y:auto;">
+				  </div>
 				</div>
 				<span style="font-size:0.85rem;color:#6b7280;">Auto-guardado: <span id="estadoGuardado" style="color:#10b981;"><i class="fas fa-check-circle"></i> Activo</span></span>
 			  </div>
@@ -5965,6 +5973,135 @@ input.search-bar {
 		}
 	  }, 30000); // Cada 30 segundos
 	}
+	
+	// ========== OCULTAR / MOSTRAR COLUMNAS EN VISTA DETALLE (TIPO EXCEL) ==========
+	// Columnas que NO se pueden ocultar: 1 = Unidad, 2 = Servicio, 24 = Acciones
+	const COLUMNAS_FIJAS_SALDOS = [1, 2, 24];
+	let columnasOcultasSaldos = new Set(
+	  JSON.parse(localStorage.getItem('saldosColumnasOcultas') || '[]')
+	);
+
+	function aplicarColumnasOcultasSaldos() {
+	  let estilo = document.getElementById('estiloColumnasOcultasSaldos');
+	  if (!estilo) {
+		estilo = document.createElement('style');
+		estilo.id = 'estiloColumnasOcultasSaldos';
+		document.head.appendChild(estilo);
+	  }
+
+	  const selectores = [];
+	  columnasOcultasSaldos.forEach(n => {
+		selectores.push(`#tablaSaldos.vista-detalle thead th:nth-child(${n})`);
+		selectores.push(`#tablaSaldos.vista-detalle tbody td:nth-child(${n})`);
+		// En el pie, "TOTALES" ocupa 2 columnas (colspan=2), por eso se resta 1
+		selectores.push(`#tablaSaldos.vista-detalle tfoot td:nth-child(${n - 1})`);
+	  });
+	  estilo.textContent = selectores.length
+		? selectores.join(',\n') + ' { display: none !important; }'
+		: '';
+
+	  localStorage.setItem('saldosColumnasOcultas', JSON.stringify([...columnasOcultasSaldos]));
+
+	  const badge = document.getElementById('badgeColumnasOcultas');
+	  if (badge) {
+		badge.textContent = columnasOcultasSaldos.size;
+		badge.style.display = columnasOcultasSaldos.size > 0 ? 'inline-block' : 'none';
+	  }
+	}
+
+	function construirPanelColumnasSaldos() {
+	  const panel = document.getElementById('panelColumnasSaldos');
+	  if (!panel) return;
+	  const ths = document.querySelectorAll('#tablaSaldos thead th');
+
+	  let html = `
+		<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #e5e7eb;">
+		  <strong style="color:#06402b;font-size:0.85rem;">Columnas visibles</strong>
+		  <button type="button" id="btnMostrarTodasColumnas"
+				  style="background:none;border:none;color:#06402b;font-size:0.75rem;font-weight:600;cursor:pointer;text-decoration:underline;">
+			Mostrar todas
+		  </button>
+		</div>
+		<div style="font-size:0.7rem;color:#94a3b8;margin-bottom:8px;">
+		  <i class="fas fa-mouse-pointer"></i> Tip: clic derecho sobre un encabezado para ocultarlo.
+		</div>
+	  `;
+
+	  ths.forEach((th, i) => {
+		const n = i + 1;
+		if (COLUMNAS_FIJAS_SALDOS.includes(n)) return;
+		const visible = !columnasOcultasSaldos.has(n);
+		html += `
+		  <div class="col-opcion-saldos" data-col="${n}"
+			   style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;cursor:pointer;"
+			   onmouseenter="this.style.background='#f0fdf4';" onmouseleave="this.style.background='transparent';">
+			<input type="checkbox" ${visible ? 'checked' : ''} style="pointer-events:none;width:15px;height:15px;accent-color:#06402b;">
+			<span style="color:#1f2937 !important;font-size:0.8rem;text-shadow:none !important;">${th.textContent.trim()}</span>
+		  </div>
+		`;
+	  });
+
+	  panel.innerHTML = html;
+
+	  panel.querySelectorAll('.col-opcion-saldos').forEach(op => {
+		op.addEventListener('click', (e) => {
+		  e.stopPropagation();
+		  alternarColumnaSaldos(parseInt(op.dataset.col, 10));
+		});
+	  });
+
+	  panel.querySelector('#btnMostrarTodasColumnas')?.addEventListener('click', (e) => {
+		e.stopPropagation();
+		columnasOcultasSaldos.clear();
+		aplicarColumnasOcultasSaldos();
+		construirPanelColumnasSaldos();
+	  });
+	}
+
+	function alternarColumnaSaldos(n) {
+	  if (COLUMNAS_FIJAS_SALDOS.includes(n)) return;
+	  if (columnasOcultasSaldos.has(n)) columnasOcultasSaldos.delete(n);
+	  else columnasOcultasSaldos.add(n);
+	  aplicarColumnasOcultasSaldos();
+	  construirPanelColumnasSaldos();
+	}
+
+	function initOcultarColumnasSaldos() {
+	  aplicarColumnasOcultasSaldos();
+	  if (window._ocultarColumnasSaldosInit) return; // evita duplicar listeners al re-loguear
+	  window._ocultarColumnasSaldosInit = true;
+
+	  const btn = document.getElementById('btnColumnasSaldos');
+	  const panel = document.getElementById('panelColumnasSaldos');
+	  if (!btn || !panel) return;
+
+	  // Abrir / cerrar panel
+	  btn.addEventListener('click', (e) => {
+		e.stopPropagation();
+		const abierto = panel.style.display === 'block';
+		if (!abierto) construirPanelColumnasSaldos();
+		panel.style.display = abierto ? 'none' : 'block';
+	  });
+
+	  // Cerrar al hacer clic fuera
+	  panel.addEventListener('click', (e) => e.stopPropagation());
+	  document.addEventListener('click', () => { panel.style.display = 'none'; });
+
+	  // Clic derecho sobre un encabezado → ocultar esa columna (solo en vista Detalle)
+	  document.querySelector('#tablaSaldos thead')?.addEventListener('contextmenu', (e) => {
+		const tabla = document.getElementById('tablaSaldos');
+		if (!tabla || !tabla.classList.contains('vista-detalle')) return;
+		const th = e.target.closest('th');
+		if (!th) return;
+		const n = th.cellIndex + 1;
+		if (COLUMNAS_FIJAS_SALDOS.includes(n)) return;
+		e.preventDefault();
+		columnasOcultasSaldos.add(n);
+		aplicarColumnasOcultasSaldos();
+		if (panel.style.display === 'block') construirPanelColumnasSaldos();
+		showNotification(`👁️ Columna "${th.textContent.trim()}" oculta. Usa "Columnas" para volver a mostrarla.`, 'info', 2500, null, false);
+	  });
+	}
 
 	// Función para inicializar el módulo de saldos
 	function initSaldos() {
@@ -6072,17 +6209,28 @@ input.search-bar {
 			document.getElementById('btnBorrarTodosSaldos')?.addEventListener('click', borrarTodosLosDatosSaldos);
 
 			// ✅ Toggle de vista Resumen / Detalle
-			document.querySelectorAll('.vista-toggle-btn').forEach(btn => {
+			document.querySelectorAll('#saldos .vista-toggle-btn').forEach(btn => {
 			  btn.addEventListener('click', () => {
-				document.querySelectorAll('.vista-toggle-btn').forEach(b => b.classList.remove('active'));
+				document.querySelectorAll('#saldos .vista-toggle-btn').forEach(b => b.classList.remove('active'));
 				btn.classList.add('active');
+				const esDetalle = btn.dataset.vista === 'detalle';
 				const tabla = document.getElementById('tablaSaldos');
 				if (tabla) {
-				  tabla.classList.toggle('vista-detalle', btn.dataset.vista === 'detalle');
-				  tabla.classList.toggle('vista-resumen', btn.dataset.vista === 'resumen');
+				  tabla.classList.toggle('vista-detalle', esDetalle);
+				  tabla.classList.toggle('vista-resumen', !esDetalle);
+				}
+				// Botón "Columnas" solo visible en vista Detalle
+				const btnCol = document.getElementById('btnColumnasSaldos');
+				if (btnCol) btnCol.style.display = esDetalle ? 'inline-flex' : 'none';
+				if (!esDetalle) {
+				  const panel = document.getElementById('panelColumnasSaldos');
+				  if (panel) panel.style.display = 'none';
 				}
 			  });
 			});
+
+			// ✅ Ocultar / mostrar columnas tipo Excel
+			initOcultarColumnasSaldos();
 
 			// Renderizar tabla por primera vez
 			renderTablaSaldos();
