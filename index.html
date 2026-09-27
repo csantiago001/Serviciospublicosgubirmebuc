@@ -6066,6 +6066,34 @@ input.search-bar {
 	  construirPanelColumnasSaldos();
 	}
 
+	// Posiciona el panel flotante justo debajo del botón "Columnas"
+	function posicionarPanelColumnasSaldos() {
+	  const btn = document.getElementById('btnColumnasSaldos');
+	  const panel = document.getElementById('panelColumnasSaldos');
+	  if (!btn || !panel) return;
+
+	  // Compensa el zoom del "Tamaño de letra" (html { zoom: ... })
+	  const zoom = parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
+	  const r = btn.getBoundingClientRect();
+	  const anchoPanel = 250;
+	  const margen = 8;
+
+	  let left = (r.right / zoom) - anchoPanel;
+	  if (left < margen) left = margen;
+
+	  let top = (r.bottom / zoom) + 8;
+	  const altoDisponible = (window.innerHeight / zoom) - top - margen;
+
+	  panel.style.left = left + 'px';
+	  panel.style.top = top + 'px';
+	  panel.style.maxHeight = Math.max(180, Math.min(380, altoDisponible)) + 'px';
+	}
+
+	function cerrarPanelColumnasSaldos() {
+	  const panel = document.getElementById('panelColumnasSaldos');
+	  if (panel) panel.style.display = 'none';
+	}
+
 	function initOcultarColumnasSaldos() {
 	  aplicarColumnasOcultasSaldos();
 	  if (window._ocultarColumnasSaldosInit) return; // evita duplicar listeners al re-loguear
@@ -6075,17 +6103,37 @@ input.search-bar {
 	  const panel = document.getElementById('panelColumnasSaldos');
 	  if (!btn || !panel) return;
 
+	  // ✅ Sacar el panel de la tarjeta (que tiene overflow:hidden) y ponerlo flotando sobre todo
+	  document.body.appendChild(panel);
+	  panel.style.position = 'fixed';
+	  panel.style.right = 'auto';
+	  panel.style.width = '250px';
+	  panel.style.zIndex = '10050';
+
 	  // Abrir / cerrar panel
 	  btn.addEventListener('click', (e) => {
 		e.stopPropagation();
 		const abierto = panel.style.display === 'block';
-		if (!abierto) construirPanelColumnasSaldos();
-		panel.style.display = abierto ? 'none' : 'block';
+		if (abierto) {
+		  cerrarPanelColumnasSaldos();
+		} else {
+		  construirPanelColumnasSaldos();
+		  panel.style.display = 'block';
+		  posicionarPanelColumnasSaldos();
+		}
 	  });
 
 	  // Cerrar al hacer clic fuera
 	  panel.addEventListener('click', (e) => e.stopPropagation());
-	  document.addEventListener('click', () => { panel.style.display = 'none'; });
+	  document.addEventListener('click', cerrarPanelColumnasSaldos);
+
+	  // Reubicar si se hace scroll o se cambia el tamaño de la ventana
+	  window.addEventListener('scroll', () => {
+		if (panel.style.display === 'block') posicionarPanelColumnasSaldos();
+	  }, { passive: true });
+	  window.addEventListener('resize', () => {
+		if (panel.style.display === 'block') posicionarPanelColumnasSaldos();
+	  });
 
 	  // Clic derecho sobre un encabezado → ocultar esa columna (solo en vista Detalle)
 	  document.querySelector('#tablaSaldos thead')?.addEventListener('contextmenu', (e) => {
