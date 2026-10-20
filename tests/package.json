@@ -1,0 +1,11 @@
+{
+  "name": "gubir-mebuc-tests",
+  "private": true,
+  "description": "Pruebas automatizadas de la lógica de importación y saldos de GUBIR MEBUC",
+  "scripts": {
+    "test": "node --test ./*.test.js"
+  },
+  "devDependencies": {
+    "xlsx": "0.18.5"
+  }
+}
