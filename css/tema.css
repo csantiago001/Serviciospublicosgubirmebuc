@@ -291,15 +291,15 @@ html body .section-card .card div { color: inherit !important; }
 
 /* Textos blancos fijos (escritos para el diseño anterior sobre vidrio verde):
    se adaptan al tema salvo que el propio elemento pinte su fondo. */
-html body .content-area [style*="color:white"]:not([style*="background"]):not(button):not(.btn),
-html body .content-area [style*="color: white"]:not([style*="background"]):not(button):not(.btn),
-html body .content-area [style*="color:#fff"]:not([style*="background"]):not(button):not(.btn),
-html body .content-area [style*="color: #fff"]:not([style*="background"]):not(button):not(.btn),
-html body .content-area [style*="color:#FFF"]:not([style*="background"]):not(button):not(.btn),
-html body .content-area [style*="color:rgba(255,255,255"]:not([style*="background"]):not(button):not(.btn),
-html body .content-area [style*="color: rgba(255,255,255"]:not([style*="background"]):not(button):not(.btn),
-html body .content-area [style*="color: rgba(255, 255, 255"]:not([style*="background"]):not(button):not(.btn),
-html body .content-area [style*="color:#cbd5e0"]:not([style*="background"]):not(button):not(.btn) {
+html body .content-area [style*="color:white"]:not([style*="background"]):not(button):not(.btn):not(i),
+html body .content-area [style*="color: white"]:not([style*="background"]):not(button):not(.btn):not(i),
+html body .content-area [style*="color:#fff"]:not([style*="background"]):not(button):not(.btn):not(i),
+html body .content-area [style*="color: #fff"]:not([style*="background"]):not(button):not(.btn):not(i),
+html body .content-area [style*="color:#FFF"]:not([style*="background"]):not(button):not(.btn):not(i),
+html body .content-area [style*="color:rgba(255,255,255"]:not([style*="background"]):not(button):not(.btn):not(i),
+html body .content-area [style*="color: rgba(255,255,255"]:not([style*="background"]):not(button):not(.btn):not(i),
+html body .content-area [style*="color: rgba(255, 255, 255"]:not([style*="background"]):not(button):not(.btn):not(i),
+html body .content-area [style*="color:#cbd5e0"]:not([style*="background"]):not(button):not(.btn):not(i) {
   color: var(--g-text) !important;
   text-shadow: none !important;
 }
@@ -800,6 +800,47 @@ html body :is(.content-area, .modal) :is(.btn, .btn-secondary).btn-contorno i { 
 html body #saldos :is(.btn, .btn-secondary) { font-size: var(--g-fs-sm) !important; min-height: 34px; padding: 6px 12px !important; height: auto !important; }
 
 /* Textos blancos serializados por el navegador como rgb() */
-html body .content-area [style*="color: rgb(255, 255, 255)"]:not([style*="background"]):not(button):not(.btn) { color: var(--g-text) !important; }
+html body .content-area [style*="color: rgb(255, 255, 255)"]:not([style*="background"]):not(button):not(.btn):not(i) { color: var(--g-text) !important; }
 html body .config-card-icon i { color: inherit !important; }
 html body .config-section-title { border-left: 0 !important; padding-left: 0 !important; }
+
+/* ---------------------------------------------------------------------
+   Ajustes de contraste (claro y oscuro)
+   --------------------------------------------------------------------- */
+:root { --g-dorado-texto: #9a6b06; }
+:root[data-theme="dark"] { --g-dorado-texto: #f2c14e; }
+/* Montos resaltados en dorado: legibles sobre superficies claras */
+html body .content-area [style*="color:#fbbf24"]:not([style*="background"]),
+html body .content-area [style*="color: #fbbf24"]:not([style*="background"]),
+html body .content-area [style*="color:#f59e0b"]:not([style*="background"]),
+html body .content-area [style*="color: #f59e0b"]:not([style*="background"]),
+html body .content-area [style*="color: rgb(251, 191, 36)"]:not([style*="background"]) { color: var(--g-dorado-texto) !important; }
+html body .content-area [style*="background:linear-gradient(135deg,#06402b"] [style*="color:#fbbf24"],
+html body .content-area [style*="background: linear-gradient(135deg, #06402b"] [style*="color:#fbbf24"] { color: #f2c14e !important; }
+
+:root[data-theme="dark"] body .topbar { background: var(--g-header) !important; border-bottom: 1px solid var(--g-border) !important; }
+html body #tablaSaldos, html body #tablaContainer { background: var(--g-surface) !important; }
+html body .saldos-tabla-cabecera h3 i { color: var(--g-text-3); margin-right: 6px; }
+:root[data-theme="dark"] body .notification { background: var(--g-surface-2) !important; color: var(--g-text) !important; border: 1px solid var(--g-border) !important; }
+:root[data-theme="dark"] body .notification * { color: var(--g-text) !important; }
+
+/* Tarjetas de tramitación (Inicio) */
+html body .tramitacion-item [style*="background: #f9fafb"], html body .tramitacion-item [style*="background:#f9fafb"] {
+  background: var(--g-surface-2) !important; border-left-color: var(--g-primary) !important;
+}
+html body .tramitacion-item [style*="color: #1f2937"] { color: var(--g-text) !important; }
+html body .tramitacion-item b[style*="color: #059669"] { color: var(--ok) !important; }
+html body .tramitacion-item b[style*="color: #dc2626"] { color: var(--peligro) !important; }
+html body .tramitacion-item b[style*="color: #06402b"], html body .tramitacion-item i[style*="color: #06402b"] { color: var(--g-text) !important; }
+html body .tramitacion-item svg text { fill: var(--g-text) !important; }
+html body .tramitacion-item svg circle:first-child { stroke: var(--g-surface-3) !important; }
+:root[data-theme="dark"] body .tramitacion-item [style*="background: #06402b"] { background: var(--g-primary) !important; }
+html body .content-area input.search-input { padding-left: 36px !important; }
+/* Encabezados de modal con fondo de color: texto claro */
+html body .modal-content .modal-header-gradient :is(h1, h2, h3, h4, p, span, i) { color: #fff !important; }
+html body .modal-header-gradient { overflow: visible !important; height: auto !important; padding: 14px 18px !important; }
+html body .modal-header-gradient h2 { font-size: 1.15rem !important; margin: 0 !important; line-height: 1.3 !important; }
+/* Tablas anchas: primera columna con ancho mínimo legible */
+html body #predial table td:first-child { min-width: 180px; }
+:root[data-theme="dark"] body #tablaSaldos tbody tr { background: transparent !important; }
+:root[data-theme="dark"] body #tablaSaldos tbody tr:nth-child(even) td:not(.col-fija) { background: var(--g-fila-par) !important; }

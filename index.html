@@ -3674,9 +3674,9 @@ input.search-bar {
 		  <!-- Tabla con Scroll Mejorado -->
 		  <div class="section-card saldos-section saldos-tabla" style="padding:0;overflow:hidden;">
 			<div class="saldos-tabla-cabecera" style="padding:15px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-			  <h3 style="color:#000 !important;margin:0;font-size:1.1rem;font-weight:700 !important;">
-				<i class="fas fa-table"></i>
-				<span style="color:#000 !important;">Detalle de Saldos</span>
+			  <h3 style="margin:0;font-size:1rem;font-weight:700;">
+				<i class="fas fa-table" aria-hidden="true"></i>
+				<span>Detalle de Saldos</span>
 				<span id="contadorFilas" style="font-size:0.9rem;"></span>
 			  </h3>
 			  <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;">
@@ -7316,6 +7316,14 @@ input.search-bar {
 		  generarGraficosSaldos(filas, datosCalculados);
 		}
 	
+
+	// ✅ Formato monetario colombiano único: $ 1.234.567 (sin decimales en pantalla;
+	// los cálculos internos conservan la precisión original de la matriz)
+	function formatCOP(valor) {
+	  const n = Number(valor);
+	  if (!isFinite(n)) return '—';
+	  return (n < 0 ? '-$' : '$') + Math.round(Math.abs(n)).toLocaleString('es-CO');
+	}
 
 	// ===== Utilidades de seguridad y validación para Saldos =====
 	function escapeHtml(valor) {
@@ -11150,20 +11158,19 @@ function toggleNovedadBlock(id) {
 	  compareBtn.id = 'compareButton';
 	  compareBtn.className = 'btn btn-primary';
 	  compareBtn.innerHTML = '<i class="fas fa-balance-scale"></i> Comparar Predios';
-	  compareBtn.style.cssText = `
-		margin-top: 15px;
-		margin-bottom: 15px;
-		background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-		width: 100%;
-		max-width: 580px;
-	  `;
+	  compareBtn.type = 'button';
+	  compareBtn.style.cssText = `margin-top: 10px;`;
 	  compareBtn.onclick = showCompareModal;
 
 	  const searchCard = searchContainer.querySelector('.section-card');
 	  if (searchCard) {
 		const searchInput = searchCard.querySelector('#searchInput');
 		if (searchInput && !searchCard.querySelector('#compareButton')) {
-		  searchCard.insertBefore(compareBtn, searchInput.nextSibling);
+		  // ✅ El campo está dentro de un contenedor; se inserta después de ese
+		  // contenedor (antes se usaba insertBefore sobre un nodo que no era hijo
+		  // directo y el botón nunca aparecía).
+		  const ancla = searchInput.parentElement || searchInput;
+		  ancla.insertAdjacentElement('afterend', compareBtn);
 		}
 	  }
 	}
@@ -11344,13 +11351,13 @@ function toggleNovedadBlock(id) {
               <div style="margin: 10px 0;">
                 <p style="color: #64748b; font-size: 0.9rem;">Total a Tramitar</p>
                 <p style="font-size: 1.3rem; font-weight: 700;">
-                  $${data1.tramitarTotal.toLocaleString('es-CO', {minimumFractionDigits: 2})}
+                  ${formatCOP(data1.tramitarTotal)}
                 </p>
               </div>
               <div style="margin: 10px 0;">
                 <p style="color: #64748b; font-size: 0.9rem;">Intereses</p>
                 <p style="font-size: 1.1rem; font-weight: 700; color: #ef4444;">
-                  $${data1.interesesTotal.toLocaleString('es-CO', {minimumFractionDigits: 2})}
+                  ${formatCOP(data1.interesesTotal)}
                 </p>
               </div>
             </div>
@@ -11379,13 +11386,13 @@ function toggleNovedadBlock(id) {
               <div style="margin: 10px 0;">
                 <p style="color: #64748b; font-size: 0.9rem;">Total a Tramitar</p>
                 <p style="font-size: 1.3rem; font-weight: 700;">
-                  $${data2.tramitarTotal.toLocaleString('es-CO', {minimumFractionDigits: 2})}
+                  ${formatCOP(data2.tramitarTotal)}
                 </p>
               </div>
               <div style="margin: 10px 0;">
                 <p style="color: #64748b; font-size: 0.9rem;">Intereses</p>
                 <p style="font-size: 1.1rem; font-weight: 700; color: #ef4444;">
-                  $${data2.interesesTotal.toLocaleString('es-CO', {minimumFractionDigits: 2})}
+                  ${formatCOP(data2.interesesTotal)}
                 </p>
               </div>
             </div>
@@ -11494,11 +11501,11 @@ function toggleNovedadBlock(id) {
 			  <td>${row.unit.toUpperCase()}</td>
 			  <td>${factura}</td>
 			  <td style="text-align:right;">${kwh.toFixed(2)} kWh</td>
-			  <td style="text-align:right;">$${consumo.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-			  <td style="text-align:right;">$${aPublico.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-			  <td style="text-align:right;">$${aseo.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-			  <td style="text-align:right;">$${tramitar.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-			  <td style="text-align:right;">$${intereses.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+			  <td style="text-align:right;">${formatCOP(consumo)}</td>
+			  <td style="text-align:right;">${formatCOP(aPublico)}</td>
+			  <td style="text-align:right;">${formatCOP(aseo)}</td>
+			  <td style="text-align:right;">${formatCOP(tramitar)}</td>
+			  <td style="text-align:right;">${formatCOP(intereses)}</td>
 			</tr>
 		  `;
 		});
@@ -11520,11 +11527,11 @@ function toggleNovedadBlock(id) {
 			<td colspan="2">TOTALES</td>
 			<td></td>
 			<td style="text-align:right;">${totals.kwh.toFixed(2)} kWh</td>
-			<td style="text-align:right;">$${totals.consumo.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-			<td style="text-align:right;">$${totals.aPublico.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-			<td style="text-align:right;">$${totals.aseo.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-			<td style="text-align:right;">$${totals.tramitar.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-			<td style="text-align:right;">$${totals.intereses.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+			<td style="text-align:right;">${formatCOP(totals.consumo)}</td>
+			<td style="text-align:right;">${formatCOP(totals.aPublico)}</td>
+			<td style="text-align:right;">${formatCOP(totals.aseo)}</td>
+			<td style="text-align:right;">${formatCOP(totals.tramitar)}</td>
+			<td style="text-align:right;">${formatCOP(totals.intereses)}</td>
 		  </tr>
 		`;
 		promediosHTML = `
@@ -11534,23 +11541,23 @@ function toggleNovedadBlock(id) {
 		  </div>
 		  <div style="background:white;padding:15px;border-radius:8px;">
 			<p style="color:#64748b;margin-bottom:5px;">Promedio Consumo</p>
-			<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">$${(totals.consumo / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+			<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">${formatCOP((totals.consumo / count))}</p>
 		  </div>
 		  <div style="background:white;padding:15px;border-radius:8px;">
 			<p style="color:#64748b;margin-bottom:5px;">Promedio A. Público</p>
-			<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">$${(totals.aPublico / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+			<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">${formatCOP((totals.aPublico / count))}</p>
 		  </div>
 		  <div style="background:white;padding:15px;border-radius:8px;">
 			<p style="color:#64748b;margin-bottom:5px;">Promedio Aseo</p>
-			<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">$${(totals.aseo / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+			<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">${formatCOP((totals.aseo / count))}</p>
 		  </div>
 		  <div style="background:white;padding:15px;border-radius:8px;">
 			<p style="color:#64748b;margin-bottom:5px;">Promedio Tramitado</p>
-			<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">$${(totals.tramitar / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+			<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">${formatCOP((totals.tramitar / count))}</p>
 		  </div>
 		  <div style="background:white;padding:15px;border-radius:8px;">
 			<p style="color:#64748b;margin-bottom:5px;">Promedio Intereses</p>
-			<p style="font-size:1.3rem;font-weight:700;color:#ef4444;">$${(totals.intereses / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+			<p style="font-size:1.3rem;font-weight:700;color:#ef4444;">${formatCOP((totals.intereses / count))}</p>
 		  </div>
 		`;
 	  } else if (service === 'acueducto') {
@@ -11575,11 +11582,11 @@ function toggleNovedadBlock(id) {
 			  <td>${row.unit.toUpperCase()}</td>
 			  <td>${factura}</td>
 			  <td style="text-align:right;">${m3.toFixed(2)} M³</td>
-			  <td style="text-align:right;">$${acueducto.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-			  <td style="text-align:right;">$${alcantarillado.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-			  <td style="text-align:right;">$${aseo.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-			  <td style="text-align:right;">$${tramitar.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-			  <td style="text-align:right;">$${intereses.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+			  <td style="text-align:right;">${formatCOP(acueducto)}</td>
+			  <td style="text-align:right;">${formatCOP(alcantarillado)}</td>
+			  <td style="text-align:right;">${formatCOP(aseo)}</td>
+			  <td style="text-align:right;">${formatCOP(tramitar)}</td>
+			  <td style="text-align:right;">${formatCOP(intereses)}</td>
 			</tr>
 		  `;
 		});
@@ -11601,11 +11608,11 @@ function toggleNovedadBlock(id) {
 			<td colspan="2">TOTALES</td>
 			<td></td>
 			<td style="text-align:right;">${totals.m3.toFixed(2)} M³</td>
-			<td style="text-align:right;">$${totals.acueducto.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-			<td style="text-align:right;">$${totals.alcantarillado.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-			<td style="text-align:right;">$${totals.aseo.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-			<td style="text-align:right;">$${totals.tramitar.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-			<td style="text-align:right;">$${totals.intereses.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+			<td style="text-align:right;">${formatCOP(totals.acueducto)}</td>
+			<td style="text-align:right;">${formatCOP(totals.alcantarillado)}</td>
+			<td style="text-align:right;">${formatCOP(totals.aseo)}</td>
+			<td style="text-align:right;">${formatCOP(totals.tramitar)}</td>
+			<td style="text-align:right;">${formatCOP(totals.intereses)}</td>
 		  </tr>
 		`;
 		promediosHTML = `
@@ -11615,23 +11622,23 @@ function toggleNovedadBlock(id) {
 		  </div>
 		  <div style="background:white;padding:15px;border-radius:8px;">
 			<p style="color:#64748b;margin-bottom:5px;">Promedio Acueducto</p>
-			<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">$${(totals.acueducto / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+			<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">${formatCOP((totals.acueducto / count))}</p>
 		  </div>
 		  <div style="background:white;padding:15px;border-radius:8px;">
 			<p style="color:#64748b;margin-bottom:5px;">Promedio Alcantarillado</p>
-			<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">$${(totals.alcantarillado / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+			<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">${formatCOP((totals.alcantarillado / count))}</p>
 		  </div>
 		  <div style="background:white;padding:15px;border-radius:8px;">
 			<p style="color:#64748b;margin-bottom:5px;">Promedio Aseo</p>
-			<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">$${(totals.aseo / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+			<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">${formatCOP((totals.aseo / count))}</p>
 		  </div>
 		  <div style="background:white;padding:15px;border-radius:8px;">
 			<p style="color:#64748b;margin-bottom:5px;">Promedio Tramitado</p>
-			<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">$${(totals.tramitar / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+			<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">${formatCOP((totals.tramitar / count))}</p>
 		  </div>
 		  <div style="background:white;padding:15px;border-radius:8px;">
 			<p style="color:#64748b;margin-bottom:5px;">Promedio Intereses</p>
-			<p style="font-size:1.3rem;font-weight:700;color:#ef4444;">$${(totals.intereses / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+			<p style="font-size:1.3rem;font-weight:700;color:#ef4444;">${formatCOP((totals.intereses / count))}</p>
 		  </div>
 		`;
 	  } else if (service === 'gas') {
@@ -11650,8 +11657,8 @@ function toggleNovedadBlock(id) {
 			  <td>${row.unit.toUpperCase()}</td>
 			  <td>${factura}</td>
 			  <td style="text-align:right;">${m3.toFixed(2)} M³</td>
-			  <td style="text-align:right;">$${tramitar.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-			  <td style="text-align:right;">$${intereses.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+			  <td style="text-align:right;">${formatCOP(tramitar)}</td>
+			  <td style="text-align:right;">${formatCOP(intereses)}</td>
 			</tr>
 		  `;
 		});
@@ -11670,8 +11677,8 @@ function toggleNovedadBlock(id) {
 			<td colspan="2">TOTALES</td>
 			<td></td>
 			<td style="text-align:right;">${totals.m3.toFixed(2)} M³</td>
-			<td style="text-align:right;">$${totals.tramitar.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
-			<td style="text-align:right;">$${totals.intereses.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+			<td style="text-align:right;">${formatCOP(totals.tramitar)}</td>
+			<td style="text-align:right;">${formatCOP(totals.intereses)}</td>
 		  </tr>
 		`;
 		promediosHTML = `
@@ -11681,11 +11688,11 @@ function toggleNovedadBlock(id) {
 		  </div>
 		  <div style="background:white;padding:15px;border-radius:8px;">
 			<p style="color:#64748b;margin-bottom:5px;">Promedio Tramitado</p>
-			<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">$${(totals.tramitar / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+			<p style="font-size:1.3rem;font-weight:700;color:var(--primary-solid);">${formatCOP((totals.tramitar / count))}</p>
 		  </div>
 		  <div style="background:white;padding:15px;border-radius:8px;">
 			<p style="color:#64748b;margin-bottom:5px;">Promedio Intereses</p>
-			<p style="font-size:1.3rem;font-weight:700;color:#ef4444;">$${(totals.intereses / count).toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+			<p style="font-size:1.3rem;font-weight:700;color:#ef4444;">${formatCOP((totals.intereses / count))}</p>
 		  </div>
 		`;
 	  }
@@ -11914,22 +11921,22 @@ function toggleNovedadBlock(id) {
 			let cardsHtml = '';
 			if (service === 'energia') {
 			  cardsHtml += createStatCard('fa-bolt', 'KW/H', totals.kwh.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
-			  cardsHtml += createStatCard('fa-file-invoice-dollar', 'Energía', `$${totals.consumoValor.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
-			  cardsHtml += createStatCard('fa-lightbulb', 'A. público', `$${totals.aPublico.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
-			  cardsHtml += createStatCard('fa-trash', 'Aseo', `$${totals.aseo.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
-			  cardsHtml += createStatCard('fa-file-invoice', 'Total a tramitar', `$${totals.tramitar.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
-			  cardsHtml += createStatCard('fa-triangle-exclamation', 'Intereses', `$${totals.intereses.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
+			  cardsHtml += createStatCard('fa-file-invoice-dollar', 'Energía', `${formatCOP(totals.consumoValor)}`);
+			  cardsHtml += createStatCard('fa-lightbulb', 'A. público', `${formatCOP(totals.aPublico)}`);
+			  cardsHtml += createStatCard('fa-trash', 'Aseo', `${formatCOP(totals.aseo)}`);
+			  cardsHtml += createStatCard('fa-file-invoice', 'Total a tramitar', `${formatCOP(totals.tramitar)}`);
+			  cardsHtml += createStatCard('fa-triangle-exclamation', 'Intereses', `${formatCOP(totals.intereses)}`);
 			} else if (service === 'acueducto') {
 			  cardsHtml += createStatCard('fa-droplet', 'M³', totals.m3.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
-			  cardsHtml += createStatCard('fa-faucet', 'Acueducto', `$${totals.acueducto.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
-			  cardsHtml += createStatCard('fa-toilet', 'Alcantarillado', `$${totals.alcantarillado.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
-			  cardsHtml += createStatCard('fa-trash', 'Aseo', `$${totals.aseo.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
-			  cardsHtml += createStatCard('fa-file-invoice', 'Total a tramitar', `$${totals.tramitar.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
-			  cardsHtml += createStatCard('fa-triangle-exclamation', 'Intereses', `$${totals.intereses.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
+			  cardsHtml += createStatCard('fa-faucet', 'Acueducto', `${formatCOP(totals.acueducto)}`);
+			  cardsHtml += createStatCard('fa-toilet', 'Alcantarillado', `${formatCOP(totals.alcantarillado)}`);
+			  cardsHtml += createStatCard('fa-trash', 'Aseo', `${formatCOP(totals.aseo)}`);
+			  cardsHtml += createStatCard('fa-file-invoice', 'Total a tramitar', `${formatCOP(totals.tramitar)}`);
+			  cardsHtml += createStatCard('fa-triangle-exclamation', 'Intereses', `${formatCOP(totals.intereses)}`);
 			} else if (service === 'gas') {
 			  cardsHtml += createStatCard('fa-fire', 'M³', totals.m3.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
-			  cardsHtml += createStatCard('fa-file-invoice', 'Total a tramitar', `$${totals.tramitar.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
-			  cardsHtml += createStatCard('fa-triangle-exclamation', 'Intereses', `$${totals.intereses.toLocaleString('es-CO', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`);
+			  cardsHtml += createStatCard('fa-file-invoice', 'Total a tramitar', `${formatCOP(totals.tramitar)}`);
+			  cardsHtml += createStatCard('fa-triangle-exclamation', 'Intereses', `${formatCOP(totals.intereses)}`);
 			}
 
 			let periodoLabel;
