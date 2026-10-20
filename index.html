@@ -1519,7 +1519,7 @@ body {
   color: #2d3748 !important;
 }
 
-//* ===== VARIABLES DE TEMA OSCURO COMPLETO ===== */
+/* ===== VARIABLES DE TEMA OSCURO COMPLETO ===== */
 [data-theme="dark"] {
   --surface: rgba(30, 41, 59, 0.95);
   --text-primary: #f8fafc;
@@ -3087,6 +3087,7 @@ input.search-bar {
   }
 }
 </style>
+<link rel="stylesheet" href="css/tema.css">
 </head>
 <body>
  <div id="loginOverlay">
@@ -3199,43 +3200,46 @@ input.search-bar {
   <div class="layout">
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
-        <p style="font-size: 14px;">Policía Metropolitana de Bucaramanga</p>
-        <p style="font-size: 14px;">Grupo Bienes Raíces</p>
-      </div>
-      <nav class="nav-menu">
-        <div class="nav-link active" data-section="inicio">
-          <i class="fas fa-home"></i>
-          <span>INICIO</span>
+        <img src="logo.jpeg" alt="" class="sidebar-logo" width="36" height="36">
+        <div class="sidebar-titulos">
+          <p class="t1">Policía Metropolitana de Bucaramanga</p>
+          <p class="t2">Grupo Bienes Raíces</p>
         </div>
-        <div class="nav-link" data-section="novedades">
+      </div>
+      <nav class="nav-menu" aria-label="Módulos">
+        <div class="nav-link active" data-section="inicio" role="link" tabindex="0" aria-current="page">
+          <i class="fas fa-home"></i>
+          <span>Inicio</span>
+        </div>
+        <div class="nav-link" data-section="novedades" role="link" tabindex="0">
           <i class="fas fa-exclamation-triangle"></i>
           <span>Novedades</span>
         </div>
-        <div class="nav-link" data-section="busqueda">
+        <div class="nav-link" data-section="busqueda" role="link" tabindex="0">
           <i class="fas fa-search"></i>
           <span>Búsqueda Inteligente</span>
         </div>
-        <div class="nav-link" data-section="estadisticas">
+        <div class="nav-link" data-section="estadisticas" role="link" tabindex="0">
           <i class="fas fa-chart-bar"></i>
           <span>Estadísticas</span>
         </div>
-        <div class="nav-link" data-section="graficos">
+        <div class="nav-link" data-section="graficos" role="link" tabindex="0">
           <i class="fas fa-chart-line"></i>
           <span>Análisis Gráfico</span>
         </div>
-		<div class="nav-link" data-section="consolidado">
+		<div class="nav-link" data-section="consolidado" role="link" tabindex="0">
 		  <i class="fas fa-balance-scale"></i>
 		  <span>Consolidado</span>
 		</div>
-		<div class="nav-link" data-section="saldos">
+		<div class="nav-link" data-section="saldos" role="link" tabindex="0">
 		  <i class="fas fa-wallet"></i>
 		  <span>Saldos Presupuestales</span>
 		</div>
-		<div class="nav-link" data-section="predial">
+		<div class="nav-link" data-section="predial" role="link" tabindex="0">
 		  <i class="fas fa-house-chimney"></i>
 		  <span>Impuesto Predial</span>
 		</div>
-        <div class="nav-link" data-section="configuracion">
+        <div class="nav-link" data-section="configuracion" role="link" tabindex="0">
           <i class="fas fa-cog"></i>
           <span>Configuración</span>
         </div>
@@ -3252,9 +3256,10 @@ input.search-bar {
 			<i class="fas fa-bars"></i>
 		  </button>
 		  <div class="topbar-title" style="flex: 1; text-align: center; padding: 0 80px;">
-			<span style="font-weight: 700; font-size: 1.2rem; color: white; white-space: nowrap;">
-			  SISTEMA DE GESTIÓN DE SERVICIOS PÚBLICO GUBIR MEBUC
-			</span>
+			<div class="topbar-marca">
+			  <span class="marca" title="Sistema de Gestión de Servicios Públicos GUBIR MEBUC">GUBIR MEBUC<span class="largo"> · Gestión de Servicios Públicos</span></span>
+			  <span class="modulo" id="topbarModulo" aria-live="polite">Inicio</span>
+			</div>
 		  </div>
 		<!-- Botón flotante de ayuda global -->
 		<button class="floating-help" id="floatingHelpBtn" aria-label="Abrir guía de ayuda">
@@ -3445,7 +3450,7 @@ input.search-bar {
 		  
 
 		<!-- Resumen Ejecutivo con Animaciones -->
-		<div class="section-card saldos-section" style="padding:20px;background:linear-gradient(135deg, #06402b, #0a5c3d);color:white;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.15);width:100%;">
+		<div class="section-card saldos-section saldos-kpis" style="padding:20px;width:100%;">
 		  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;font-size:0.9rem;">
 			
 			<div class="kpi-card" style="text-align:center;padding:15px;background:rgba(255,255,255,0.1);border-radius:8px;transition:all 0.3s ease;cursor:pointer;border:2px solid transparent;">
@@ -3492,6 +3497,9 @@ input.search-bar {
 			
 		  </div>
 		</div>
+
+		<!-- Avisos de validación de la última importación de matrices -->
+		<div id="avisosImportacionPanel" class="section-card saldos-section avisos-panel" hidden role="region" aria-live="polite" aria-label="Avisos de importación"></div>
 
 		<!-- Formulario para Editar/Agregar Presupuesto (oculto por defecto) -->
 		<div class="section-card saldos-section" id="adminFormSection" style="display:none;">
@@ -3560,15 +3568,15 @@ input.search-bar {
 
 		  <!-- Contenedor de botones alineados abajo y centrados -->
 		  <div style="display:flex;justify-content:center;gap:15px;margin-top:10px;">
-			<button id="btnGuardarEdicion" class="btn"
+			<button id="btnGuardarEdicion" class="btn btn-primary"
 			  style="padding:10px 24px;height:40px;font-size:0.9rem;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#06402b;font-weight:bold;border:none;border-radius:6px;cursor:pointer;transition:all 0.3s;box-shadow:0 2px 8px rgba(251,191,36,0.3);min-width:160px;text-align:center;">
 			  <i class="fas fa-save"></i> Guardar
 			</button>
-			<button id="btnCerrarAdmin" class="btn"
+			<button id="btnCerrarAdmin" class="btn btn-neutro"
 			  style="padding:10px 20px;height:40px;font-size:0.9rem;background:linear-gradient(135deg,#6b7280,#4b5563);color:white;font-weight:bold;border:none;border-radius:6px;cursor:pointer;transition:all .3s;display:none;">
 			  <i class="fas fa-user-times"></i> Salir del modo administrador
 			</button>
-			<button id="btnBorrarTodosSaldos" class="btn"
+			<button id="btnBorrarTodosSaldos" class="btn btn-peligro"
 			  style="padding:10px 20px;height:40px;font-size:0.9rem;background:linear-gradient(135deg,#ef4444,#dc2626);color:white;font-weight:bold;border:none;border-radius:6px;cursor:pointer;transition:all .3s;display:none;">
 			  <i class="fas fa-trash-alt"></i> Borrar todos los datos del año
 			</button>
@@ -3633,17 +3641,17 @@ input.search-bar {
 
 				<!-- Botón de desglose (ocupa 2 columnas en pantallas pequeñas) -->
 				<div style="grid-column: span 2 / span 2; display:flex; justify-content:flex-end; align-items:end; gap:12px; flex-wrap:wrap;">
-				  <button id="btnVerDesglose" class="btn" style="background:linear-gradient(135deg, #06402b, #0a5c3d);color:white;padding:10px 20px;font-size:0.9rem;font-weight:600;">
+				  <button id="btnVerDesglose" class="btn btn-primary" style="background:linear-gradient(135deg, #06402b, #0a5c3d);color:white;padding:10px 20px;font-size:0.9rem;font-weight:600;">
 					<i class="fas fa-table"></i> Ver Desglose
 				  </button>
 				  <div style="display:flex;gap:10px;">
-					<button id="btnLimpiarFiltros" class="btn-secondary" style="padding:10px 16px;background:#6b7280;color:white;border:none;border-radius:6px;font-size:0.85rem;white-space:nowrap;">
+					<button id="btnLimpiarFiltros" class="btn-secondary btn-neutro" style="padding:10px 16px;background:#6b7280;color:white;border:none;border-radius:6px;font-size:0.85rem;white-space:nowrap;">
 					  <i class="fas fa-undo"></i> Limpiar
 					</button>
-					<button id="btnExportarExcel" class="btn-secondary" style="padding:10px 16px;background:#10b981;color:white;border:none;border-radius:6px;font-size:0.85rem;white-space:nowrap;">
+					<button id="btnExportarExcel" class="btn-secondary btn-exito" style="padding:10px 16px;background:#10b981;color:white;border:none;border-radius:6px;font-size:0.85rem;white-space:nowrap;">
 					  <i class="fas fa-file-excel"></i> Exportar
 					</button>
-					<button onclick="abrirModalControlAlumbrado()" class="btn-secondary" style="padding:10px 16px;background:#fbbf24;color:#06402b;border:none;border-radius:6px;font-size:0.85rem;white-space:nowrap;font-weight:700;">
+					<button onclick="abrirModalControlAlumbrado()" class="btn-secondary btn-contorno" style="padding:10px 16px;background:#fbbf24;color:#06402b;border:none;border-radius:6px;font-size:0.85rem;white-space:nowrap;font-weight:700;">
 					  <i class="fas fa-lightbulb"></i> Meses Alumbrado
 					</button>
 				  </div>
@@ -3664,14 +3672,12 @@ input.search-bar {
 		  </div>
 
 		  <!-- Tabla con Scroll Mejorado -->
-		  <div class="section-card saldos-section" style="padding:0;background:white;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1);overflow:hidden;">
-			<div style="padding:15px 20px;background:#f9fafb;border-bottom:2px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+		  <div class="section-card saldos-section saldos-tabla" style="padding:0;overflow:hidden;">
+			<div class="saldos-tabla-cabecera" style="padding:15px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
 			  <h3 style="color:#000 !important;margin:0;font-size:1.1rem;font-weight:700 !important;">
 				<i class="fas fa-table"></i>
 				<span style="color:#000 !important;">Detalle de Saldos</span>
-				<span id="contadorFilas" style="color:#000 !important;font-size:0.9rem;font-weight:700 !important;">
-				  (19 registros)
-				</span>
+				<span id="contadorFilas" style="font-size:0.9rem;"></span>
 			  </h3>
 			  <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;">
 								<div style="display:flex;gap:6px;align-items:center;position:relative;">
@@ -3686,7 +3692,7 @@ input.search-bar {
 					   style="display:none;position:absolute;top:calc(100% + 8px);right:0;z-index:60;background:#fff;border:1px solid #e5e7eb;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,0.18);padding:12px;width:250px;max-height:380px;overflow-y:auto;">
 				  </div>
 				</div>
-				<span style="font-size:0.85rem;color:#6b7280;">Auto-guardado: <span id="estadoGuardado" style="color:#10b981;"><i class="fas fa-check-circle"></i> Activo</span></span>
+				<span id="estadoGuardado" class="estado-persistencia" title="Origen de los presupuestos mostrados"><span class="punto"></span><span class="texto">Comprobando conexión…</span></span>
 			  </div>
 			</div>
 			<div id="tablaContainer" style="width:100%;overflow-x:auto;position:relative;display:block;-webkit-overflow-scrolling:touch;">
@@ -3934,6 +3940,7 @@ input.search-bar {
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script src="js/importador.js"></script>
 
 
 	<script>
@@ -4686,14 +4693,13 @@ input.search-bar {
 	  const asignacion = parseFloat(document.getElementById('editarAsignacion').value) || 0;
 	  const dicAnterior = parseFloat(document.getElementById('editarDicAnterior').value) || 0;
 
+	  const btnGuardar = document.getElementById('btnGuardarEdicion');
+	  if (btnGuardar?.disabled) return; // evita envíos duplicados
+	  if (btnGuardar) btnGuardar.disabled = true;
 	  showLoading();
 	  try {
 		// Conservar los meses congelados ya existentes (el formulario no los edita)
 		const mesesCongeladosActuales = appData.saldos?.[unidad]?.[servicio]?.mesesCongelados || [];
-
-		// Actualizar en estructura local
-		if (!appData.saldos[unidad]) appData.saldos[unidad] = {};
-		appData.saldos[unidad][servicio] = { cdp, asignacion, dicAnterior, mesesCongelados: mesesCongeladosActuales };
 
 		// ✅ Usar window.supabaseClient (definido globalmente con seguridad)
 		if (!window.supabaseClient) {
@@ -4716,16 +4722,19 @@ input.search-bar {
 
 		if (error) throw error;
 
-		// Respaldo local
+		// ✅ La estructura local se actualiza solo cuando la nube confirmó el guardado
+		if (!appData.saldos[unidad]) appData.saldos[unidad] = {};
+		appData.saldos[unidad][servicio] = { cdp, asignacion, dicAnterior, mesesCongelados: mesesCongeladosActuales };
 		localStorage.setItem('appDataSaldos', JSON.stringify(appData.saldos));
 		limpiarFormulario();
 		renderTablaSaldos();
 		showNotification(`✅ Presupuesto guardado en la nube para ${servicio} (${unidad.toUpperCase()})`, 'success', 3000);
 	  } catch (error) {
 		console.error('❌ Error al guardar en Supabase:', error);
-		showNotification(`❌ Error: ${error.message}`, 'error', 5000);
+		showNotification(`❌ No se guardó el presupuesto: ${error.message}. Los datos del formulario se conservan para reintentar.`, 'error', 6000);
 	  } finally {
 		hideLoading();
+		if (btnGuardar) btnGuardar.disabled = false;
 	  }
 	}
 	
@@ -4965,7 +4974,7 @@ input.search-bar {
 		}
 	
 	// Función para calcular proyección presupuestal del próximo mes (dinámica por tendencia)
-	function calcularProyeccionMensual() {
+	function calcularProyeccionMensual(filtro = null) {
 	  // ✅ Usa datos SIN congelamiento: Alumbrado Público se asume pagado con
 	  // normalidad mes a mes, ya que para el mes que se proyecta aún no se sabe
 	  // si el rubro se agotará.
@@ -4986,6 +4995,7 @@ input.search-bar {
 		servicios.forEach(servicio => {
 		  const config = appData.saldos[unidad]?.[servicio];
 		  if (!config) return;
+		  if (filtro && !filtro.has(`${unidad}|${servicio}`)) return;
 
 		  let totalTramitado = 0;
 		  let mesesConDatos = 0;
@@ -5009,7 +5019,7 @@ input.search-bar {
 	  return Math.round(totalProyectado);
 	}
 	
-	function calcularProyeccionAnual() {
+	function calcularProyeccionAnual(filtro = null) {
 	  // ✅ Leer IPC seleccionado por el usuario
 	  const ipcSelect = document.getElementById('selectIPC');
 	  const factorIPC = ipcSelect ? parseFloat(ipcSelect.value) : 0.15; // fallback 15%
@@ -5028,6 +5038,7 @@ input.search-bar {
 		servicios.forEach(servicio => {
 		  const config = appData.saldos[unidad]?.[servicio];
 		  if (!config) return;
+		  if (filtro && !filtro.has(`${unidad}|${servicio}`)) return;
 
 		  if (servicio === 'Alumbrado Público') {
 			// ✅ Se proyecta según el trámite real promedio, no según la asignación
@@ -5470,24 +5481,27 @@ input.search-bar {
 	  chartInstances = {};
 
 	  // Colores consistentes
+	  // Paleta con tonos claramente distinguibles entre servicios
 	  const coloresServicios = {
-		'Energía': 'rgba(251, 191, 36, 0.8)',
-		'Alumbrado Público': 'rgba(245, 158, 11, 0.8)',
-		'Acueducto': 'rgba(32, 191, 107, 0.8)',
-		'Alcantarillado': 'rgba(5, 117, 230, 0.8)',
-		'Gas': 'rgba(245, 175, 25, 0.8)'
+		'Energía': '#d4a017',
+		'Alumbrado Público': '#8b5cf6',
+		'Acueducto': '#0891b2',
+		'Alcantarillado': '#2f7d5b',
+		'Gas': '#ea580c'
 	  };
 	  const coloresUnidades = {
-		'mebuc': 'rgba(251, 191, 36, 0.8)',
-		'desan': 'rgba(32, 191, 107, 0.8)',
-		'demam': 'rgba(245, 175, 25, 0.8)',
-		'setra': 'rgba(5, 117, 230, 0.8)'
+		'mebuc': '#2f7d5b', 'desan': '#3b82c4', 'demam': '#c48a1d',
+		'setra': '#7c5cc4', 'asturias': '#c4513b', 'nusefa': '#3ba6a6'
 	  };
 
-	  // === OPCIONES COMUNES PARA TEXTO BLANCO ===
+	  // === Colores de texto y rejilla según el tema activo (variables de css/tema.css) ===
+	  const estilos = getComputedStyle(document.documentElement);
+	  const colorTexto = (estilos.getPropertyValue('--g-text-2') || '#44534c').trim();
+	  const colorRejilla = (estilos.getPropertyValue('--g-border') || '#dde3e0').trim();
+	  const colorSuperficie = (estilos.getPropertyValue('--g-surface') || '#ffffff').trim();
 	  const whiteTextOptions = {
-		font: { size: 13, family: "'Inter', sans-serif", weight: '500' },
-		color: '#FFFFFF'
+		font: { size: 12, family: "'Inter', sans-serif", weight: '500' },
+		color: colorTexto
 	  };
 
 	  // GRÁFICO 1: Ejecución por Servicio (Doughnut)
@@ -5506,8 +5520,8 @@ input.search-bar {
 		  datasets: [{
 			data: datosServicios,
 			backgroundColor: servicios.map(s => coloresServicios[s]),
-			borderWidth: 3,
-			borderColor: '#fff'
+			borderWidth: 2,
+			borderColor: colorSuperficie
 		  }]
 		},
 		options: {
@@ -5546,7 +5560,9 @@ input.search-bar {
 	  });
 
 	  // GRÁFICO 2: Ejecución por Unidad (Bar)
-	  const unidades = ['mebuc', 'desan', 'demam', 'setra'];
+	  // ✅ Incluye ASTURIAS y NUSEFA y respeta los filtros (antes solo 4 unidades fijas)
+	  const unidades = ['mebuc', 'desan', 'demam', 'setra', 'asturias', 'nusefa']
+		.filter(u => datos.some(d => d.unidad === u));
 	  const datosUnidades = unidades.map(unidad => {
 		const total = datos
 		  .filter(d => d.unidad === unidad)
@@ -5575,11 +5591,11 @@ input.search-bar {
 			  ticks: {
 				...whiteTextOptions,
 				callback: function(value) {
-				  return '$' + (value / 1000000).toFixed(1) + 'M';
+				  return '$' + (value / 1000000).toLocaleString('es-CO', { maximumFractionDigits: 1 }) + ' M';
 				}
 			  },
 			  grid: {
-				color: 'rgba(255,255,255,0.1)'
+				color: colorRejilla
 			  }
 			},
 			x: {
@@ -5611,16 +5627,12 @@ input.search-bar {
 	  // GRÁFICO 3: Tendencia Mensual (Line)
 	  const meses = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
 	  const mesesCompletos = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
-	  const tendenciaMensual = mesesCompletos.map(mes => {
-		let total = 0;
-		unidades.forEach(unidad => {
-		  servicios.forEach(servicio => {
-			if (datosCalculados[unidad] && datosCalculados[unidad][servicio]) {
-			  total += datosCalculados[unidad][servicio][mes] || 0;
-			}
-		  });
-		});
-		return total;
+	  // ✅ Misma fuente que la tabla (filas filtradas). Un mes sin datos importados
+	  // en ninguna fila se deja como hueco (null) en lugar de dibujarlo como $0.
+	  const tendenciaMensual = mesesCompletos.map((mes, i) => {
+		const conDatos = datos.filter(d => d.mesesCargados ? d.mesesCargados[i] : true);
+		if (conDatos.length === 0) return null;
+		return conDatos.reduce((sum, d) => sum + (d.meses[i] || 0), 0);
 	  });
 	  const ctxTendencia = document.getElementById('chartTendencia').getContext('2d');
 	  chartInstances.tendencia = new Chart(ctxTendencia, {
@@ -5630,16 +5642,16 @@ input.search-bar {
 		  datasets: [{
 			label: 'Ejecución Mensual',
 			data: tendenciaMensual,
-			borderColor: '#fbbf24',
-			backgroundColor: 'rgba(251, 191, 36, 0.15)',
-			borderWidth: 3,
+			borderColor: '#1a7350',
+			backgroundColor: 'rgba(26, 115, 80, 0.10)',
+			borderWidth: 2,
 			fill: true,
-			tension: 0.4,
-			pointRadius: 5,
-			pointHoverRadius: 7,
-			pointBackgroundColor: '#fbbf24',
-			pointBorderColor: '#fff',
-			pointBorderWidth: 2
+			tension: 0.25,
+			pointRadius: 3,
+			pointHoverRadius: 6,
+			pointBackgroundColor: '#1a7350',
+			pointBorderColor: colorSuperficie,
+			pointBorderWidth: 1
 		  }]
 		},
 		options: {
@@ -5651,14 +5663,14 @@ input.search-bar {
 			  ticks: {
 				...whiteTextOptions,
 				callback: function(value) {
-				  return '$' + (value / 1000000).toFixed(1) + 'M';
+				  return '$' + (value / 1000000).toLocaleString('es-CO', { maximumFractionDigits: 1 }) + ' M';
 				}
 			  },
-			  grid: { color: 'rgba(255,255,255,0.1)' }
+			  grid: { color: colorRejilla }
 			},
 			x: {
 			  ticks: whiteTextOptions,
-			  grid: { color: 'rgba(255,255,255,0.15)' }
+			  grid: { display: false }
 			}
 		  },
 		  plugins: {
@@ -5695,28 +5707,26 @@ input.search-bar {
 	  }).filter(Boolean);
 
 	  cumplimientoPorServicio.forEach(item => {
-		const colorBarra = item.porcentaje > 80 ? '#ef4444' : item.porcentaje > 60 ? '#f59e0b' : '#22c55e';
-		const colorFondo = item.porcentaje > 80 ? '#331a1a' : item.porcentaje > 60 ? '#332713' : '#0c3321';
-		const barraHTML = `
-		  <div style="margin-bottom:16px;">
-			<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-			  <span style="font-size:0.9rem;font-weight:600;color:white;">${item.servicio}</span>
-			  <span style="font-size:0.85rem;font-weight:700;color:${colorBarra};">${item.porcentaje.toFixed(1)}%</span>
+		const estado = item.porcentaje > 80 ? 'peligro' : item.porcentaje > 60 ? 'alerta' : 'ok';
+		cumplimientoContainer.innerHTML += `
+		  <div style="margin-bottom:12px;">
+			<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+			  <span style="font-size:0.82rem;font-weight:600;color:var(--g-text);">${escapeHtml(item.servicio)}</span>
+			  <span style="font-size:0.8rem;font-weight:700;color:var(--${estado});">${item.porcentaje.toFixed(1)}%</span>
 			</div>
-			<div style="width:100%;height:24px;background:${colorFondo};border-radius:12px;overflow:hidden;position:relative;border:1px solid ${colorBarra}60;">
-			  <div style="width:${Math.min(item.porcentaje, 100)}%;height:100%;background:${colorBarra};transition:width 0.6s ease;border-radius:12px;"></div>
+			<div role="progressbar" aria-label="Ejecución de ${escapeHtml(item.servicio)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(item.porcentaje)}"
+				 style="width:100%;height:8px;background:var(--g-surface-3);border-radius:999px;overflow:hidden;">
+			  <div style="width:${Math.min(item.porcentaje, 100)}%;height:100%;background:var(--${estado});border-radius:999px;"></div>
 			</div>
-			<div style="display:flex;justify-content:space-between;margin-top:6px;font-size:0.8rem;color:#cbd5e0;">
-			  <span>Ejec: <strong>$${(item.totalEjecutado / 1000000).toFixed(1)}M</strong></span>
-			  <span>Asig: <strong>$${(item.totalAsignado / 1000000).toFixed(1)}M</strong></span>
+			<div style="display:flex;justify-content:space-between;margin-top:4px;font-size:0.74rem;color:var(--g-text-3);">
+			  <span>Ejecutado: <strong style="color:var(--g-text-2);">$${Math.round(item.totalEjecutado).toLocaleString('es-CO')}</strong></span>
+			  <span>Asignado: <strong style="color:var(--g-text-2);">$${Math.round(item.totalAsignado).toLocaleString('es-CO')}</strong></span>
 			</div>
-		  </div>
-		`;
-		cumplimientoContainer.innerHTML += barraHTML;
+		  </div>`;
 	  });
 
 	  if (cumplimientoPorServicio.length === 0) {
-		cumplimientoContainer.innerHTML = '<p style="text-align:center;color:#cbd5e0;padding:20px;font-size:0.9rem;">No hay datos para mostrar</p>';
+		cumplimientoContainer.innerHTML = '<p style="text-align:center;color:var(--g-text-3);padding:20px;font-size:0.85rem;">No hay datos para los filtros seleccionados</p>';
 	  }
 	}
 	
@@ -5778,48 +5788,30 @@ input.search-bar {
 	  });
 
 	  // ===== DATOS =====
-	  const datosCalculados = calcularValoresPorMesYUnidad();
-	  const unidades = ['mebuc', 'desan', 'demam', 'setra', 'asturias', 'nusefa'];
-	  const servicios = ['Energía', 'Alumbrado Público', 'Acueducto', 'Alcantarillado', 'Gas'];
-	  const meses = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
-
-	  unidades.forEach(unidad => {
-		if (!appData.saldos[unidad]) return;
-		servicios.forEach(servicio => {
-		  const config = appData.saldos[unidad][servicio];
-		  if (!config) return;
-
-		  const datosServicio = datosCalculados[unidad]?.[servicio] || {};
-		  const totalMeses = meses.reduce((sum, m) => sum + (datosServicio[m] || 0), 0);
-		  const totalTramitado = totalMeses + (config.dicAnterior || 0);
-		  const asignacion = config.asignacion || 0;
-		  const mesesConDatos = meses.filter(m => datosServicio[m] > 0).length;
-		  const promedio = mesesConDatos > 0 ? totalMeses / mesesConDatos : 0;
-		  const saldoEjec = asignacion - totalTramitado;
-		  const mesActual = new Date().getMonth(); // 0 = enero
-		  const mesesRestantes = 11 - mesActual;
-		  const terminarVigencia = promedio * mesesRestantes;
-		  const sobraFalta = saldoEjec - terminarVigencia;
-		  const porcentajeEjec = asignacion > 0 ? (totalTramitado / asignacion * 100) : 0;
-
-		  const row = [
-			unidad.toUpperCase(),
-			servicio,
-			config.cdp || '',
-			asignacion,
-			config.dicAnterior || 0,
-			...meses.map(m => datosServicio[m] || 0),
-			totalTramitado,
-			Math.round(promedio),
-			saldoEjec,
-			Math.round(terminarVigencia),
-			sobraFalta, // sin $, con signo
-			porcentajeEjec / 100 // para formato %
-		  ];
-
-		  worksheet.addRow(row);
-		});
+	  // ✅ Se exportan exactamente las filas que muestra la tabla (con los filtros
+	  // activos), para que el archivo coincida con la pantalla.
+	  renderTablaSaldos();
+	  const filasExportar = (window.ultimaVistaSaldos && window.ultimaVistaSaldos.filas) || [];
+	  filasExportar.forEach(f => {
+		worksheet.addRow([
+		  f.unidad.toUpperCase(), f.servicio, f.cdp || '', f.asignacion, f.dicAnterior,
+		  // mes sin datos importados → celda vacía (no $0)
+		  ...f.meses.map((v, i) => (f.mesesCargados && !f.mesesCargados[i]) ? null : v),
+		  f.totalTramitado, Math.round(f.promedio), f.saldoEjec, Math.round(f.terminarVigencia),
+		  f.sobraFalta, f.porcentajeEjec / 100
+		]);
 	  });
+	  if (filasExportar.length) {
+		const sumaCol = (fn) => filasExportar.reduce((a, f) => a + fn(f), 0);
+		const asig = sumaCol(f => f.asignacion), trami = sumaCol(f => f.totalTramitado);
+		const filaTotal = worksheet.addRow([
+		  'TOTALES', '', '', asig, sumaCol(f => f.dicAnterior),
+		  ...Array.from({ length: 12 }, (_, i) => sumaCol(f => f.meses[i])),
+		  trami, Math.round(sumaCol(f => f.promedio) / filasExportar.length), sumaCol(f => f.saldoEjec),
+		  Math.round(sumaCol(f => f.terminarVigencia)), sumaCol(f => f.sobraFalta), asig > 0 ? trami / asig : 0
+		]);
+		filaTotal.font = { bold: true };
+	  }
 
 	  // ===== APLICAR FORMATOS POR COLUMNA =====
 	  const totalRows = worksheet.rowCount;
@@ -5847,10 +5839,10 @@ input.search-bar {
 		  if ([1, 2, 3].includes(colNumber)) {
 			// Sin formato numérico: Unidad, Servicio, CDP
 			// Ya están como string
-		  } else if (colNumber === 22) {
-			// % Ejecución → formato porcentaje
+		  } else if (colNumber === 23) {
+			// % Ejecución → formato porcentaje (antes se aplicaba por error a Sobra/Falta)
 			cell.numFmt = '0.00%';
-		  } else if (colNumber === 21) {
+		  } else if (colNumber === 22) {
 			// Sobra/Falta → número con signo, sin $
 			cell.numFmt = '#,##0_);[Red](#,##0)';
 		  } else {
@@ -5960,16 +5952,8 @@ input.search-bar {
 	  
 	  autoGuardadoInterval = setInterval(() => {
 		if (appData.saldos && Object.keys(appData.saldos).length > 0) {
+		  // Respaldo local periódico (el indicador de la tabla muestra el origen real de los datos)
 		  localStorage.setItem('appDataSaldos', JSON.stringify(appData.saldos));
-		  const estadoEl = document.getElementById('estadoGuardado');
-		  if (estadoEl) {
-			estadoEl.innerHTML = '<i class="fas fa-check-circle"></i> Guardado';
-			estadoEl.style.color = '#10b981';
-			
-			setTimeout(() => {
-			  estadoEl.innerHTML = '<i class="fas fa-check-circle"></i> Activo';
-			}, 2000);
-		  }
 		}
 	  }, 30000); // Cada 30 segundos
 	}
@@ -6152,12 +6136,25 @@ input.search-bar {
 	}
 
 	// Función para inicializar el módulo de saldos
+	function actualizarEstadoPersistencia(origen) {
+	  const el = document.getElementById('estadoGuardado');
+	  if (!el) return;
+	  const textos = {
+		nube: 'Sincronizado con la nube',
+		local: 'Sin conexión con la nube · mostrando respaldo local',
+		vacio: 'Sin conexión con la nube · sin respaldo local'
+	  };
+	  el.classList.remove('ok', 'local');
+	  el.classList.add(origen === 'nube' ? 'ok' : 'local');
+	  el.querySelector('.texto').textContent = textos[origen] || origen;
+	}
+
 	function initSaldos() {
 		  // 1️⃣ Cargar primero desde Supabase
-		  cargarSaldosDesdeSupabase().then(() => {
-			// 2️⃣ Si no hay datos en Supabase, usar localStorage como respaldo
-			const tieneDatos = Object.values(appData.saldos)
-			  .some(unidad => unidad && Object.keys(unidad).length > 0);
+		  cargarSaldosDesdeSupabase().then((cargadoDeLaNube) => {
+			// 2️⃣ Solo si la nube NO respondió se usa el respaldo local. Una tabla
+			// vacía en la nube es un dato válido y no se reemplaza con datos locales.
+			const tieneDatos = cargadoDeLaNube;
 
 			if (!tieneDatos) {
 			  const saved = localStorage.getItem('appDataSaldos');
@@ -6170,13 +6167,23 @@ input.search-bar {
 					Object.assign(appData.saldos[unidad], parsed[unidad]);
 				  });
 				  console.log('✅ Saldos cargados desde localStorage (respaldo)');
+				  actualizarEstadoPersistencia('local');
+				  showNotification('⚠️ No se pudo conectar con la nube. Se muestran los presupuestos guardados en este equipo.', 'warning', 6000);
 				} catch (e) {
 				  console.warn('⚠️ Error al cargar desde localStorage:', e);
+				  actualizarEstadoPersistencia('vacio');
 				}
+			  } else {
+				actualizarEstadoPersistencia('vacio');
 			  }
+			} else {
+			  actualizarEstadoPersistencia('nube');
 			}
 
-			// 3️⃣ Configurar eventos y comportamientos
+			// 3️⃣ Configurar eventos y comportamientos (una sola vez: initSaldos se
+			// vuelve a ejecutar al iniciar sesión de nuevo y no debe duplicar acciones)
+			if (window._saldosEventosVinculados) { renderTablaSaldos(); return; }
+			window._saldosEventosVinculados = true;
 			document.getElementById('btnGuardarEdicion').addEventListener('click', guardarEdicionPresupuesto);
 			document.getElementById('btnLimpiarForm').addEventListener('click', limpiarFormulario);
 			document.getElementById('filtroUnidadSaldos').addEventListener('change', renderTablaSaldos);
@@ -6986,8 +6993,8 @@ input.search-bar {
 	async function cargarDesdeSupabaseAutomatico() {
 	  try {
 		
-		await cargarDesdeSupabase(); // Usa la función ya corregida
-		showNotification('✅ Carga automática completada con éxito', 'success', 3000);
+		// cargarDesdeSupabase() ya informa el resultado real (éxito parcial o error)
+		await cargarDesdeSupabase();
 	  } catch (error) {
 		console.error('❌ Error en carga automática:', error);
 		showNotification(`❌ Error al cargar datos automáticamente: ${error.message}`, 'error', 5000);
@@ -7124,29 +7131,8 @@ input.search-bar {
 		  const unidades = filtroUnidad === 'todas' ? ['mebuc', 'desan', 'demam', 'setra', 'asturias', 'nusefa'] : [filtroUnidad];
 		  const servicios = filtroServicio === 'todos' ? ['Energía', 'Alumbrado Público', 'Acueducto', 'Alcantarillado', 'Gas'] : [filtroServicio];
 
-		  let totalGeneralAsignado = 0;
-		  let totalGeneralDicAnterior = 0;
-		  let totalGeneralEne = 0;
-		  let totalGeneralFeb = 0;
-		  let totalGeneralMar = 0;
-		  let totalGeneralAbr = 0;
-		  let totalGeneralMay = 0;
-		  let totalGeneralJun = 0;
-		  let totalGeneralJul = 0;
-		  let totalGeneralAgo = 0;
-		  let totalGeneralSep = 0;
-		  let totalGeneralOct = 0;
-		  let totalGeneralNov = 0;
-		  let totalGeneralDic = 0;
-		  let totalGeneralTotalTramitado = 0;
-		  let totalGeneralPromedio = 0;
-		  let totalGeneralSaldoEjec = 0;
-		  let totalGeneralTerminarVigencia = 0;
-		  let totalGeneralSobraFalta = 0;
-		  let totalGeneralPorcentajeEjec = 0;
-		  let totalFilas = 0;
-
 		  const mesesKeys = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
+		  const indiceProblemas = construirIndiceProblemasSaldos();
 		  let filas = [];
 
 		  unidades.forEach(unidad => {
@@ -7158,6 +7144,8 @@ input.search-bar {
 
 			  const asignacion = config.asignacion || 0;
 			  const dicAnterior = config.dicAnterior || 0;
+			  // undefined = el mes no tiene datos cargados (≠ un $0 real)
+			  const mesesCargados = mesesKeys.map(m => datosServicio[m] !== undefined);
 			  const mesesValores = mesesKeys.map(m => datosServicio[m] || 0);
 			  const totalMeses = mesesValores.reduce((a, b) => a + b, 0);
 			  const totalTramitado = totalMeses + dicAnterior;
@@ -7169,84 +7157,91 @@ input.search-bar {
 			  const terminarVigencia = promedio * mesesRestantes;
 			  const sobraFalta = saldoEjec - terminarVigencia;
 			  const porcentajeEjec = asignacion > 0 ? (totalTramitado / asignacion * 100) : 0;
+			  const problemasMes = mesesKeys.map(m => indiceProblemas[`${unidad}|${servicio}|${m}`] || null);
 
 			  filas.push({
 				unidad, servicio, cdp: config.cdp, asignacion, dicAnterior,
-				meses: mesesValores,
+				meses: mesesValores, mesesCargados, problemasMes,
 				totalMeses, totalTramitado, promedio, saldoEjec,
 				terminarVigencia, sobraFalta, porcentajeEjec
 			  });
-
-			  totalGeneralAsignado += asignacion;
-			  totalGeneralDicAnterior += dicAnterior;
-			  totalGeneralEne += mesesValores[0];
-			  totalGeneralFeb += mesesValores[1];
-			  totalGeneralMar += mesesValores[2];
-			  totalGeneralAbr += mesesValores[3];
-			  totalGeneralMay += mesesValores[4];
-			  totalGeneralJun += mesesValores[5];
-			  totalGeneralJul += mesesValores[6];
-			  totalGeneralAgo += mesesValores[7];
-			  totalGeneralSep += mesesValores[8];
-			  totalGeneralOct += mesesValores[9];
-			  totalGeneralNov += mesesValores[10];
-			  totalGeneralDic += mesesValores[11];
-			  totalGeneralTotalTramitado += totalTramitado;
-			  totalGeneralPromedio += promedio;
-			  totalGeneralSaldoEjec += saldoEjec;
-			  totalGeneralTerminarVigencia += terminarVigencia;
-			  totalGeneralSobraFalta += sobraFalta;
-			  totalGeneralPorcentajeEjec += porcentajeEjec;
-			  totalFilas++;
 			});
 		  });
 
-		  filas = filas.filter(fila => {
-			const query = textoBusqueda.toLowerCase();
-			return !query ||
-			  fila.unidad.toLowerCase().includes(query) ||
-			  fila.servicio.toLowerCase().includes(query) ||
-			  (fila.cdp && fila.cdp.toLowerCase().includes(query));
-		  });
+		  const query = (textoBusqueda || '').trim().toLowerCase();
+		  filas = filas.filter(fila => !query ||
+			fila.unidad.toLowerCase().includes(query) ||
+			fila.servicio.toLowerCase().includes(query) ||
+			(fila.cdp && String(fila.cdp).toLowerCase().includes(query)));
+
+		  window.ultimaVistaSaldos = { filas, filtroUnidad, filtroServicio, query };
+
+		  // ✅ Totales e indicadores sobre las MISMAS filas que muestra la tabla
+		  const suma = (fn) => filas.reduce((a, f) => a + fn(f), 0);
+		  const totalGeneralAsignado = suma(f => f.asignacion);
+		  const totalGeneralDicAnterior = suma(f => f.dicAnterior);
+		  const totalesMes = mesesKeys.map((_, i) => suma(f => f.meses[i]));
+		  const [totalGeneralEne, totalGeneralFeb, totalGeneralMar, totalGeneralAbr, totalGeneralMay, totalGeneralJun,
+			totalGeneralJul, totalGeneralAgo, totalGeneralSep, totalGeneralOct, totalGeneralNov, totalGeneralDic] = totalesMes;
+		  const totalGeneralTotalTramitado = suma(f => f.totalTramitado);
+		  const totalGeneralPromedio = suma(f => f.promedio);
+		  const totalGeneralSaldoEjec = suma(f => f.saldoEjec);
+		  const totalGeneralTerminarVigencia = suma(f => f.terminarVigencia);
+		  const totalGeneralSobraFalta = suma(f => f.sobraFalta);
+		  const totalFilas = filas.length;
+		  const fmt = (v) => Math.round(v).toLocaleString('es-CO');
+
+		  if (filas.length === 0) {
+			tbody.innerHTML = `<tr><td colspan="24" class="tabla-vacia">${
+			  Object.keys(appData.saldos || {}).length === 0
+				? 'Aún no hay presupuestos registrados. Un administrador puede agregarlos con el formulario.'
+				: 'Ningún registro coincide con los filtros seleccionados.'}</td></tr>`;
+		  }
 
 		  filas.forEach(fila => {
-			const mesesHtml = fila.meses.map(val =>
-			  `<td class="col-detalle" style="padding:6px 8px;text-align:right;font-size:0.73rem;">$${val.toLocaleString('es-CO', { maximumFractionDigits: 0 })}</td>`
-			).join('');
+			const mesesHtml = fila.meses.map((val, i) => {
+			  const problema = fila.problemasMes[i];
+			  if (!fila.mesesCargados[i]) {
+				return `<td class="col-detalle num celda-sin-datos" title="Sin datos importados para ${mesesKeys[i].toLowerCase()}">—</td>`;
+			  }
+			  return `<td class="col-detalle num${problema ? ' celda-con-aviso' : ''}"${problema ? ` title="${escapeHtml(problema)}"` : ''}>${problema ? '<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> ' : ''}$${fmt(val)}</td>`;
+			}).join('');
 
-			const totalTramitadoFormateado = `$${fila.totalTramitado.toLocaleString('es-CO', { maximumFractionDigits: 0 })}`;
+			const totalTramitadoFormateado = `$${fmt(fila.totalTramitado)}`;
 			const colorEjec = fila.porcentajeEjec > 80 ? '#ef4444' : fila.porcentajeEjec > 60 ? '#f59e0b' : '#22c55e';
 			let badgeEstado = '<span class="badge-estado badge-normal">NORMAL</span>';
 			if (fila.porcentajeEjec > 80) badgeEstado = '<span class="badge-estado badge-critico">CRÍTICO</span>';
 			else if (fila.porcentajeEjec > 60) badgeEstado = '<span class="badge-estado badge-alerta">ALERTA</span>';
+			const unidadAttr = escapeHtml(fila.unidad);
+			const servicioAttr = escapeHtml(fila.servicio);
 
 			const row = document.createElement('tr');
 			row.innerHTML = `
-			  <td style="position:sticky;left:0;background:inherit;z-index:9;font-weight:bold;padding:6px 8px;border-right:1px solid #e5e7eb;">${fila.unidad.toUpperCase()}</td>
-			  <td style="padding:6px 8px;font-weight:500;font-size:0.75rem;">${fila.servicio}</td>
-			  <td class="col-detalle" style="padding:6px 8px;text-align:center;color:#6b7280;font-size:0.7rem;">${fila.cdp || '-'}</td>
-			  <td style="padding:6px 8px;text-align:right;font-weight:600;font-size:0.75rem;">$${fila.asignacion.toLocaleString('es-CO')}</td>
-			  <td class="col-detalle" style="padding:6px 8px;text-align:right;color:#6b7280;font-size:0.75rem;">$${fila.dicAnterior.toLocaleString('es-CO')}</td>
+			  <td class="col-fija">${escapeHtml(fila.unidad.toUpperCase())}</td>
+			  <td class="col-servicio">${servicioAttr}</td>
+			  <td class="col-detalle col-cdp">${fila.cdp ? escapeHtml(fila.cdp) : '-'}</td>
+			  <td class="num fuerte">$${fmt(fila.asignacion)}</td>
+			  <td class="col-detalle num tenue">$${fmt(fila.dicAnterior)}</td>
 			  ${mesesHtml}
-			  <td style="padding:6px 8px;text-align:right;font-weight:600;color:#06402b;font-size:0.75rem;">${totalTramitadoFormateado}</td>
-			  <td class="col-detalle" style="padding:6px 8px;text-align:right;color:#6b7280;font-size:0.75rem;">$${Math.round(fila.promedio).toLocaleString('es-CO')}</td>
-			  <td style="padding:6px 8px;text-align:right;font-weight:500;font-size:0.75rem;">$${fila.saldoEjec.toLocaleString('es-CO')}</td>
-			  <td class="col-detalle" style="padding:6px 8px;text-align:right;color:#6b7280;font-size:0.75rem;">$${Math.round(fila.terminarVigencia).toLocaleString('es-CO')}</td>
-			  <td class="col-detalle" style="padding:6px 8px;text-align:right;color:${fila.sobraFalta >= 0 ? '#22c55e' : '#ef4444'} !important;font-weight:600;font-size:0.75rem;">
-				${fila.sobraFalta >= 0 ? '+' : '-'}$${Math.abs(fila.sobraFalta).toLocaleString('es-CO')}
+			  <td class="num fuerte total-tramitado">${totalTramitadoFormateado}</td>
+			  <td class="col-detalle num tenue">$${fmt(fila.promedio)}</td>
+			  <td class="num${fila.saldoEjec < 0 ? ' negativo' : ''}">$${fmt(fila.saldoEjec)}</td>
+			  <td class="col-detalle num tenue">$${fmt(fila.terminarVigencia)}</td>
+			  <td class="col-detalle num fuerte" style="color:${fila.sobraFalta >= 0 ? 'var(--ok, #16a34a)' : 'var(--peligro, #dc2626)'} !important;">
+				${fila.sobraFalta >= 0 ? '+' : '-'}$${fmt(Math.abs(fila.sobraFalta))}
 			  </td>
-			  <td style="padding:6px 8px;text-align:right;font-size:0.75rem;">
+			  <td class="num">
 				<div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;">
 				  <span style="font-weight:bold;color:${colorEjec};">${fila.porcentajeEjec.toFixed(1)}%</span>
 				  ${badgeEstado}
 				</div>
 			  </td>
-			  <td style="padding:6px 8px;text-align:center;">
-				<button class="btn-accion btn-editar" onclick="cargarDatosParaEdicion('${fila.unidad}', '${fila.servicio}')" title="Editar">
-				  <i class="fas fa-edit"></i>
+			  <td style="text-align:center;white-space:nowrap;">
+				<button class="btn-accion btn-editar" onclick="cargarDatosParaEdicion('${unidadAttr}', '${servicioAttr}')" title="Editar ${servicioAttr} de ${unidadAttr.toUpperCase()}" aria-label="Editar ${servicioAttr} de ${unidadAttr.toUpperCase()}">
+				  <i class="fas fa-edit" aria-hidden="true"></i>
 				</button>
-				<button class="btn-accion btn-eliminar" onclick="eliminarRegistro('${fila.unidad}', '${fila.servicio}')" title="Eliminar">
-				  <i class="fas fa-trash"></i>
+				<button class="btn-accion btn-eliminar" onclick="eliminarRegistro('${unidadAttr}', '${servicioAttr}')" title="Eliminar ${servicioAttr} de ${unidadAttr.toUpperCase()}" aria-label="Eliminar ${servicioAttr} de ${unidadAttr.toUpperCase()}">
+				  <i class="fas fa-trash" aria-hidden="true"></i>
 				</button>
 			  </td>
 			`;
@@ -7257,39 +7252,28 @@ input.search-bar {
 		  const totalPorcentajeEjec = totalGeneralAsignado > 0 ? (totalGeneralTotalTramitado / totalGeneralAsignado * 100) : 0;
 
 		  tfoot.innerHTML = `
-			<tr style="background:linear-gradient(135deg, #f9fafb, #f3f4f6);font-weight:bold;border-top:2px solid #06402b;">
-			  <td colspan="2" style="padding:8px;color:#06402b;font-size:0.75rem;">TOTALES</td>
+			<tr class="fila-totales">
+			  <td colspan="2" class="col-fija">TOTALES${query ? ' (filtrados)' : ''}</td>
 			  <td class="col-detalle"></td>
-			  <td style="padding:8px;text-align:right;color:#06402b;font-size:0.75rem;">$${totalGeneralAsignado.toLocaleString('es-CO')}</td>
-			  <td class="col-detalle" style="padding:8px;text-align:right;color:#6b7280;font-size:0.75rem;">$${totalGeneralDicAnterior.toLocaleString('es-CO')}</td>
-			  <td class="col-detalle" style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralEne.toLocaleString('es-CO')}</td>
-			  <td class="col-detalle" style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralFeb.toLocaleString('es-CO')}</td>
-			  <td class="col-detalle" style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralMar.toLocaleString('es-CO')}</td>
-			  <td class="col-detalle" style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralAbr.toLocaleString('es-CO')}</td>
-			  <td class="col-detalle" style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralMay.toLocaleString('es-CO')}</td>
-			  <td class="col-detalle" style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralJun.toLocaleString('es-CO')}</td>
-			  <td class="col-detalle" style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralJul.toLocaleString('es-CO')}</td>
-			  <td class="col-detalle" style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralAgo.toLocaleString('es-CO')}</td>
-			  <td class="col-detalle" style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralSep.toLocaleString('es-CO')}</td>
-			  <td class="col-detalle" style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralOct.toLocaleString('es-CO')}</td>
-			  <td class="col-detalle" style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralNov.toLocaleString('es-CO')}</td>
-			  <td class="col-detalle" style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralDic.toLocaleString('es-CO')}</td>
-			  <td style="padding:8px;text-align:right;color:#06402b;font-size:0.75rem;">$${totalGeneralTotalTramitado.toLocaleString('es-CO')}</td>
-			  <td class="col-detalle" style="padding:8px;text-align:right;font-size:0.75rem;">$${Math.round(totalPromedio).toLocaleString('es-CO')}</td>
-			  <td style="padding:8px;text-align:right;font-size:0.75rem;">$${totalGeneralSaldoEjec.toLocaleString('es-CO')}</td>
-			  <td class="col-detalle" style="padding:8px;text-align:right;font-size:0.75rem;">$${Math.round(totalGeneralTerminarVigencia).toLocaleString('es-CO')}</td>
-			  <td class="col-detalle" style="padding:8px;text-align:right;color:${totalGeneralSobraFalta >= 0 ? '#22c55e' : '#ef4444'} !important;font-size:0.75rem;">
-				${totalGeneralSobraFalta >= 0 ? '+' : '-'}$${Math.abs(totalGeneralSobraFalta).toLocaleString('es-CO')}
+			  <td class="num">$${fmt(totalGeneralAsignado)}</td>
+			  <td class="col-detalle num tenue">$${fmt(totalGeneralDicAnterior)}</td>
+			  ${totalesMes.map(v => `<td class="col-detalle num">$${fmt(v)}</td>`).join('')}
+			  <td class="num">$${fmt(totalGeneralTotalTramitado)}</td>
+			  <td class="col-detalle num">$${fmt(totalPromedio)}</td>
+			  <td class="num">$${fmt(totalGeneralSaldoEjec)}</td>
+			  <td class="col-detalle num">$${fmt(totalGeneralTerminarVigencia)}</td>
+			  <td class="col-detalle num" style="color:${totalGeneralSobraFalta >= 0 ? 'var(--ok, #16a34a)' : 'var(--peligro, #dc2626)'} !important;">
+				${totalGeneralSobraFalta >= 0 ? '+' : '-'}$${fmt(Math.abs(totalGeneralSobraFalta))}
 			  </td>
-			  <td style="padding:8px;text-align:right;font-size:0.75rem;">${totalPorcentajeEjec.toFixed(1)}%</td>
+			  <td class="num">${totalPorcentajeEjec.toFixed(1)}%</td>
 			  <td></td>
 			</tr>
 		  `;
 
-		  if (totalAsignadoEl) totalAsignadoEl.textContent = `$${totalGeneralAsignado.toLocaleString('es-CO')}`;
-		  if (totalEjecutadoEl) totalEjecutadoEl.textContent = `$${totalGeneralTotalTramitado.toLocaleString('es-CO')}`;
+		  if (totalAsignadoEl) totalAsignadoEl.textContent = `$${fmt(totalGeneralAsignado)}`;
+		  if (totalEjecutadoEl) totalEjecutadoEl.textContent = `$${fmt(totalGeneralTotalTramitado)}`;
 		  if (porcentajeEjecucionEl) porcentajeEjecucionEl.textContent = `${totalPorcentajeEjec.toFixed(1)}%`;
-		  if (saldoDisponibleEl) saldoDisponibleEl.textContent = `$${totalGeneralSaldoEjec.toLocaleString('es-CO')}`;
+		  if (saldoDisponibleEl) saldoDisponibleEl.textContent = `$${fmt(totalGeneralSaldoEjec)}`;
 
 		  const mesActual = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'][new Date().getMonth()];
 		  if (mesActualEl) mesActualEl.textContent = mesActual;
@@ -7311,11 +7295,13 @@ input.search-bar {
 			contadorFilasEl.textContent = `(${filas.length} registro${filas.length !== 1 ? 's' : ''})`;
 		  }
 
+		  // ✅ Las proyecciones usan las mismas filas visibles que la tabla
+		  const filtroProyeccion = new Set(filas.map(f => `${f.unidad}|${f.servicio}`));
 		  if (proyeccionMensualEl) {
-			proyeccionMensualEl.textContent = `$${calcularProyeccionMensual().toLocaleString('es-CO')}`;
+			proyeccionMensualEl.textContent = `$${calcularProyeccionMensual(filtroProyeccion).toLocaleString('es-CO')}`;
 		  }
 		  if (proyeccionAnualEl) {
-			proyeccionAnualEl.textContent = `$${calcularProyeccionAnual().toLocaleString('es-CO')}`;
+			proyeccionAnualEl.textContent = `$${calcularProyeccionAnual(filtroProyeccion).toLocaleString('es-CO')}`;
 		  }
 
 			const ipcSelect = document.getElementById('selectIPC');
@@ -7330,8 +7316,72 @@ input.search-bar {
 		  generarGraficosSaldos(filas, datosCalculados);
 		}
 	
+
+	// ===== Utilidades de seguridad y validación para Saldos =====
+	function escapeHtml(valor) {
+	  return String(valor ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+	}
+
+	// Índice "unidad|Servicio|MES" → texto del problema, a partir de los
+	// registros importados que traen celdas con error o texto no numérico.
+	function construirIndiceProblemasSaldos() {
+	  const indice = {};
+	  const agregar = (clave, texto) => { indice[clave] = indice[clave] ? indice[clave] + ' · ' + texto : texto; };
+	  const camposServicio = {
+		energia: { ENERGIA: 'Energía', energia: 'Energía', A_PUBLICO: 'Alumbrado Público', aPublico: 'Alumbrado Público', aseo: 'Alcantarillado' },
+		acueducto: { acueducto: 'Acueducto', alcantarillado: 'Alcantarillado', aseo: 'Alcantarillado' }
+	  };
+	  ['energia', 'acueducto'].forEach(serv => {
+		Object.entries(appData[serv] || {}).forEach(([unidad, meses]) => {
+		  Object.entries(meses || {}).forEach(([mes, filas]) => {
+			(Array.isArray(filas) ? filas : []).forEach(r => {
+			  (r._problemas || []).forEach(p => {
+				const servicio = camposServicio[serv][p.campo];
+				if (!servicio) return;
+				agregar(`${unidad}|${servicio}|${mes}`, `Cuenta ${r.CUENTA}: valor no numérico "${p.texto}" en la matriz (se tomó como 0)`);
+			  });
+			});
+		  });
+		});
+	  });
+	  return indice;
+	}
+
+	const ETIQUETAS_AVISO = {
+	  mes_corregido: 'Rótulo de mes corregido', rotulo_no_reconocido: 'Bloque sin mes válido', bloque_sin_mes: 'Bloque sin mes válido',
+	  fila_sin_cuenta: 'Fila sin cuenta', cuenta_no_mapeada: 'Cuenta sin unidad', valor_invalido: 'Valor no numérico',
+	  cuenta_duplicada: 'Cuenta repetida', mes_repetido: 'Mes repetido', columna_faltante: 'Columna faltante',
+	  error_lectura: 'Error de lectura', hoja_no_mes: 'Hoja no reconocida'
+	};
+
+	function renderAvisosImportacion() {
+	  const panel = document.getElementById('avisosImportacionPanel');
+	  if (!panel) return;
+	  const avisos = window.avisosImportacion || [];
+	  if (!avisos.length) { panel.hidden = true; panel.innerHTML = ''; return; }
+	  const graves = avisos.filter(a => a.tipo !== 'mes_corregido').length;
+	  panel.hidden = false;
+	  panel.classList.toggle('avisos-graves', graves > 0);
+	  panel.innerHTML = `
+		<details ${graves > 0 ? 'open' : ''}>
+		  <summary>
+			<i class="fas fa-triangle-exclamation" aria-hidden="true"></i>
+			<strong>Validación de la importación:</strong> ${avisos.length} aviso${avisos.length !== 1 ? 's' : ''}
+			<span class="avisos-sub">Revise y corrija la matriz de origen; los datos afectados están señalados en la tabla.</span>
+		  </summary>
+		  <ul class="avisos-lista">
+			${avisos.map(a => `
+			  <li>
+				<span class="aviso-tipo aviso-${escapeHtml(a.tipo)}">${escapeHtml(ETIQUETAS_AVISO[a.tipo] || a.tipo)}</span>
+				<span class="aviso-ubicacion">${escapeHtml([a.archivo, a.hoja, a.fila ? 'fila ' + a.fila : ''].filter(Boolean).join(' · '))}</span>
+				<span class="aviso-texto">${escapeHtml(a.mensaje)}</span>
+			  </li>`).join('')}
+		  </ul>
+		</details>`;
+	}
+
 	// ========== FUNCIÓN PARA CONFIRMAR ELIMINACIÓN DE PRESUPUESTO ==========
-	function confirmarEliminacion() {
+	async function confirmarEliminacion() {
 	  if (!registroEditando) {
 		showNotification('⚠️ No hay registro seleccionado para eliminar', 'error');
 		document.getElementById('modalEliminar').style.display = 'none';
@@ -7339,40 +7389,36 @@ input.search-bar {
 	  }
 
 	  const { unidad, servicio } = registroEditando;
+	  const btn = document.getElementById('btnConfirmarEliminar');
+	  if (btn) { btn.disabled = true; btn.textContent = 'Eliminando…'; }
 
 	  try {
-		// Eliminar del objeto local
-		if (appData.saldos[unidad]?.[servicio]) {
-		  delete appData.saldos[unidad][servicio];
-		  localStorage.setItem('appDataSaldos', JSON.stringify(appData.saldos));
-
-		  // ✅ Eliminar en Supabase (si está disponible)
-		  if (window.supabaseClient) {
-			window.supabaseClient
-			  .from('saldos_presupuestales')
-			  .delete()
-			  .match({ unidad, servicio })
-			  .then(({ error }) => {
-				if (error) {
-				  console.warn('⚠️ No se pudo eliminar en Supabase:', error);
-				}
-			  });
-		  }
-
-		  showNotification(`✅ Registro eliminado: ${servicio} (${unidad.toUpperCase()})`, 'success');
-		  renderTablaSaldos();
-		} else {
+		if (!appData.saldos[unidad]?.[servicio]) {
 		  showNotification('❌ Registro no encontrado', 'error');
+		  return;
 		}
+		// ✅ Primero en la nube: si falla, el registro local se conserva y se informa
+		if (window.supabaseClient) {
+		  const { error } = await window.supabaseClient
+			.from('saldos_presupuestales')
+			.delete()
+			.match({ unidad, servicio });
+		  if (error) throw error;
+		}
+		delete appData.saldos[unidad][servicio];
+		localStorage.setItem('appDataSaldos', JSON.stringify(appData.saldos));
+		showNotification(`✅ Registro eliminado: ${servicio} (${unidad.toUpperCase()})`, 'success');
+		renderTablaSaldos();
 	  } catch (error) {
 		console.error('❌ Error al eliminar registro:', error);
-		showNotification('❌ Error al eliminar el registro', 'error');
+		showNotification(`❌ No se pudo eliminar en la nube: ${error.message || error}. El registro se conserva.`, 'error', 5000);
 	  } finally {
+		if (btn) { btn.disabled = false; btn.textContent = 'Eliminar'; }
 		document.getElementById('modalEliminar').style.display = 'none';
 		registroEditando = null;
 	  }
 	}
-	
+
 	// ========== BORRAR TODOS LOS DATOS DE SALDOS (RESET ANUAL) ==========
 	async function borrarTodosLosDatosSaldos() {
 	  if (!isAdminMode) {
@@ -7427,13 +7473,24 @@ input.search-bar {
         const section = this.getAttribute('data-section');
         showSection(section);
       });
+      // ✅ Navegación con teclado (Enter / Espacio)
+      link.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.click(); }
+      });
     });
 	
 	function showSection(section) {
+	  const destino = document.getElementById(section);
+	  const enlace = document.querySelector(`.nav-link[data-section="${section}"]`);
+	  if (!destino || !enlace) return;
 	  document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
-	  document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-	  document.getElementById(section).classList.add('active');
-	  document.querySelector(`[data-section="${section}"]`).classList.add('active');
+	  document.querySelectorAll('.nav-link').forEach(n => { n.classList.remove('active'); n.removeAttribute('aria-current'); });
+	  destino.classList.add('active');
+	  enlace.classList.add('active');
+	  enlace.setAttribute('aria-current', 'page');
+	  const modulo = document.getElementById('topbarModulo');
+	  if (modulo) modulo.textContent = enlace.textContent.trim();
+	  window.scrollTo({ top: 0 });
   
 	  let service = null;
 	  if (['novedades', 'busqueda', 'estadisticas', 'graficos'].includes(section)) {
@@ -7447,37 +7504,13 @@ input.search-bar {
 
     // ========== TEMA POR SERVICIO ==========
     function applyServiceTheme(service = null) {
-	  const root = document.documentElement;
-	  const body = document.body;
-	  
-	  if (!service) {
-		// Color verde institucional por defecto
-		root.style.setProperty('--primary', 'linear-gradient(135deg, #06402b 0%, #0a5c3d 100%)');
-		root.style.setProperty('--primary-solid', '#06402b');
-		body.style.background = 'linear-gradient(135deg, #06402b 0%, #0a5c3d 100%)';
-		body.style.backgroundAttachment = 'fixed';
-		document.getElementById('topbar').className = 'topbar';
-		return;
-	  }
-	  
-	  if (service === 'energia') {
-		root.style.setProperty('--primary', 'var(--primary-energia)');
-		root.style.setProperty('--primary-solid', 'var(--primary-energia-solid)');
-		body.style.background = 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)';
-		body.style.backgroundAttachment = 'fixed';
-	  } else if (service === 'acueducto') {
-		root.style.setProperty('--primary', 'var(--primary-acueducto)');
-		root.style.setProperty('--primary-solid', 'var(--primary-acueducto-solid)');
-		body.style.background = 'linear-gradient(135deg, #20bf6b 0%, #0575e6 100%)';
-		body.style.backgroundAttachment = 'fixed';
-	  } else if (service === 'gas') {
-		root.style.setProperty('--primary', 'var(--primary-gas)');
-		root.style.setProperty('--primary-solid', 'var(--primary-gas-solid)');
-		body.style.background = 'linear-gradient(135deg, #f5af19 0%, #f12711 100%)';
-		body.style.backgroundAttachment = 'fixed';
-	  }
-	  
-	  document.getElementById('topbar').className = 'topbar';
+	  // El servicio activo solo cambia el color de acento (botones y resaltados);
+	  // el fondo de la página permanece neutro para no saturar la vista.
+	  const servicio = ['energia', 'acueducto', 'gas'].includes(service) ? service : '';
+	  if (servicio) document.body.setAttribute('data-servicio', servicio);
+	  else document.body.removeAttribute('data-servicio');
+	  const topbar = document.getElementById('topbar');
+	  if (topbar) topbar.className = 'topbar';
 	}
 
 	 // ========== UTILIDADES UI ==========
@@ -7781,9 +7814,20 @@ input.search-bar {
 		  return new File([blob], nombre, { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 		});
 
-		const archivos = await Promise.all(promesas);
+		const resultados = await Promise.allSettled(promesas);
+		const archivos = resultados.filter(r => r.status === 'fulfilled').map(r => r.value);
+		const fallidos = nombresArchivos.filter((_, i) => resultados[i].status === 'rejected');
+		if (archivos.length === 0) throw new Error('No se pudo descargar ninguna matriz desde la nube');
 		await handleFiles(archivos);
-		showNotification('✅ Archivos descargados y procesados desde la nube', 'success', 3000);
+		if (fallidos.length) {
+		  // Un archivo ausente NO equivale a datos en $0: se informa explícitamente
+		  registrarAvisosImportacion(fallidos.map(nombre => ({ tipo: 'error_lectura', archivo: nombre,
+			mensaje: 'No se pudo descargar el archivo desde la nube. Sus datos no están incluidos en esta sesión.' })));
+		  renderAvisosImportacion();
+		  showNotification(`⚠️ Se procesaron ${archivos.length} de ${nombresArchivos.length} matrices. Falló: ${fallidos.join(', ')}`, 'warning', 8000);
+		} else {
+		  showNotification(`✅ ${archivos.length} matrices descargadas y procesadas desde la nube`, 'success', 3000);
+		}
 	  } catch (error) {
 		console.error('❌ Error al cargar desde Supabase Storage:', error);
 		showNotification(`❌ Error: ${error.message}`, 'error', 5000);
@@ -7856,6 +7900,7 @@ input.search-bar {
 		const fileArray = Array.from(files);
 		let processedCount = 0;
 		const timestampCarga = new Date().toISOString();
+		window.avisosImportacion = []; // reporte de validación de esta carga
 
 		const processPromises = fileArray.map(async (file) => {
 		  try {
@@ -7878,16 +7923,23 @@ input.search-bar {
 			console.log(`✅ Archivo procesado: ${fileName} (${processedCount}/${fileArray.length})`);
 		  } catch (error) {
 			console.error(`❌ Error procesando ${file.name}:`, error);
+			registrarAvisosImportacion([{ tipo: 'error_lectura', archivo: file.name,
+			  mensaje: `No se pudo leer el archivo: ${error.message}` }]);
 			showNotification(`Error al procesar ${file.name}`, 'error');
 		  }
 		});
 
 		await Promise.all(processPromises);
-		
+
 		if (processedCount > 0) {
 		  updateSummary(); // Esto llama a updateTramitacionGrid
 		  inicializarEstructuraSaldosDesdeDatos();
 		  renderTablaSaldos();
+		}
+		renderAvisosImportacion();
+		const nAvisos = window.avisosImportacion.length;
+		if (nAvisos > 0) {
+		  showNotification(`⚠️ La importación generó ${nAvisos} aviso(s) de validación. Revísalos en Saldos Presupuestales.`, 'warning', 6000);
 		}
 	  } catch (error) {
 		console.error('❌ Error general:', error);
@@ -8325,231 +8377,126 @@ input.search-bar {
 	  results.flat().forEach(result => {
 		if (result && result.data) {
 		  const targetUnit = result.unit;
-		  if (!appData[service][targetUnit][result.sheetName]) {
-			appData[service][targetUnit][result.sheetName] = [];
+		  // ✅ La hoja se guarda con el nombre canónico del mes ("Septiembre ",
+		  // "SETIEMBRE" o "SEPTEIMBRE" → "SEPTIEMBRE") para que Saldos la encuentre.
+		  const det = GubirImport.detectarMes(result.sheetName);
+		  const mesKey = det ? det.mes : result.sheetName;
+		  if (det && !det.exacto && GubirImport.normalizarTexto(result.sheetName) !== det.mes) {
+			registrarAvisosImportacion([{ tipo: 'mes_corregido', archivo: filename, hoja: result.sheetName, mes: det.mes,
+			  mensaje: `La hoja "${result.sheetName}" se interpretó como ${det.mes}. Corrija el nombre de la hoja.` }]);
+		  } else if (!det) {
+			registrarAvisosImportacion([{ tipo: 'hoja_no_mes', archivo: filename, hoja: result.sheetName,
+			  mensaje: `La hoja "${result.sheetName}" no corresponde a un mes; sus datos no se incluyen en Saldos.` }]);
 		  }
-		  appData[service][targetUnit][result.sheetName] = result.data;
+		  if (!appData[service][targetUnit]) appData[service][targetUnit] = {};
+		  appData[service][targetUnit][mesKey] = result.data;
 		  console.log(`✅ Procesada hoja ${result.sheetName} -> ${service.toUpperCase()} / ${targetUnit.toUpperCase()}: ${result.data.length} registros`);
 		}
 	  });
 	}
 	
-	async function processAsturiasNusefaFile(filename, workbook, timestampCarga) {
-			console.log(`✅ Procesando archivo ASTURIAS/NUSEFA: ${filename}`);
+	// ========== BIESO / ASTURIAS / NUSEFA ==========
+	// La matriz "8- BIESO Y ASTURIAS" organiza cada hoja (ENERGIA, ACUEDUCTO) en
+	// bloques mensuales: rótulo del mes → encabezado → filas por cuenta.
+	// La lectura de bloques, meses y montos vive en js/importador.js
+	// (GubirImport.parsearMatrizPorBloques), donde está cubierta por pruebas.
+	const CUENTAS_BIESO_ASTURIAS = {
+	  energia:   { '214262': 'nusefa', '1085817': 'asturias', '1085818': 'asturias', '1136898': 'asturias' },
+	  acueducto: { '039806': 'nusefa', '39806': 'nusefa', '122860': 'asturias' }
+	};
 
-			// --- DEFINICIÓN DE CUENTAS ---
-			const NUSEFA_ENERGIA_ACCOUNTS = new Set(['214262']);
-			const ASTURIAS_ENERGIA_ACCOUNTS = new Set(['1085817', '1085818', '1136898']);
-			const NUSEFA_ACUEDUCTO_ACCOUNTS = new Set(['039806', '39806']);
-			const ASTURIAS_ACUEDUCTO_ACCOUNTS = new Set(['122860']);
+	function construirConfigBieso(servicio, sheetName, timestampCarga) {
+	  const comunes = {
+		cuenta: ['cuenta', 'numero cuenta', 'no cuenta', 'cta', 'n° cuenta', 'no. cuenta'],
+		estacion: ['estacion', 'estación', 'predio', 'nombre', 'dependencia'],
+		factura: ['factura', 'n° factura', 'numero factura', 'no factura'],
+		aseo: ['aseo', 'servicio aseo'],
+		tramitar: ['total a tramitar', 'total tramite', 'tramitar', 'a tramitar', 'total tramitar'],
+		intereses: ['intereses', 'intereses y/o saldos', 'saldos', 'mora'],
+		direccion: ['direccion', 'dirección', 'dir'],
+		radicado: ['comunicación oficial', 'comunicacion oficial', 'comunicado', 'radicado', 'comunicado o radicado']
+	  };
+	  const mapeoColumnas = servicio === 'energia'
+		? { ...comunes, kwh: ['kw/h', 'kwh', 'kw / h', 'kilowatios'], energia: ['energia', 'valor energia', 'consumo'],
+			aPublico: ['a. publico', 'a.publico', 'alumbrado publico', 'alumbrado público', 'a publico'] }
+		: { ...comunes, m3: ['m3', 'm³', 'm 3'], acueducto: ['acueducto', 'agua'], alcantarillado: ['alcantarillado', 'alcant'] };
+	  const camposMonetarios = servicio === 'energia'
+		? ['energia', 'aPublico', 'aseo', 'tramitar', 'intereses']
+		: ['acueducto', 'alcantarillado', 'aseo', 'tramitar', 'intereses'];
+	  const cuentas = CUENTAS_BIESO_ASTURIAS[servicio];
 
-			const MESES = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
-
-			// Asegurar que las estructuras existan
-			['nusefa', 'asturias'].forEach(u => {
-				if (!appData.energia[u]) appData.energia[u] = {};
-				if (!appData.acueducto[u]) appData.acueducto[u] = {};
-			});
-
-			for (const sheetName of workbook.SheetNames) {
-				const sheetUpper = sheetName.toUpperCase().trim();
-
-				// ✅ Solo procesar ENERGIA y ACUEDUCTO
-				if (sheetUpper !== 'ENERGIA' && sheetUpper !== 'ACUEDUCTO') {
-					console.log(`⚠️ Hoja ignorada: "${sheetName}"`);
-					continue;
-				}
-
-				const currentService = sheetUpper === 'ENERGIA' ? 'energia' : 'acueducto';
-
-				const COLUMN_MAPPING = sheetUpper === 'ENERGIA' ? {
-					cuenta: ['cuenta', 'numero cuenta', 'no cuenta', 'cta', 'n° cuenta', 'no. cuenta'],
-					estacion: ['estacion', 'estación', 'predio', 'nombre', 'dependencia'],
-					factura: ['factura', 'n° factura', 'numero factura', 'no factura'],
-					kwh: ['kw/h', 'kwh', 'kw / h', 'kilowatios'],
-					energia: ['energia', 'consumo', 'valor energia'],
-					aPublico: ['a. publico', 'a.publico', 'alumbrado publico', 'alumbrado público', 'a publico', 'publico'],
-					aseo: ['aseo', 'servicio aseo'],
-				    tramitar: ['total a tramitar', 'tramitar', 'a tramitar', 'total tramitar'],
-					intereses: ['intereses', 'int', 'saldos', 'mora', 'intereses y/o saldos'],
-					direccion: ['direccion', 'dirección', 'dir'],
-					radicado: ['comunicado', 'radicado', 'comunicado o radicado', 'rad', 'com']
-				} : {
-					cuenta: ['cuenta', 'numero cuenta', 'no cuenta', 'cta', 'n° cuenta', 'no. cuenta'],
-					estacion: ['estacion', 'estación', 'predio', 'nombre', 'dependencia'],
-					factura: ['factura', 'n° factura', 'numero factura', 'no factura'],
-					m3: ['m3', 'm³', 'm 3'],
-					acueducto: ['acueducto', 'agua'],
-					alcantarillado: ['alcantarillado', 'alcant'],
-					aseo: ['aseo', 'servicio aseo'],
-					tramitar: ['total tramite', 'total a tramitar', 'tramitar', 'a tramitar', 'total tramitar'],
-					intereses: ['intereses', 'int', 'saldos', 'mora', 'intereses y/o saldos'],
-					direccion: ['direccion', 'dirección', 'dir'],
-					radicado: ['comunicado', 'radicado', 'comunicado o radicado', 'rad', 'com']
-				};
-
-				try {
-					const worksheet = workbook.Sheets[sheetName];
-					const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
-					const maxRows = Math.min(range.e.r + 1, 2000);
-
-					let currentMes = null;   // Mes del bloque que se está leyendo actualmente
-					let colMap = null;       // Mapeo de columnas del bloque actual (se reinicia en cada nuevo mes)
-					let headers = [];
-
-					for (let r = 0; r < maxRows; r++) {
-						const row = [];
-						for (let c = range.s.c; c <= range.e.c; c++) {
-							const cell = worksheet[XLSX.utils.encode_cell({ r, c })];
-							row.push(cell ? String(cell.v ?? '').trim() : '');
-						}
-
-						const firstCell = row[0].toUpperCase().trim();
-
-						// ✅ ¿Esta fila es un rótulo de mes? → inicia un nuevo bloque
-						if (MESES.some(m => firstCell === m)) {
-							currentMes = firstCell;
-							colMap = null; // Forzar a buscar de nuevo el encabezado dentro de este bloque
-							continue;
-						}
-
-						if (!currentMes) continue; // Aún no hemos visto ningún mes: ignorar filas previas al primero
-
-						// ✅ ¿Esta fila es el encabezado del bloque actual?
-						if (!colMap) {
-							const hasKey = row.some(cell => {
-								const lower = cell.toLowerCase();
-								return lower.includes('cuenta') || lower.includes('estacion') || lower.includes('estación') || lower.includes('factura');
-							});
-							if (hasKey) {
-								headers = row;
-								colMap = {};
-								for (const [key, patterns] of Object.entries(COLUMN_MAPPING)) {
-									colMap[key] = -1;
-									for (let i = 0; i < headers.length; i++) {
-										const headerLower = headers[i].toLowerCase().trim();
-										if (patterns.some(p => headerLower === p.toLowerCase() || headerLower.includes(p.toLowerCase()))) {
-											colMap[key] = i;
-											break;
-										}
-									}
-								}
-							}
-							continue;
-						}
-
-						// ✅ Fila de datos dentro del bloque actual
-						const cuenta = colMap.cuenta >= 0 ? row[colMap.cuenta] : '';
-						const estacion = colMap.estacion >= 0 ? row[colMap.estacion] : '';
-
-						if (!isValidCuenta(cuenta)) continue; // fila de subtotal/vacía → se ignora sin romper el bloque
-
-						const upperEstacion = estacion.toUpperCase();
-						if (upperEstacion.includes('TOTAL') || upperEstacion.includes('SUBTOTAL') ||
-							upperEstacion.includes('PROMEDIO') || upperEstacion.includes('SUMATORIA')) {
-							continue;
-						}
-
-						// Determinar unidad según el número de cuenta
-						let unidad = null;
-						if (currentService === 'energia') {
-							if (NUSEFA_ENERGIA_ACCOUNTS.has(cuenta)) unidad = 'nusefa';
-							else if (ASTURIAS_ENERGIA_ACCOUNTS.has(cuenta)) unidad = 'asturias';
-						} else {
-							if (NUSEFA_ACUEDUCTO_ACCOUNTS.has(cuenta)) unidad = 'nusefa';
-							else if (ASTURIAS_ACUEDUCTO_ACCOUNTS.has(cuenta)) unidad = 'asturias';
-						}
-
-						if (!unidad) {
-							console.warn(`⚠️ Cuenta no mapeada: ${cuenta} en hoja ${sheetName}, mes ${currentMes}`);
-							continue;
-						}
-
-						// Construir el registro según el servicio
-						let record;
-						if (currentService === 'energia') {
-							const kwh = cleanAndParseFloat(row[colMap.kwh]);
-							const energiaVal = cleanAndParseFloat(row[colMap.energia]);
-							const aPublico = cleanAndParseFloat(row[colMap.aPublico]);
-							const aseo = cleanAndParseFloat(row[colMap.aseo]);
-							const tramitar = cleanAndParseFloat(row[colMap.tramitar]);
-							const intereses = cleanAndParseFloat(row[colMap.intereses]);
-
-							const factura = colMap.factura >= 0 ? String(row[colMap.factura]).trim() : '';
-							const direccion = colMap.direccion >= 0 ? row[colMap.direccion] : '';
-							const radicado = colMap.radicado >= 0 ? String(row[colMap.radicado]).trim() : '';
-							record = {
-								ESTACION: estacion,
-								CUENTA: cuenta,
-								FACTURA: factura,
-								RADICADO: radicado,
-								CONSUMO: kwh,
-								CONSUMO_VALOR: energiaVal,
-								ENERGIA: energiaVal,
-								A_PUBLICO: aPublico,
-								ASEO: aseo,
-								TOTAL_TRAMITAR: tramitar,
-								INTERESES: intereses,
-								TOTAL_FACTURA: tramitar + intereses,
-								DIRECCION: direccion,
-								_timestamp_carga: timestampCarga
-							};
-						} else {
-							const m3 = cleanAndParseFloat(row[colMap.m3]);
-							const acueductoVal = cleanAndParseFloat(row[colMap.acueducto]);
-							const alcantarillado = cleanAndParseFloat(row[colMap.alcantarillado]);
-							const aseo = cleanAndParseFloat(row[colMap.aseo]);
-							const tramitar = cleanAndParseFloat(row[colMap.tramitar]);
-							const intereses = cleanAndParseFloat(row[colMap.intereses]);
-
-							const factura = colMap.factura >= 0 ? String(row[colMap.factura]).trim() : '';
-							const direccion = colMap.direccion >= 0 ? row[colMap.direccion] : '';
-							const radicado = colMap.radicado >= 0 ? String(row[colMap.radicado]).trim() : '';
-							record = {
-								ESTACION: estacion,
-								CUENTA: cuenta,
-								FACTURA: factura,
-								RADICADO: radicado,
-								CONSUMO: m3,
-								ACUEDUCTO: acueductoVal,
-								ALCANTARILLADO: alcantarillado,
-								ASEO: aseo,
-								TOTAL_TRAMITAR: tramitar,
-								INTERESES: intereses,
-								TOTAL_FACTURA: tramitar + intereses,
-								DIRECCION: direccion,
-								_timestamp_carga: timestampCarga
-							};
-						}
-
-						// ✅ Guardar en appData[servicio][unidad][MES], reemplazando si ya existía
-						// un registro de esa misma cuenta en ese mes (evita duplicados al recargar el archivo)
-						if (!appData[currentService][unidad][currentMes]) {
-							appData[currentService][unidad][currentMes] = [];
-						}
-						const existentes = appData[currentService][unidad][currentMes];
-						const idxExistente = existentes.findIndex(r => String(r.CUENTA).trim() === String(cuenta).trim());
-						if (idxExistente >= 0) {
-							existentes[idxExistente] = record;
-						} else {
-							existentes.push(record);
-						}
-					}
-
-					// ✅ Resumen por consola
-					['nusefa', 'asturias'].forEach(u => {
-						const meses = Object.keys(appData[currentService][u] || {});
-						if (meses.length > 0) {
-							console.log(`✅ ${sheetName} → ${currentService.toUpperCase()} / ${u.toUpperCase()}: ${meses.length} mes(es) cargados (${meses.join(', ')})`);
-						}
-					});
-
-				} catch (err) {
-					console.error(`❌ Error en hoja ${sheetName}:`, err);
-				}
-			}
+	  return {
+		hoja: sheetName,
+		mapeoColumnas,
+		camposMonetarios,
+		resolverUnidad: (cuenta) => cuentas[String(cuenta).trim()] || null,
+		construirRegistro: ({ fila, mapa, cuenta, estacion, montos, texto }) => {
+		  const col = (k) => (mapa[k] >= 0 ? texto(fila[mapa[k]]) : '');
+		  const consumo = mapa[servicio === 'energia' ? 'kwh' : 'm3'] >= 0
+			? GubirImport.parsearMonto(fila[mapa[servicio === 'energia' ? 'kwh' : 'm3']]).valor : 0;
+		  const tramitar = montos.tramitar.valor;
+		  const intereses = montos.intereses.valor;
+		  const base = {
+			ESTACION: estacion, CUENTA: cuenta, FACTURA: col('factura'), RADICADO: col('radicado'),
+			CONSUMO: consumo, ASEO: montos.aseo.valor, TOTAL_TRAMITAR: tramitar, INTERESES: intereses,
+			TOTAL_FACTURA: tramitar + intereses, DIRECCION: col('direccion'), _timestamp_carga: timestampCarga
+		  };
+		  return servicio === 'energia'
+			? { ...base, CONSUMO_VALOR: montos.energia.valor, ENERGIA: montos.energia.valor, A_PUBLICO: montos.aPublico.valor }
+			: { ...base, ACUEDUCTO: montos.acueducto.valor, ALCANTARILLADO: montos.alcantarillado.valor };
 		}
-		
+	  };
+	}
+
+	async function processAsturiasNusefaFile(filename, workbook, timestampCarga) {
+	  console.log(`✅ Procesando archivo ASTURIAS/NUSEFA: ${filename}`);
+	  const avisos = [];
+
+	  for (const sheetName of workbook.SheetNames) {
+		const hoja = GubirImport.normalizarTexto(sheetName);
+		if (hoja !== 'ENERGIA' && hoja !== 'ACUEDUCTO') {
+		  console.log(`⚠️ Hoja ignorada: "${sheetName}"`);
+		  continue;
+		}
+		const servicio = hoja === 'ENERGIA' ? 'energia' : 'acueducto';
+		try {
+		  const filas = GubirImport.leerFilasHoja(XLSX, workbook.Sheets[sheetName], 5000);
+		  const { datos, avisos: avisosHoja } = GubirImport.parsearMatrizPorBloques(
+			filas, construirConfigBieso(servicio, sheetName, timestampCarga)
+		  );
+		  avisosHoja.forEach(a => avisos.push({ ...a, archivo: filename, servicio }));
+
+		  // La matriz es la fuente completa de estas unidades: cada mes leído
+		  // reemplaza al anterior (idempotente al reimportar, sin duplicados).
+		  ['nusefa', 'asturias'].forEach(unidad => {
+			if (!appData[servicio][unidad]) appData[servicio][unidad] = {};
+			Object.entries(datos[unidad] || {}).forEach(([mes, registros]) => {
+			  appData[servicio][unidad][mes] = registros;
+			});
+			const meses = Object.keys(datos[unidad] || {});
+			if (meses.length) console.log(`✅ ${sheetName} → ${servicio.toUpperCase()} / ${unidad.toUpperCase()}: ${meses.join(', ')}`);
+		  });
+		} catch (err) {
+		  console.error(`❌ Error en hoja ${sheetName}:`, err);
+		  avisos.push({ tipo: 'error_lectura', archivo: filename, hoja: sheetName, servicio,
+			mensaje: `No se pudo leer la hoja ${sheetName}: ${err.message}` });
+		}
+	  }
+
+	  registrarAvisosImportacion(avisos);
+	  return avisos;
+	}
+
+	// ========== REPORTE DE VALIDACIÓN DE IMPORTACIÓN ==========
+	// Acumula los avisos de la última carga para mostrarlos al usuario en lugar
+	// de convertir silenciosamente un dato ilegible en $0.
+	window.avisosImportacion = window.avisosImportacion || [];
+	function registrarAvisosImportacion(avisos) {
+	  if (!Array.isArray(avisos) || !avisos.length) return;
+	  window.avisosImportacion.push(...avisos);
+	  avisos.forEach(a => console.warn(`⚠️ [${a.archivo || ''} · ${a.hoja || ''} fila ${a.fila || '-'}] ${a.mensaje}`));
+	}
+
 	// ========== IMPUESTO PREDIAL ==========
     async function processImpuestoPredialFile(filename, workbook, timestampCarga) {
 	  console.log(`✅ Procesando archivo de Impuesto Predial: ${filename}`);
@@ -8704,6 +8651,10 @@ input.search-bar {
 		'811045', '811046', '811048', '811044', '811051'
 	  ]);
 
+	  // La matriz de gas es la única fuente de ASTURIAS/gas: se reinicia antes de
+	  // acumular para que una segunda importación no duplique las tablas.
+	  appData.gas.asturias = [];
+
 	  ['MEBUC', 'DESAN', 'DEMAM'].forEach(unitName => {
 		if (workbook.Sheets[unitName]) {
 		  try {
@@ -8779,11 +8730,17 @@ input.search-bar {
       for (let i = 0; i < data.length; i++) {
         const row = data[i];
         const firstCell = String(row[0] || '').toUpperCase().trim();
-        if (months.some(m => firstCell.includes(m))) {
+        // ✅ Rótulo de mes tolerante a tildes, año o errores leves de digitación
+        const mesDetectado = firstCell ? GubirImport.detectarMes(firstCell) : null;
+        if (mesDetectado) {
           if (currentTable.length > 0 && headers) {
             tables.push({ mes: currentMonth, data: currentTable });
           }
-          currentMonth = firstCell;
+          if (!mesDetectado.exacto && GubirImport.normalizarTexto(firstCell) !== mesDetectado.mes) {
+            registrarAvisosImportacion([{ tipo: 'mes_corregido', archivo: 'GAS', hoja: '', fila: i + 1, mes: mesDetectado.mes,
+              mensaje: `El rótulo "${firstCell}" se interpretó como ${mesDetectado.mes}. Corrija la matriz de gas.` }]);
+          }
+          currentMonth = mesDetectado.mes;
           currentTable = [];
           headers = null;
           columnIndexes = {};
